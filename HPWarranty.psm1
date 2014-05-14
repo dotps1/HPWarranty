@@ -64,6 +64,7 @@
 .NOTES
     Requires PowerShell V4.0
     A valid serial number and computer model are required to establish the session.
+    Only one Registration Session needs to be established, the the Gdid and Token can be reused for the Excute-HPWarrantyLookup cmdlet.
     Credits to:
         StackOverFlow:OneLogicalMyth
         StackOverFlow:user3076063
@@ -275,8 +276,11 @@ function Execute-HPWarrantyLookup
                                 'WarrantyStandardEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[1]
                                 'WarrantyExtendedEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[0]
                            }
-
-    return $warranty
+    
+    if ($warranty -ne $null)
+    {
+        return $warranty
+    }
 }
 
 <#
@@ -373,6 +377,7 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
                                                                                     ProductNumber = $_["ProductNumber"]
                                                                                     ProductManufacturer = $_["ProductManufacturer"]
                                                                                     ProductModel = $_["ProductModel"]
+                                                                                    LastCommunicationTime = $_["LastCommunicationTime"]
                                                                                     }}
         }
     }
