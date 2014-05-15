@@ -12,7 +12,7 @@ The Invoke-SOAPRequst is not really used by a user, but it is used by the two ot
 
  
 
-Examples 1:
+Example 1:
 
 	# Execute from a local HP Workstation
 	Import-Module -Name HPWarranty; $reg = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token
@@ -43,7 +43,7 @@ Example 2:
 Example 3:
 
 	# Query a remote computer for information to create a session with the the HP Web Services.
-	# Remote WMI access is necessary to use this function.
+	# Remote WMI access is necessary to use this function remotely.
 	Import-Module -Name HPWarranty
 	
 	$reg = Invoke-HPWarrantyRegistrationRequest -ComputerName HPComputer.mydomain.org
