@@ -1,4 +1,4 @@
-﻿function Execute-SOAPRequest 
+﻿function Invoke-SOAPRequest 
 {
     [CmdletBinding()]
     [OutputType([Xml])]
@@ -58,9 +58,9 @@
 .DESCRIPTION
     Creates a session with HP ISEE Web Servies and returns the necassary information send Requests.
 .EXAMPLE
-    Execute-HPWarrantyRegistrationRequest
+    Invoke-HPWarrantyRegistrationRequest
 .EXAMPLE
-    Execute-HPWarrantyRegistrationRequest -SerialNumber ABCDE12345 -ProductModel "HP ProBook 645 G1"
+    Invoke-HPWarrantyRegistrationRequest -SerialNumber ABCDE12345 -ProductModel "HP ProBook 645 G1"
 .NOTES
     Requires PowerShell V4.0
     A valid serial number and computer model are required to establish the session.
@@ -78,7 +78,7 @@
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Execute-HPWarrantyRegistrationRequest
+function Invoke-HPWarrantyRegistrationRequest
 {
     [CmdletBinding()]
     [OutputType([PSObject])]
@@ -153,7 +153,7 @@ function Execute-HPWarrantyRegistrationRequest
 </SOAP-ENV:Envelope>
 "@
 
-    $registrationAction = Execute-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
+    $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
     [PSObject]$registration = @{
                                     'Gdid' = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.Gdid
@@ -168,9 +168,9 @@ function Execute-HPWarrantyRegistrationRequest
 .DESCRIPTION
     Retrives the start date, standard end date and extened end date warranty information for an Hewlett-Packard system.
 .EXAMPLE
-    $registration = Execute-HPWarrantyRegistrationRequest; Execute-HPWarrantyLookup -Gdid $registration.Gdid -Token $registration.Token
+    $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyLookup -Gdid $registration.Gdid -Token $registration.Token
 .EXAMPLE
-    $registration = Execute-HPWarrantyRegistrationRequest; Execute-HPWarrantyLookup -Gdid $registration.Gdid -Token $registration.Token -SerialNumber AABBCCD123 -ProductNumber F2R10UT#ABA
+    $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyLookup -Gdid $registration.Gdid -Token $registration.Token -SerialNumber AABBCCD123 -ProductNumber F2R10UT#ABA
 .NOTES
     Requires PowerShell V4.0
     A valid Gdid and Token are required to used this cmdlet.
@@ -187,7 +187,7 @@ function Execute-HPWarrantyRegistrationRequest
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Execute-HPWarrantyLookup
+function Invoke-HPWarrantyLookup
 {
     [CmdletBinding()]
     [OutputType([PSObject])]
@@ -268,7 +268,7 @@ function Execute-HPWarrantyLookup
 </SOAP-ENV:Envelope>
 "@
 
-    $entitlementAction = Execute-SOAPRequest -SOAPRequest $EntitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
+    $entitlementAction = Invoke-SOAPRequest -SOAPRequest $EntitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
 
     [PSObject]$warranty = @{
                                 'SerialNumber' = $SerialNumber
