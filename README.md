@@ -20,7 +20,7 @@ Example 1:
 Example 2:
 
 	# Create one session but look up multiple warranty's
-	Import-Module HPWarranty
+	Import-Module -name HPWarranty
 	
 	$HP1 = @{
 		'SerialNumber' = 'A1B2C3D4E5'
