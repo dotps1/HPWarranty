@@ -93,8 +93,26 @@ function Invoke-HPWarrantyRegistrationRequest
         # ProductModel, Type String, The product Model of the Hewlett-Packard System.
         [Parameter(Position=1)]
         [String]
-        $ProductModel=(Get-WmiObject -Class Win32_ComputerSystem).Model
+        $ProductModel=(Get-WmiObject -Class Win32_ComputerSystem).Model,
+
+        # ComputerName, Type String, The remote Hewlett-Packard Computer.
+        [Parameter(ParameterSetName='RemoteComputer')]
+        [String]
+        $ComputerName
     )
+    
+    if ($ComputerName)
+    {
+        try
+        {
+            $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
+            $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
+        }
+        catch
+        {
+            throw "Unable to retrieve WMI Information from $ComputerName."
+        }
+    }
 
 [Xml]$registrationSOAPRequest = @"
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:iseeReg="http://www.hp.com/isee/webservices/">
