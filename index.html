@@ -28,13 +28,14 @@
         </ul>
       </header>
       <section>
-        <p>This module contains four functions:
-Invoke-SOAPRequest
-Invoke-HPWarrantyRegistrationRequest
-Invoke-HPWarrantyLookup
-Get-HPComputerInformationForWarrantyRequestFromCCMDB</p>
+        <p>This module contains four functions:</p>
 
-<p>The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
+<ul>
+<li>Invoke-SOAPRequest</li>
+<li>Invoke-HPWarrantyRegistrationRequest</li>
+<li>Invoke-HPWarrantyLookup</li>
+<li>Get-HPComputerInformationForWarrantyRequestFromCCMDB</li>
+</ul><p>The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
 
 <ol>
 <li> A Session needs to be established with their Web Services, this is done by using the Invoke-HPWarrantyRegistrationRequest.  You need a valid SerialNumber and Product Model to do this.  If successful, it will return a Gdid and a Session Token, that then needs to be passed to the Invoke-HPWarrantyLookup.</li>
