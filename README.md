@@ -65,7 +65,7 @@ Example 4:
 	
 Example 5:
 
-	# Hashtables are a little tricky to export to CSV, your have to build new Objects; so here is how I run my build date report:
+	# Hashtables are a little tricky to export to CSV, you have to build new Objects; so here is how I run my build date report:
 	Import-Module -Name HPWarranty
 	
 	$reg = Invoke-HPWarrantyRegistrationRequest
