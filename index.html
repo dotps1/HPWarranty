@@ -1,33 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>HPWarranty by PowerShellSith</title>
 
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
-    <title>Hpwarranty by PowerShellSith</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
-
   <body>
+    <div class="wrapper">
+      <header>
+        <h1>HPWarranty</h1>
+        <p>PowerShell module to help retrieve Hewlett-Packard Warranty Information</p>
 
-    <header>
-      <div class="container">
-        <h1>Hpwarranty</h1>
-        <h2>PowerShell module to help retrieve Hewlett-Packard Warranty Information</h2>
+        <p class="view"><a href="https://github.com/PowerShellSith/HPWarranty">View the Project on GitHub <small>PowerShellSith/HPWarranty</small></a></p>
 
-        <section id="downloads">
-          <a href="https://github.com/PowerShellSith/HPWarranty/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/PowerShellSith/HPWarranty/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/PowerShellSith/HPWarranty" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
-    </header>
 
-    <div class="container">
-      <section id="main_content">
+        <ul>
+          <li><a href="https://github.com/PowerShellSith/HPWarranty/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/PowerShellSith/HPWarranty/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/PowerShellSith/HPWarranty">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
         <p>This module contains four functions:
 Invoke-SOAPRequest
 Invoke-HPWarrantyRegistrationRequest
@@ -49,7 +49,7 @@ Import-Module -Name HPWarranty; $reg = Invoke-HPWarrantyRegistrationRequest; Inv
 <p>Example 2:</p>
 
 <pre><code># Create one session but look up multiple warranty's
-Import-Module -name HPWarranty
+Import-Module -Name HPWarranty
 
 $HP1 = @{
     'SerialNumber' = 'A1B2C3D4E5'
@@ -88,15 +88,37 @@ Import-Module -Name HPWarranty
 
 $reg = Invoke-HPWarrantyRegistrationRequest -SeralNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
 
-$HPs = Get-HPComputerInformationForWarrantyRequestFromCCMDB -Server MySccmDBServer -Database CM_MS1 -IntergratedSecurity
+$HPs = Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity
 foreach ($HP in $HPs)
 {
      Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP.SerialNumber -ProductNumber $HP.ProductNumber
 }
 </code></pre>
-      </section>
-    </div>
 
+<p>Example 5:</p>
+
+<pre><code># Hashtables are a little tricky to export to CSV, you have to build new Objects; so here is how I run my build date report:
+Import-Module -Name HPWarranty
+
+$reg = Invoke-HPWarrantyRegistrationRequest
+
+# Not sure if you can line break the New-Object properties on the ';' may need to append backticks '`', or do it all in one line.
+Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity |
+    %{ New-Object -TypeName PSObject -Property @{ 'ComputerName' = $_.ComputerName; 
+                                                  'SerialNumber' = $_.SerialNumber; 
+                                                  'ProductModel' = $_.ProductModel; 
+                                                  'LastHardwareScan' = Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd';
+                                                  'Username' = $_.Username;
+                                                  'BuildDate' = (Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductNumber $_.ProductNumber).WarrantyStartDate } |
+    Export-Csv C:\HPBuildReport.csv -NoTypeInformation -Append }
+</code></pre>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/PowerShellSith">PowerShellSith</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
     
   </body>
 </html>
