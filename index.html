@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Hpwarranty by PowerShellSith</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Hpwarranty</h1>
+        <p>PowerShell module to help retrieve Hewlett-Packard Warranty Information</p>
+
+        <p class="view"><a href="https://github.com/PowerShellSith/HPWarranty">View the Project on GitHub <small>PowerShellSith/HPWarranty</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/PowerShellSith/HPWarranty/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/PowerShellSith/HPWarranty/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/PowerShellSith/HPWarranty">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>This module contains four functions:
+Invoke-SOAPRequest
+Invoke-HPWarrantyRegistrationRequest
+Invoke-HPWarrantyLookup
+Get-HPComputerInformationForWarrantyRequestFromCCMDB</p>
+
+<p>The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
+
+<ol>
+<li> A Session needs to be established with their Web Services, this is done by using the Invoke-HPWarrantyRegistrationRequest.  You need a valid SerialNumber and Product Model to do this.  If successful, it will return a Gdid and a Session Token, that then needs to be passed to the Invoke-HPWarrantyLookup.</li>
+<li> Using the Gdid and the Token from step 1, and a valid SerialNumber and ProductNumber you can request the information for that device, returning the SerialNumber,WarrantyStartDate,WarrantyStandardEndDate, and WarrantyExtendedEndDate.  (The return SOAP Envelop contains much more information, but that is was I parse and return).</li>
+<li> You can reuse the Gdid and Token from step one in a foreach loop to retrieve multiple warranty objects.  That is why I created the Get-HPComputerInformationForWarrantyRequestFromCCMDB.  If you configure your SCCM Client to inventory the MS_SystemInformation WMI Class (Found in the root namespace, not in CIMV2, root\MS_SystemInformation) you can then use this function to return form the CM_ database an array of objects containing the information needed to complete all actions.  SerialNumber,ProductModel,ProductNumber,ProductManufacturer.</li>
+</ol><p>Example 1:</p>
+
+<pre><code># Execute from a local HP Workstation
+Import-Module -Name HPWarranty; $reg = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token
+</code></pre>
+
+<p>Example 2:</p>
+
+<pre><code># Create one session but look up multiple warranty's
+Import-Module -name HPWarranty
+
+$HP1 = @{
+    'SerialNumber' = 'A1B2C3D4E5'
+    'ProductModel' = 'HP Laptop 100 G1'
+    'ProductNumber' = '123ABC'
+}
+
+$HP2 = @{
+    'SerialNumber' = '12345ABCDE'
+    'ProductModel' = 'HP Desktop 1100 G1'
+    'ProductNumber' = 'ABC123'
+}
+
+# Use either HP1 or HP2 properties to establish a session with the HP Web Services.
+$reg = Invoke-HPWarrantyRegistrationRequest -SerialNumber $HP1.SerialNumber -ProductModel $HP1.ProductModel
+
+Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP1.SerialNumber -ProductNumber $HP1.ProductNumber
+Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP2.SerialNumber -ProductNumber $HP2.ProductNumber
+</code></pre>
+
+<p>Example 3:</p>
+
+<pre><code># Query a remote computer for information to create a session with the the HP Web Services.
+# Remote WMI access is necessary to use this function remotely.
+Import-Module -Name HPWarranty
+
+$reg = Invoke-HPWarrantyRegistrationRequest -ComputerName HPComputer.mydomain.org
+
+Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -ComputerName HPComputer.mydomain.org
+</code></pre>
+
+<p>Example 4:</p>
+
+<pre><code># Execute with information from ConfigMgr Database:
+Import-Module -Name HPWarranty
+
+$reg = Invoke-HPWarrantyRegistrationRequest -SeralNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
+
+$HPs = Get-HPComputerInformationForWarrantyRequestFromCCMDB -Server MySccmDBServer -Database CM_MS1 -IntergratedSecurity
+foreach ($HP in $HPs)
+{
+     Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP.SerialNumber -ProductNumber $HP.ProductNumber
+}
+</code></pre>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/PowerShellSith">PowerShellSith</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
