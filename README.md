@@ -20,7 +20,7 @@ Example 1:
 Example 2:
 
 	# Create one session but look up multiple warranty's
-	Import-Module -name HPWarranty
+	Import-Module -Name HPWarranty
 	
 	$HP1 = @{
 		'SerialNumber' = 'A1B2C3D4E5'
@@ -57,8 +57,26 @@ Example 4:
 
 	$reg = Invoke-HPWarrantyRegistrationRequest -SeralNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
 
-	$HPs = Get-HPComputerInformationForWarrantyRequestFromCCMDB -Server MySccmDBServer -Database CM_MS1 -IntergratedSecurity
+	$HPs = Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity
 	foreach ($HP in $HPs)
 	{
 		 Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP.SerialNumber -ProductNumber $HP.ProductNumber
 	}
+	
+Example 5:
+
+	# Hashtables are a little tricky to export to CSV, your have to build new Objects; so here is how I run my build date report:
+	Import-Module -Name HPWarranty
+	
+	$reg = Invoke-HPWarrantyRegistrationRequest
+	
+	# Not sure if you can line break the New-Object properties on the ';' may need to append backticks '`', or do it all in one line.
+	Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity |
+		%{ New-Object -TypeName PSObject -Property @{ 'ComputerName' = $_.ComputerName; 
+		                                              'SerialNumber' = $_.SerialNumber; 
+													  'ProductModel' = $_.ProductModel; 
+													  'LastHardwareScan' = Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd';
+                                                      'Username' = $_.Username;
+													  'BuildDate' = (Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductNumber $_.ProductNumber).WarrantyStartDate } |
+		Export-Csv C:\HPBuildReport.csv -NoTypeInformation -Append }
+	

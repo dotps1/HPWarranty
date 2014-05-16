@@ -368,20 +368,22 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
     }
 
     $sqlCMD=New-Object System.Data.SqlClient.SqlCommand
-    $sqlCMD.CommandText= "SELECT Computer_System_DATA.Name00                     AS ComputerName,
-	                             PC_BIOS_DATA.SerialNumber00                     AS SerialNumber,
-	                             MS_SYSTEMINFORMATION_DATA.SystemSKU00           AS ProductNumber,
-	                             MS_SYSTEMINFORMATION_DATA.SystemManufacturer00  AS ProductManufacturer,
-	                             MS_SYSTEMINFORMATION_DATA.SystemProductName00   AS ProductModel,
-	                             Computer_System_Data.TimeKey					 AS LastCommunicationTime
+    $sqlCMD.CommandText= "SELECT Computer_System_DATA.Name00                    AS ComputerName,
+                                 Computer_System_Data.UserName00                AS Username,
+	                             PC_BIOS_DATA.SerialNumber00                    AS SerialNumber,
+	                             MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
+	                             MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
+	                             MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
+                                 WorkstationStatus_DATA.LastHWScan				AS LastHardwareScan
                          FROM MS_SYSTEMINFORMATION_DATA
-	                         JOIN  Computer_System_Data ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
-	                         JOIN  PC_BIOS_DATA         ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
-	                         WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
-	                         OR    MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
-	                         AND   MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
-	                         AND   MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
-                         ORDER BY MS_SYSTEMINFORMATION_DATA.BaseBoardProduct00"
+	                         JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
+	                         JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
+                             JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
+	                     WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
+	                         OR  MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
+	                         AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
+	                         AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
+                         ORDER BY WorkstationStatus_DATA.LastHWScan"
 
     $sqlCMD.Connection = $sqlConnection
     $results = $sqlCMD.ExecuteReader()
@@ -391,11 +393,12 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
         While ($results.Read())
         {
             $results.GetEnumerator() | %{ New-Object -TypeName PSObject -Property @{ComputerName = $_["ComputerName"]
+                                                                                    Username = $_["Username"]
                                                                                     SerialNumber = $_["SerialNumber"]
                                                                                     ProductNumber = $_["ProductNumber"]
                                                                                     ProductManufacturer = $_["ProductManufacturer"]
                                                                                     ProductModel = $_["ProductModel"]
-                                                                                    LastCommunicationTime = $_["LastCommunicationTime"]
+                                                                                    LastHardwareScan = $_["LastHardwareScan"]
                                                                                     }}
         }
     }
