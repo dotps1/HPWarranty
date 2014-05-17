@@ -88,12 +88,12 @@ function Invoke-HPWarrantyRegistrationRequest
         [Parameter(Position=0)]
         [ValidateLength(10,10)]
         [String]
-        $SerialNumber=(Get-WmiObject -Class Win32_Bios).SerialNumber,
+        $SerialNumber,
 
         # ProductModel, Type String, The product Model of the Hewlett-Packard System.
         [Parameter(Position=1)]
         [String]
-        $ProductModel=(Get-WmiObject -Class Win32_ComputerSystem).Model,
+        $ProductModel,
 
         # ComputerName, Type String, The remote Hewlett-Packard Computer.
         [Parameter(ParameterSetName='RemoteComputer')]
@@ -101,12 +101,32 @@ function Invoke-HPWarrantyRegistrationRequest
         $ComputerName
     )
     
+    if (-not($SerialNumber -or $ProductModel))
+    {
+        if ((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer").Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer").Manufacturer -eq "HP")
+        {
+            $SerialNumber = (Get-WmiObject -Class Win32_Bios).SerialNumber
+            $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem).Model
+        }
+        else
+        {
+            throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
+        }
+    }
+
     if ($ComputerName)
     {
         try
         {
-            $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-            $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
+            if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
+            {
+                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
+                $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
+            }
+            else
+            {
+                throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
+            }
         }
         catch
         {
@@ -212,27 +232,25 @@ function Invoke-HPWarrantyLookup
     Param
     (
         # Gdid, Type String, The Gdid Identitfier of the session with the HP ISEE Service.
-        [Parameter(Mandatory=$true,
-                   Position=0)]
+        [Parameter(Position=0)]
         [String]
-        $Gdid,
+        $Gdid = (Invoke-HPWarrantyRegistrationRequest).Gdid,
 
         # Token, Type String, The Token of the session with the HP ISEE Service.
-        [Parameter(Mandatory=$true,
-                   Position=1)]
+        [Parameter(Position=1)]
         [String]
-        $Token,
+        $Token = (Invoke-HPWarrantyRegistrationRequest).Token,
 
         # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
         [Parameter(Position=2)]
         [ValidateLength(10,10)]
         [String]
-        $SerialNumber=(Get-WmiObject -Class Win32_Bios).SerialNumber,
+        $SerialNumber,
 
         # ProductNumber, Type String, The product number (SKU) of the Hewlett-Packard System.
         [Parameter(Position=3)]
         [String]
-        $ProductNumber=(Get-WmiObject -Namespace root\WMI MS_SystemInformation).SystemSKU,
+        $ProductNumber,
 
         # ComputerName, Type String, The remote Hewlett-Packard Computer.
         [Parameter(ParameterSetName='RemoteComputer')]
@@ -240,12 +258,32 @@ function Invoke-HPWarrantyLookup
         $ComputerName
     )
 
+    if (-not($SerialNumber -or $ProductNumber))
+    {
+        if ((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer").Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer").Manufacturer -eq "HP")
+        {
+            $SerialNumber = (Get-WmiObject -Class Win32_Bios).SerialNumber
+            $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation).SystemSKU
+        }
+        else
+        {
+            throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
+        }
+    }
+
     if ($ComputerName)
     {
         try
         {
-            $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-            $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
+            if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
+            {
+                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
+                $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
+            }
+            else
+            {
+                throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
+            }
         }
         catch
         {
