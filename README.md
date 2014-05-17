@@ -10,7 +10,6 @@ The Invoke-SOAPRequst is not really used by a user, but it is used by the two ot
 2.  Using the Gdid and the Token from step 1, and a valid SerialNumber and ProductNumber you can request the information for that device, returning the SerialNumber,WarrantyStartDate,WarrantyStandardEndDate, and WarrantyExtendedEndDate.  (The return SOAP Envelop contains much more information, but that is was I parse and return).
 3.  You can reuse the Gdid and Token from step one in a foreach loop to retrieve multiple warranty objects.  That is why I created the Get-HPComputerInformationForWarrantyRequestFromCCMDB.  If you configure your SCCM Client to inventory the MS_SystemInformation WMI Class (Found in the root namespace, not in CIMV2, root\MS_SystemInformation) you can then use this function to return form the CM_<SiteCode> database an array of objects containing the information needed to complete all actions.  SerialNumber,ProductModel,ProductNumber,ProductManufacturer.
 
- 
 
 Example 1:
 
@@ -65,18 +64,19 @@ Example 4:
 	
 Example 5:
 
-	# Hashtables are a little tricky to export to CSV, you have to build new Objects; so here is how I run my build date report:
+	# Hashtables are a little tricky to export to CSV, so here is how I run my build date report:
 	Import-Module -Name HPWarranty
-	
+	Import-Module -Name ActiveDirectory
+
 	$reg = Invoke-HPWarrantyRegistrationRequest
 	
-	# Not sure if you can line break the New-Object properties on the ';' may need to append backticks '`', or do it all in one line.
-	Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity |
-		%{ New-Object -TypeName PSObject -Property @{ 'ComputerName' = $_.ComputerName; 
-		                                              'SerialNumber' = $_.SerialNumber; 
-													  'ProductModel' = $_.ProductModel; 
-													  'LastHardwareScan' = Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd';
-                                                      'Username' = $_.Username;
-													  'BuildDate' = (Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductNumber $_.ProductNumber).WarrantyStartDate } |
-		Export-Csv C:\HPBuildReport.csv -NoTypeInformation -Append }
-	
+	# This output is tailored to the request that was given to me, not all of these values maybe necessary to return.
+    Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MyCCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
+    Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } }, 
+                            @{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } }, 
+                            @{ Name = 'ProductModel';     Expression = { $_.ProductModel } }, 
+                            @{ Name = 'BuildDate';        Expression = { (Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductNumber $_.ProductNumber).WarrantyStartDate } },
+                            @{ Name = 'LastHardwareScan'; Expression = { Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd' } },
+                            @{ Name = 'LastLoggedOnUser'; Expression = { $_.Username } },
+                            @{ Name = 'CompanyName';      Expression = { if ($_.Username -ne $null){ (Get-ADUser -Identity $_.Username.ToString().Trim('MYDOMAIN\') -Properties Company).Company } } } |
+    Export-Csv -Path C:\HPBuildInfo.csv -NoTypeInformation -Append 
