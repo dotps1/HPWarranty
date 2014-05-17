@@ -28,14 +28,13 @@
         </ul>
       </header>
       <section>
-        <p>This module contains four functions:</p>
+        <p>This module contains four functions:
+Invoke-SOAPRequest
+Invoke-HPWarrantyRegistrationRequest
+Invoke-HPWarrantyLookup
+Get-HPComputerInformationForWarrantyRequestFromCCMDB</p>
 
-<ul>
-<li>Invoke-SOAPRequest</li>
-<li>Invoke-HPWarrantyRegistrationRequest</li>
-<li>Invoke-HPWarrantyLookup</li>
-<li>Get-HPComputerInformationForWarrantyRequestFromCCMDB</li>
-</ul><p>The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
+<p>The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
 
 <ol>
 <li> A Session needs to be established with their Web Services, this is done by using the Invoke-HPWarrantyRegistrationRequest.  You need a valid SerialNumber and Product Model to do this.  If successful, it will return a Gdid and a Session Token, that then needs to be passed to the Invoke-HPWarrantyLookup.</li>
@@ -98,20 +97,22 @@ foreach ($HP in $HPs)
 
 <p>Example 5:</p>
 
-<pre><code># Hashtables are a little tricky to export to CSV, you have to build new Objects; so here is how I run my build date report:
+<pre><code># Hashtables are a little tricky to export to CSV, so here is how I run my build date report:
 Import-Module -Name HPWarranty
+Import-Module -Name ActiveDirectory
 
 $reg = Invoke-HPWarrantyRegistrationRequest
 
-# Not sure if you can line break the New-Object properties on the ';' may need to append backticks '`', or do it all in one line.
-Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity |
-    %{ New-Object -TypeName PSObject -Property @{ 'ComputerName' = $_.ComputerName; 
-                                                  'SerialNumber' = $_.SerialNumber; 
-                                                  'ProductModel' = $_.ProductModel; 
-                                                  'LastHardwareScan' = Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd';
-                                                  'Username' = $_.Username;
-                                                  'BuildDate' = (Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductNumber $_.ProductNumber).WarrantyStartDate } |
-    Export-Csv C:\HPBuildReport.csv -NoTypeInformation -Append }
+# This output is tailored to the request that was given to me, not all of these values maybe necessary to return.
+Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MyCCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
+Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } }, 
+                        @{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } }, 
+                        @{ Name = 'ProductModel';     Expression = { $_.ProductModel } }, 
+                        @{ Name = 'BuildDate';        Expression = { (Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductNumber $_.ProductNumber).WarrantyStartDate } },
+                        @{ Name = 'LastHardwareScan'; Expression = { Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd' } },
+                        @{ Name = 'LastLoggedOnUser'; Expression = { $_.Username } },
+                        @{ Name = 'CompanyName';      Expression = { if ($_.Username -ne $null){ (Get-ADUser -Identity $_.Username.ToString().Trim('MYDOMAIN\') -Properties Company).Company } } } |
+Export-Csv -Path C:\HPBuildInfo.csv -NoTypeInformation -Append 
 </code></pre>
       </section>
       <footer>
