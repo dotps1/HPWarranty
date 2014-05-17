@@ -43,7 +43,7 @@ Get-HPComputerInformationForWarrantyRequestFromCCMDB</p>
 </ol><p>Example 1:</p>
 
 <pre><code># Execute from a local HP Workstation
-Import-Module -Name HPWarranty; $reg = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token
+Invoke-HPWarrantyLookup
 </code></pre>
 
 <p>Example 2:</p>
