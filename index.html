@@ -7,7 +7,6 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -16,27 +15,27 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1 class="header">HPWarranty</h1>
-        <p class="header">PowerShell module to help retrieve Hewlett-Packard Warranty Information</p>
+        <h1>HPWarranty</h1>
+        <p>PowerShell module to help retrieve Hewlett-Packard Warranty Information</p>
+
+        <p class="view"><a href="https://github.com/PowerShellSith/HPWarranty">View the Project on GitHub <small>PowerShellSith/HPWarranty</small></a></p>
+
 
         <ul>
-          <li class="download"><a class="buttons" href="https://github.com/PowerShellSith/HPWarranty/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/PowerShellSith/HPWarranty/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/PowerShellSith/HPWarranty">View On GitHub</a></li>
+          <li><a href="https://github.com/PowerShellSith/HPWarranty/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/PowerShellSith/HPWarranty/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/PowerShellSith/HPWarranty">View On <strong>GitHub</strong></a></li>
         </ul>
-
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/PowerShellSith">PowerShellSith</a></p>
-
-
       </header>
       <section>
-        <p>This module contains four functions:
-Invoke-SOAPRequest
-Invoke-HPWarrantyRegistrationRequest
-Invoke-HPWarrantyLookup
-Get-HPComputerInformationForWarrantyRequestFromCCMDB</p>
+        <p>This module contains four functions:</p>
 
-<p>The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
+<ul>
+<li>Invoke-SOAPRequest</li>
+<li>Invoke-HPWarrantyRegistrationRequest</li>
+<li>Invoke-HPWarrantyLookup</li>
+<li>Get-HPComputerInformationForWarrantyRequestFromCCMDB</li>
+</ul><p>The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
 
 <ol>
 <li> A Session needs to be established with their Web Services, this is done by using the Invoke-HPWarrantyRegistrationRequest.  You need a valid SerialNumber and Product Model to do this.  If successful, it will return a Gdid and a Session Token, that then needs to be passed to the Invoke-HPWarrantyLookup.</li>
@@ -118,10 +117,11 @@ Export-Csv -Path C:\HPBuildInfo.csv -NoTypeInformation -Append
 </code></pre>
       </section>
       <footer>
-        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+        <p>This project is maintained by <a href="https://github.com/PowerShellSith">PowerShellSith</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+    <script src="javascripts/scale.fix.js"></script>
+    
   </body>
 </html>
