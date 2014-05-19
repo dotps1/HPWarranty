@@ -99,7 +99,7 @@ function Invoke-HPWarrantyRegistrationRequest
 
         # ComputerName, Type String, The remote Hewlett-Packard Computer.
         [Parameter(ParameterSetName='RemoteComputer')]
-        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true } })]
         [String]
         $ComputerName
     )
@@ -259,7 +259,7 @@ function Invoke-HPWarrantyLookup
 
         # ComputerName, Type String, The remote Hewlett-Packard Computer.
         [Parameter(ParameterSetName='RemoteComputer')]
-        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true} })]
         [String]
         $ComputerName
     )
@@ -369,7 +369,7 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
         # SqlServer, Type string, The SQL Server containing the ConfigMgr database.
         [Parameter(Mandatory=$true,
                    Position=0)]
-        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true } })]
         [string]
         $SqlServer = $env:COMPUTERNAME,
 
