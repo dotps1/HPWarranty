@@ -87,16 +87,19 @@ function Invoke-HPWarrantyRegistrationRequest
         # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
         [Parameter(Position=0)]
         [ValidateLength(10,10)]
+        [Alias("SN")]
         [String]
         $SerialNumber,
 
         # ProductModel, Type String, The product Model of the Hewlett-Packard System.
         [Parameter(Position=1)]
+        [Alias("PN")]
         [String]
         $ProductModel,
 
         # ComputerName, Type String, The remote Hewlett-Packard Computer.
         [Parameter(ParameterSetName='RemoteComputer')]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
         [String]
         $ComputerName
     )
@@ -244,16 +247,19 @@ function Invoke-HPWarrantyLookup
         # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
         [Parameter(Position=2)]
         [ValidateLength(10,10)]
+        [Alias("SN")]
         [String]
         $SerialNumber,
 
         # ProductNumber, Type String, The product number (SKU) of the Hewlett-Packard System.
         [Parameter(Position=3)]
+        [Alias("PN")]
         [String]
         $ProductNumber,
 
         # ComputerName, Type String, The remote Hewlett-Packard Computer.
         [Parameter(ParameterSetName='RemoteComputer')]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
         [String]
         $ComputerName
     )
@@ -363,6 +369,7 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
         # SqlServer, Type string, The SQL Server containing the ConfigMgr database.
         [Parameter(Mandatory=$true,
                    Position=0)]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
         [string]
         $SqlServer=$env:COMPUTERNAME,
 
@@ -376,6 +383,7 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
         # Database, Type string, The name of the ConfigMgr database.
         [Parameter(Mandatory=$true,
                    Position=2)]
+        [Alias("CMDB")]
         [string]
         $Database,
 

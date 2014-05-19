@@ -14,7 +14,7 @@ The Invoke-SOAPRequst is not really used by a user, but it is used by the two ot
 Example 1:
 
 	# Execute from a local HP Workstation
-	Invoke-HPWarrantyLookup
+	Import-Module HPWarranty; Invoke-HPWarrantyLookup
 
 Example 2:
 
