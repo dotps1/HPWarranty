@@ -1,8 +1,8 @@
 This module contains four functions:
-Invoke-SOAPRequest
-Invoke-HPWarrantyRegistrationRequest
-Invoke-HPWarrantyLookup
-Get-HPComputerInformationForWarrantyRequestFromCCMDB
+* Invoke-SOAPRequest
+* Invoke-HPWarrantyRegistrationRequest
+* Invoke-HPWarrantyLookup
+* Get-HPComputerInformationForWarrantyRequestFromCCMDB
 
 The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:
 

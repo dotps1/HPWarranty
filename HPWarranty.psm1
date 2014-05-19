@@ -371,14 +371,14 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
                    Position=0)]
         [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
         [string]
-        $SqlServer=$env:COMPUTERNAME,
+        $SqlServer = $env:COMPUTERNAME,
 
         # ConnectionPort, Type int, Port to connect to SQL server with, defualt value is 1433.
         [parameter(Position=1)]
         [ValidateRange(1,50009)]
         [Alias("Port")]
         [int]
-        $ConnectionPort=1433,
+        $ConnectionPort = 1433,
 
         # Database, Type string, The name of the ConfigMgr database.
         [Parameter(Mandatory=$true,
@@ -392,7 +392,7 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
         $IntergratedSecurity
     )
 
-    $sqlConnection=New-Object System.Data.SqlClient.SqlConnection
+    $sqlConnection = New-Object System.Data.SqlClient.SqlConnection
     $sqlConnection.ConnectionString="Server=$SqlServer,$ConnectionPort;Database=$Database;Integrated Security="
     if ($IntergratedSecurity)
     {
@@ -400,8 +400,8 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
     }
     else
     {
-        $sqlCredentials=Get-Credential
-        $sqlConnection.ConnectionString+="false;User ID=$($sqlCredentials.Username);Password=$($sqlCredentials.GetNetworkCredential().Password);"
+        $sqlCredentials = Get-Credential
+        $sqlConnection.ConnectionString += "false;User ID=$($sqlCredentials.Username);Password=$($sqlCredentials.GetNetworkCredential().Password);"
     }
     
     try
@@ -413,23 +413,23 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
         throw $Error[0].Exception.Message
     }
 
-    $sqlCMD=New-Object System.Data.SqlClient.SqlCommand
-    $sqlCMD.CommandText= "SELECT Computer_System_DATA.Name00                    AS ComputerName,
-                                 Computer_System_Data.UserName00                AS Username,
-	                             PC_BIOS_DATA.SerialNumber00                    AS SerialNumber,
-	                             MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
-	                             MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
-	                             MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
-                                 WorkstationStatus_DATA.LastHWScan				AS LastHardwareScan
-                         FROM MS_SYSTEMINFORMATION_DATA
-	                         JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
-	                         JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
-                             JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
-	                     WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
-	                         OR  MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
-	                         AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
-	                         AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
-                         ORDER BY WorkstationStatus_DATA.LastHWScan"
+    $sqlCMD = New-Object System.Data.SqlClient.SqlCommand
+    $sqlCMD.CommandText = "SELECT Computer_System_DATA.Name00                    AS ComputerName,
+                                  Computer_System_Data.UserName00                AS Username,
+	                              PC_BIOS_DATA.SerialNumber00                    AS SerialNumber,
+	                              MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
+	                              MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
+	                              MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
+                                  WorkstationStatus_DATA.LastHWScan				AS LastHardwareScan
+                          FROM MS_SYSTEMINFORMATION_DATA
+	                          JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
+	                          JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
+                              JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
+	                      WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
+	                          OR  MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
+	                          AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
+	                          AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
+                          ORDER BY WorkstationStatus_DATA.LastHWScan"
 
     $sqlCMD.Connection = $sqlConnection
     $results = $sqlCMD.ExecuteReader()
@@ -448,7 +448,6 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
                                                                                     }}
         }
     }
-
     $results.Close()
     $sqlConnection.Close()
 }
