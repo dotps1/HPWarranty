@@ -197,7 +197,7 @@ function Invoke-HPWarrantyRegistrationRequest
     $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
     [PSObject]$registration = @{
-                                    'Gdid' = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.Gdid
+                                    'Gdid'  = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.Gdid
                                     'Token' = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.registrationtoken
                                }
     return $registration
@@ -333,8 +333,8 @@ function Invoke-HPWarrantyLookup
     $entitlementAction = Invoke-SOAPRequest -SOAPRequest $EntitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
 
     [PSObject]$warranty = @{
-                                'SerialNumber' = $SerialNumber
-                                'WarrantyStartDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("WarrantyStartDate").InnerText
+                                'SerialNumber'            = $SerialNumber
+                                'WarrantyStartDate'       = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("WarrantyStartDate").InnerText
                                 'WarrantyStandardEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[1]
                                 'WarrantyExtendedEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[0]
                            }
@@ -420,16 +420,18 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
 	                              MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
 	                              MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
 	                              MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
-                                  WorkstationStatus_DATA.LastHWScan				AS LastHardwareScan
-                          FROM MS_SYSTEMINFORMATION_DATA
-	                          JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
-	                          JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
-                              JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
-	                      WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
-	                          OR  MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
-	                          AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
-	                          AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
-                          ORDER BY WorkstationStatus_DATA.LastHWScan"
+                                  System_DISC.AD_Site_Name0                      AS ADSiteName,
+                                  WorkstationStatus_DATA.LastHWScan				 AS LastHardwareScan
+                           FROM MS_SYSTEMINFORMATION_DATA
+	                           JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
+	                           JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
+                               JOIN System_DISC            ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
+                               JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
+	                       WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
+	                           OR  MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
+	                           AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
+	                           AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
+                           ORDER BY WorkstationStatus_DATA.LastHWScan"
 
     $sqlCMD.Connection = $sqlConnection
     $results = $sqlCMD.ExecuteReader()
@@ -438,16 +440,17 @@ function Get-HPComputerInformationForWarrantyRequestFromCCMDB
     {
         While ($results.Read())
         {
-            $results.GetEnumerator() | %{ New-Object -TypeName PSObject -Property @{ComputerName = $_["ComputerName"]
-                                                                                    Username = $_["Username"]
-                                                                                    SerialNumber = $_["SerialNumber"]
-                                                                                    ProductNumber = $_["ProductNumber"]
-                                                                                    ProductManufacturer = $_["ProductManufacturer"]
-                                                                                    ProductModel = $_["ProductModel"]
-                                                                                    LastHardwareScan = $_["LastHardwareScan"]
-                                                                                    }}
+            $results.GetEnumerator() | %{ New-Object -TypeName PSObject -Property @{ ComputerName        = $_["ComputerName"]
+                                                                                     Username            = $_["Username"]
+                                                                                     SerialNumber        = $_["SerialNumber"]
+                                                                                     ProductNumber       = $_["ProductNumber"]
+                                                                                     ProductManufacturer = $_["ProductManufacturer"]
+                                                                                     ProductModel        = $_["ProductModel"]
+                                                                                     ADSiteName          = $_["ADSiteName"]
+                                                                                     LastHardwareScan    = $_["LastHardwareScan"] } }
         }
-    }
+	}
+	
     $results.Close()
     $sqlConnection.Close()
 }
