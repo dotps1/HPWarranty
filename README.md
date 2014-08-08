@@ -56,7 +56,7 @@ Example 4:
 
 	$reg = Invoke-HPWarrantyRegistrationRequest -SeralNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
 
-	$HPs = Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity
+	$HPs = Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity
 	foreach ($HP in $HPs)
 	{
 		 Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP.SerialNumber -ProductNumber $HP.ProductNumber
@@ -71,7 +71,7 @@ Example 5:
 	$reg = Invoke-HPWarrantyRegistrationRequest
 	
 	# This output is tailored to the request that was given to me, not all of these values maybe necessary to return.
-    Get-HPComputerInformationForWarrantyRequestFromCCMDB -SqlServer MyCCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
+    Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MyCCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
     Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } }, 
                             @{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } }, 
                             @{ Name = 'ProductModel';     Expression = { $_.ProductModel } }, 

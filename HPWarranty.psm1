@@ -360,7 +360,7 @@ function Invoke-HPWarrantyLookup
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Get-HPComputerInformationForWarrantyRequestFromCCMDB
+function Get-HPComputerInformationForWarrantyRequestFromCMDB
 {
     [CmdletBinding()]
     [OutputType([Array])]
