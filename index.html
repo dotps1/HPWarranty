@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>HPWarranty by PowerShellSith</title>
+    <title>HPWarranty by dotps1</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -18,13 +18,13 @@
         <h1>HPWarranty</h1>
         <p>PowerShell module to help retrieve Hewlett-Packard Warranty Information</p>
 
-        <p class="view"><a href="https://github.com/PowerShellSith/HPWarranty">View the Project on GitHub <small>PowerShellSith/HPWarranty</small></a></p>
+        <p class="view"><a href="https://github.com/dotps1/HPWarranty">View the Project on GitHub <small>dotps1/HPWarranty</small></a></p>
 
 
         <ul>
-          <li><a href="https://github.com/PowerShellSith/HPWarranty/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/PowerShellSith/HPWarranty/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/PowerShellSith/HPWarranty">View On <strong>GitHub</strong></a></li>
+          <li><a href="https://github.com/dotps1/HPWarranty/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/dotps1/HPWarranty/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/dotps1/HPWarranty">View On <strong>GitHub</strong></a></li>
         </ul>
       </header>
       <section>
@@ -34,7 +34,7 @@
 <li>Invoke-SOAPRequest</li>
 <li>Invoke-HPWarrantyRegistrationRequest</li>
 <li>Invoke-HPWarrantyLookup</li>
-<li>Get-HPComputerInformationForWarrantyRequestFromCCMDB</li>
+<li>Get-HPComputerInformationForWarrantyRequestFromCMDB</li>
 </ul><p>The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
 
 <ol>
@@ -105,7 +105,7 @@ Import-Module -Name ActiveDirectory
 $reg = Invoke-HPWarrantyRegistrationRequest
 
 # This output is tailored to the request that was given to me, not all of these values maybe necessary to return.
-Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MyCCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
+Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MyCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
 Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } }, 
                         @{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } }, 
                         @{ Name = 'ProductModel';     Expression = { $_.ProductModel } }, 
@@ -117,7 +117,7 @@ Export-Csv -Path C:\HPBuildInfo.csv -NoTypeInformation -Append
 </code></pre>
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/PowerShellSith">PowerShellSith</a></p>
+        <p>This project is maintained by <a href="https://github.com/dotps1">dotps1</a></p>
         <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
