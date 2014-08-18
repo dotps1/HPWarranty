@@ -5,21 +5,21 @@
     Param 
     (
         # SOAPRequest, Type Xml, The request to be sent.
-        [Parameter(Mandatory=$true,
-                    Position=0)]
+        [Parameter(Mandatory = $true,
+                    Position = 0)]
         [Xml]
         $SOAPRequest,
 
         # URL, Type String, The URL to send the SOAP request.
-        [Parameter(Mandatory=$true,
-                    Position=1)]
+        [Parameter(Mandatory = $true,
+                    Position = 1)]
         [ValidateSet('https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx','https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx')]
         [String]
         $URL,
 
         # Action, Type String, The Acction to be performed.
-        [Parameter(Mandatory=$true,
-                    Position=2)]
+        [Parameter(Mandatory  =$true,
+                    Position = 2)]
         [ValidateSet('http://www.hp.com/isee/webservices/RegisterClient2','http://www.hp.com/isee/webservices/GetOOSEntitlementList2')]
         [String]
         $Action
@@ -75,8 +75,8 @@
     http://ocdnix.wordpress.com/2013/03/14/hp-server-warranty-via-the-isee-api/
     http://www.iislogs.com/steveschofield/execute-a-soap-request-from-powershell
     https://github.com/ocdnix/hpisee
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Invoke-HPWarrantyRegistrationRequest
 {
@@ -85,20 +85,20 @@ function Invoke-HPWarrantyRegistrationRequest
     Param
     (
         # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
-        [Parameter(Position=0)]
+        [Parameter(Position = 0)]
         [ValidateLength(10,10)]
         [Alias("SN")]
         [String]
         $SerialNumber,
 
         # ProductModel, Type String, The product Model of the Hewlett-Packard System.
-        [Parameter(Position=1)]
+        [Parameter(Position = 1)]
         [Alias("PN")]
         [String]
         $ProductModel,
 
         # ComputerName, Type String, The remote Hewlett-Packard Computer.
-        [Parameter(ParameterSetName='RemoteComputer')]
+        [Parameter(ParameterSetName = 'RemoteComputer')]
         [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true } })]
         [String]
         $ComputerName
@@ -225,8 +225,8 @@ function Invoke-HPWarrantyRegistrationRequest
     http://ocdnix.wordpress.com/2013/03/14/hp-server-warranty-via-the-isee-api/
     http://www.iislogs.com/steveschofield/execute-a-soap-request-from-powershell
     https://github.com/ocdnix/hpisee
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Invoke-HPWarrantyLookup
 {
@@ -235,24 +235,24 @@ function Invoke-HPWarrantyLookup
     Param
     (
         # Gdid, Type String, The Gdid Identitfier of the session with the HP ISEE Service.
-        [Parameter(Position=0)]
+        [Parameter(Position = 0)]
         [String]
         $Gdid = (Invoke-HPWarrantyRegistrationRequest).Gdid,
 
         # Token, Type String, The Token of the session with the HP ISEE Service.
-        [Parameter(Position=1)]
+        [Parameter(Position = 1)]
         [String]
         $Token = (Invoke-HPWarrantyRegistrationRequest).Token,
 
         # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
-        [Parameter(Position=2)]
+        [Parameter(Position = 2)]
         [ValidateLength(10,10)]
         [Alias("SN")]
         [String]
         $SerialNumber,
 
         # ProductNumber, Type String, The product number (SKU) of the Hewlett-Packard System.
-        [Parameter(Position=3)]
+        [Parameter(Position = 3)]
         [Alias("PN")]
         [String]
         $ProductNumber,
@@ -351,9 +351,9 @@ function Invoke-HPWarrantyLookup
 .DESCRIPTION
 
 .EXAMPLE
-    Get-ComputerInformationForHPWarrantyInformation -IntergratedSecurity
+    Get-ComputerInformationForHPWarrantyInformationFromCMDB -IntergratedSecurity
 .EXAMPLE
-    Get-ComputerInformationForHPWarrantyInformation -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
+    Get-ComputerInformationForHPWarrantyInformationFromCMDB -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
 .NOTES
     The root\WMI MS_SystemInformation needs to be inventoried into ConfigMgr so the Product Number (SKU) can be retireved.
 .LINK
@@ -366,29 +366,29 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
     [OutputType([Array])]
     Param
     (
-        # SqlServer, Type string, The SQL Server containing the ConfigMgr database.
-        [Parameter(Mandatory=$true,
-                   Position=0)]
+        # SqlServer, Type String, The SQL Server containing the ConfigMgr database.
+        [Parameter(Mandatory = $true,
+                   Position = 0)]
         [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true } })]
-        [string]
+        [String]
         $SqlServer = $env:COMPUTERNAME,
 
-        # ConnectionPort, Type int, Port to connect to SQL server with, defualt value is 1433.
-        [parameter(Position=1)]
+        # ConnectionPort, Type Int, Port to connect to SQL server with, defualt value is 1433.
+        [parameter(Position = 1)]
         [ValidateRange(1,50009)]
         [Alias("Port")]
-        [int]
+        [Int]
         $ConnectionPort = 1433,
 
-        # Database, Type string, The name of the ConfigMgr database.
-        [Parameter(Mandatory=$true,
-                   Position=2)]
+        # Database, Type String, The name of the ConfigMgr database.
+        [Parameter(Mandatory = $true,
+                   Position = 2)]
         [Alias("CMDB")]
-        [string]
+        [String]
         $Database,
 
-        # IntergratedSecurity, Type switch, Use the currently logged on users credentials.
-        [switch]
+        # IntergratedSecurity, Type Switch, Use the currently logged on users credentials.
+        [Switch]
         $IntergratedSecurity
     )
 

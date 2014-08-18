@@ -2,7 +2,7 @@ This module contains four functions:
 * Invoke-SOAPRequest
 * Invoke-HPWarrantyRegistrationRequest
 * Invoke-HPWarrantyLookup
-* Get-HPComputerInformationForWarrantyRequestFromCCMDB
+* Get-HPComputerInformationForWarrantyRequestFromCMDB
 
 The Invoke-SOAPRequst is not really used by a user, but it is used by the two other Invoke-HP* functions.  Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:
 
@@ -71,7 +71,7 @@ Example 5:
 	$reg = Invoke-HPWarrantyRegistrationRequest
 	
 	# This output is tailored to the request that was given to me, not all of these values maybe necessary to return.
-    Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MyCCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
+    Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MyCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
     Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } }, 
                             @{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } }, 
                             @{ Name = 'ProductModel';     Expression = { $_.ProductModel } }, 
