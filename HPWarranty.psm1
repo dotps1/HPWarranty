@@ -5,21 +5,18 @@
     Param 
     (
         # SOAPRequest, Type Xml, The request to be sent.
-        [Parameter(Mandatory = $true,
-                    Position = 0)]
+        [Parameter(Mandatory = $true)]
         [Xml]
         $SOAPRequest,
 
         # URL, Type String, The URL to send the SOAP request.
-        [Parameter(Mandatory = $true,
-                    Position = 1)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx','https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx')]
         [String]
         $URL,
 
         # Action, Type String, The Acction to be performed.
-        [Parameter(Mandatory  =$true,
-                    Position = 2)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('http://www.hp.com/isee/webservices/RegisterClient2','http://www.hp.com/isee/webservices/GetOOSEntitlementList2')]
         [String]
         $Action
@@ -80,61 +77,47 @@
 #>
 function Invoke-HPWarrantyRegistrationRequest
 {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType([PSObject])]
     Param
     (
+        # ComputerName, Type String, The remote Hewlett-Packard Computer.
+        [Parameter(ParameterSetName = 'Default')]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String]
+        $ComputerName = $env:COMPUTERNAME,
+
         # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
-        [Parameter(Position = 0)]
+        [Parameter(ParameterSetName = 'Static',
+                   Mandatory = $true)]
         [ValidateLength(10,10)]
         [Alias("SN")]
         [String]
         $SerialNumber,
 
         # ProductModel, Type String, The product Model of the Hewlett-Packard System.
-        [Parameter(Position = 1)]
+        [Parameter(ParameterSetName = 'Static',
+                   Mandatory = $true)]
         [Alias("PN")]
         [String]
-        $ProductModel,
-
-        # ComputerName, Type String, The remote Hewlett-Packard Computer.
-        [Parameter(ParameterSetName = 'RemoteComputer')]
-        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true } })]
-        [String]
-        $ComputerName
+        $ProductModel
     )
     
-    if (-not($SerialNumber -or $ProductModel))
+    try
     {
-        if ((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer").Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer").Manufacturer -eq "HP")
+        if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
         {
-            $SerialNumber = (Get-WmiObject -Class Win32_Bios).SerialNumber
-            $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem).Model
+            $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
+            $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
         }
         else
         {
             throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
         }
     }
-
-    if ($ComputerName)
+    catch
     {
-        try
-        {
-            if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
-            {
-                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-                $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
-            }
-            else
-            {
-                throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
-            }
-        }
-        catch
-        {
-            throw "Unable to retrieve WMI Information from $ComputerName."
-        }
+        throw "Unable to retrieve WMI Information from $ComputerName."
     }
 
 [Xml]$registrationSOAPRequest = @"
@@ -146,7 +129,7 @@ function Invoke-HPWarrantyRegistrationRequest
     &lt;HP_OOSIdentifiers&gt;
     &lt;OSID&gt;
         &lt;Section name="SYSTEM_IDENTIFIERS"&gt;
-        &lt;Property name="TimestampGenerated" value="$(Get-Date ((Get-Date).ToUniversalTime()) -Format 'yyyy/MM/dd HH:mm:ss \G\M\T')"/&gt;
+        &lt;Property name="TimestampGenerated" value="$(Get-Date ((Get-Date).ToUniversalTime()) -Format 'yyyy&#47;MM&#47;dd HH:mm:ss \G\M\T')"/&gt; 
         &lt;/Section&gt;
     &lt;/OSID&gt;
     &lt;CSID&gt;
@@ -155,7 +138,7 @@ function Invoke-HPWarrantyRegistrationRequest
         &lt;Property name="CollectorVersion" value="T05.80.1 build 1"/&gt;
         &lt;Property name="AutoDetectedSystemSerialNumber" value="$SerialNumber"/&gt;
         &lt;Property name="SystemModel" value="$ProductModel"/&gt;
-        &lt;Property name="TimestampGenerated" value="$(Get-Date ((Get-Date).ToUniversalTime()) -Format 'yyyy/MM/dd HH:mm:ss \G\M\T')"/&gt;
+        &lt;Property name="TimestampGenerated" value="$(Get-Date ((Get-Date).ToUniversalTime()) -Format 'yyyy&#47;MM&#47;dd HH:mm:ss \G\M\T')"/&gt; 
         &lt;/Section&gt;
     &lt;/CSID&gt;
     &lt;/HP_OOSIdentifiers&gt;
@@ -230,74 +213,67 @@ function Invoke-HPWarrantyRegistrationRequest
 #>
 function Invoke-HPWarrantyLookup
 {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType([PSObject])]
     Param
     (
         # Gdid, Type String, The Gdid Identitfier of the session with the HP ISEE Service.
-        [Parameter(Position = 0)]
+        [Parameter(ParameterSetName = 'Default')]
         [String]
-        $Gdid = (Invoke-HPWarrantyRegistrationRequest).Gdid,
+        $Gdid,
 
         # Token, Type String, The Token of the session with the HP ISEE Service.
-        [Parameter(Position = 1)]
+        [Parameter(ParameterSetName = 'Default')]
         [String]
-        $Token = (Invoke-HPWarrantyRegistrationRequest).Token,
+        $Token,
+
+        # ComputerName, Type String, The remote Hewlett-Packard Computer.
+        [Parameter(ParameterSetName = 'Default')]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String]
+        $ComputerName = $env:COMPUTERNAME,
 
         # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
-        [Parameter(Position = 2)]
+        [Parameter(ParameterSetName = 'Static',
+                   Mandatory = $true)]
         [ValidateLength(10,10)]
         [Alias("SN")]
         [String]
         $SerialNumber,
 
         # ProductNumber, Type String, The product number (SKU) of the Hewlett-Packard System.
-        [Parameter(Position = 3)]
+        [Parameter(ParameterSetName = 'Static',
+                   Mandatory = $true)]
         [Alias("PN")]
         [String]
-        $ProductNumber,
-
-        # ComputerName, Type String, The remote Hewlett-Packard Computer.
-        [Parameter(ParameterSetName='RemoteComputer')]
-        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true} })]
-        [String]
-        $ComputerName
+        $ProductNumber
     )
 
-    if (-not($SerialNumber -or $ProductNumber))
+    try
     {
-        if ((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer").Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer").Manufacturer -eq "HP")
+        if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
         {
-            $SerialNumber = (Get-WmiObject -Class Win32_Bios).SerialNumber
-            $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation).SystemSKU
+            $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
+            $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
+
+            if (-not($PSBoundParameters.ContainsValue($Gdid)) -or -not($PSBoundParameters.ContainsValue($Token)))
+            {
+                $reg = Invoke-HPWarrantyRegistrationRequest -ComputerName $ComputerName
+                $Gdid = $reg.Gdid
+                $Token = $reg.Token
+            }
         }
         else
         {
             throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
         }
     }
-
-    if ($ComputerName)
+    catch
     {
-        try
-        {
-            if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
-            {
-                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-                $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
-            }
-            else
-            {
-                throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
-            }
-        }
-        catch
-        {
-            throw "Unable to retrieve WMI Information from $ComputerName."
-        }
+        throw "Unable to retrieve WMI Information from $ComputerName."
     }
 
-    [Xml]$entitlementSOAPRequest = @"
+[Xml]$entitlementSOAPRequest = @"
 <SOAP-ENV:Envelope
     xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:isee="http://www.hp.com/isee/webservices/">
@@ -357,8 +333,8 @@ function Invoke-HPWarrantyLookup
 .NOTES
     The root\WMI MS_SystemInformation needs to be inventoried into ConfigMgr so the Product Number (SKU) can be retireved.
 .LINK
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Get-HPComputerInformationForWarrantyRequestFromCMDB
 {
@@ -367,22 +343,19 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
     Param
     (
         # SqlServer, Type String, The SQL Server containing the ConfigMgr database.
-        [Parameter(Mandatory = $true,
-                   Position = 0)]
-        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true } })]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
         [String]
         $SqlServer = $env:COMPUTERNAME,
 
         # ConnectionPort, Type Int, Port to connect to SQL server with, defualt value is 1433.
-        [parameter(Position = 1)]
         [ValidateRange(1,50009)]
         [Alias("Port")]
         [Int]
         $ConnectionPort = 1433,
 
         # Database, Type String, The name of the ConfigMgr database.
-        [Parameter(Mandatory = $true,
-                   Position = 2)]
+        [Parameter(Mandatory = $true)]
         [Alias("CMDB")]
         [String]
         $Database,
@@ -429,8 +402,8 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
                                JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
 	                       WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
 	                           OR  MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
-	                           AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
-	                           AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
+	                           AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 &lt;&gt; ' ' 
+	                           AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 &lt;&gt; ' '
                            ORDER BY WorkstationStatus_DATA.LastHWScan"
 
     $sqlCMD.Connection = $sqlConnection
