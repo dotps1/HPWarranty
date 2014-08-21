@@ -218,12 +218,10 @@ function Invoke-HPWarrantyLookup
     Param
     (
         # Gdid, Type String, The Gdid Identitfier of the session with the HP ISEE Service.
-        [Parameter(ParameterSetName = 'Default')]
         [String]
         $Gdid,
 
         # Token, Type String, The Token of the session with the HP ISEE Service.
-        [Parameter(ParameterSetName = 'Default')]
         [String]
         $Token,
 
@@ -402,8 +400,8 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
                                JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
 	                       WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
 	                           OR  MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
-	                           AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 &lt;&gt; ' ' 
-	                           AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 &lt;&gt; ' '
+	                           AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
+	                           AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
                            ORDER BY WorkstationStatus_DATA.LastHWScan"
 
     $sqlCMD.Connection = $sqlConnection
