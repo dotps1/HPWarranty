@@ -1,4 +1,29 @@
-﻿function Invoke-SOAPRequest 
+﻿<#
+.SYNOPSIS
+    Executes a SOAP Request.
+.DESCRIPTION
+    Sends a SOAP Request to Hewlett-Packard ISEE Servers to either create a Registration GDID and Token, or retrieve Warranty Info.
+.EXAMPLE
+    Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
+.EXAMPLE
+    Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
+.NOTES
+    This module contains two XML douments used for the -SOAPRequest Parameter.
+    RegistrationSOAPRequest.xml (See Invoke-HPWarrantyRegistrationRequest Cmdlet)
+    EntitlementSOAPRequest.xml (See Invoke-HPWarrantyLookup Cmdlet).
+    Credits to:
+        StackOverFlow:OneLogicalMyth
+        StackOverFlow:user3076063
+        ocdnix HP ISEE PoC Dev
+        Steve Schofield Microsoft MVP - IIS
+.LINK
+    http://stackoverflow.com/questions/19503442/hp-warranty-lookup-using-powershell-soap
+    http://ocdnix.wordpress.com/2013/03/14/hp-server-warranty-via-the-isee-api/
+    http://www.iislogs.com/steveschofield/execute-a-soap-request-from-powershell
+    http://dotps1.github.io
+    Twitter: @dotps1
+#>
+function Invoke-SOAPRequest 
 {
     [CmdletBinding()]
     [OutputType([Xml])]
@@ -23,13 +48,14 @@
     )
      
     $soapWebRequest = [System.Net.WebRequest]::Create($URL) 
-    $soapWebRequest.Headers.Add("SOAPAction",$Action) 
+    $soapWebRequest.Headers.Add("SOAPAction",$Action)
 
     $soapWebRequest.ContentType = 'text/xml; charset=utf-8'
     $soapWebRequest.Accept = "text/xml" 
     $soapWebRequest.Method = "POST" 
     $soapWebRequest.UserAgent = 'RemoteSupport/A.05.05 - gSOAP/2.7'
 
+    $soapWebRequest.Timeout = 30000
     $soapWebRequest.ServicePoint.Expect100Continue = $false
     $soapWebRequest.ServicePoint.MaxIdleTime = 2000
     $soapWebRequest.ProtocolVersion = [system.net.httpversion]::version10
@@ -61,7 +87,7 @@
 .NOTES
     Requires PowerShell V4.0
     A valid serial number and computer model are required to establish the session.
-    Only one Registration Session needs to be established, the the Gdid and Token can be reused for the Excute-HPWarrantyLookup cmdlet.
+    Only one Registration Session needs to be established, the the Gdid and Token can be reused for the Invoke-HPWarrantyLookup Cmdlet.
     Credits to:
         StackOverFlow:OneLogicalMyth
         StackOverFlow:user3076063
@@ -102,7 +128,7 @@ function Invoke-HPWarrantyRegistrationRequest
         $ProductModel
     )
     
-    if (-not($PSBoundParameters.ContainsValue($SerialNumber) -and $PSBoundParameters.ContainsValue($ProductModel)))
+    if (-not($PSBoundParameters.ContainsKey($SerialNumber) -and $PSBoundParameters.ContainsKey($ProductModel)))
     {
         try
         {
@@ -122,10 +148,9 @@ function Invoke-HPWarrantyRegistrationRequest
         }
     }
 
-    $UTC = Get-Date ((Get-Date).ToUniversalTime()) -Format 'yyyy/MM/dd HH:mm:ss \G\M\T'
-    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace "<UniversialDateTime>","`"$($UTC)`"" `
-        -replace '<SerialNumber>', "`"$($SerialNumber)`"" `
-        -replace '<ProductModel>',"`"$($ProductModel)`""
+    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace "<UniversialDateTime>",((Get-Date).ToUniversalTime()).ToString('yyyy/MM/dd HH:mm:ss \G\M\T') `
+        -replace '<SerialNumber>',$SerialNumber `
+        -replace '<ProductModel>',$ProductModel
 
     $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
@@ -197,7 +222,7 @@ function Invoke-HPWarrantyLookup
         $ProductNumber
     )
 
-    if (-not($PSBoundParameters.ContainsValue($SerialNumber) -and $PSBoundParameters.ContainsValue($ProductNumber)))
+    if (-not($PSBoundParameters.ContainsKey($SerialNumber) -and $PSBoundParameters.ContainsKey($ProductNumber)))
     {
         try
         {
@@ -250,9 +275,9 @@ function Invoke-HPWarrantyLookup
 .SYNOPSIS
     Queries ConfigMgr Database for Information needed to query the Hewlett-Packard Servers for Warranty Information.
 .DESCRIPTION
-
+    Queries inventored information from Microsoft System Center Configuration manager for data to allow for bulk Hewlett-Packard Warranty Lookups.
 .EXAMPLE
-    Get-ComputerInformationForHPWarrantyInformationFromCMDB -IntergratedSecurity
+    Get-ComputerInformationForHPWarrantyInformationFromCMDB -Database CM_ABC -IntergratedSecurity
 .EXAMPLE
     Get-ComputerInformationForHPWarrantyInformationFromCMDB -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
 .NOTES

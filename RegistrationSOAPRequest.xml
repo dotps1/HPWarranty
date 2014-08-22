@@ -7,16 +7,16 @@
             <HP_OOSIdentifiers>
               <OSID>
                 <Section name="SYSTEM_IDENTIFIERS">
-                  <Property name="TimestampGenerated" value=<UniversialDateTime>/> 
+                  <Property name="TimestampGenerated" value="<UniversialDateTime>"/> 
                 </Section>
               </OSID>
               <CSID>
                 <Section name="SYSTEM_IDENTIFIERS">
                   <Property name="CollectorType" value="MC3"/>
                   <Property name="CollectorVersion" value="T05.80.1 build 1"/>
-                  <Property name="AutoDetectedSystemSerialNumber" value=<SerialNumber>/>
-                  <Property name="SystemModel" value=<ProductModel>/>
-                  <Property name="TimestampGenerated" value=<UniversialDateTime>/> 
+                  <Property name="AutoDetectedSystemSerialNumber" value="<SerialNumber>"/>
+                  <Property name="SystemModel" value="<ProductModel>"/>
+                  <Property name="TimestampGenerated" value="<UniversialDateTime>"/> 
                 </Section>
               </CSID>
             </HP_OOSIdentifiers>
