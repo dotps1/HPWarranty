@@ -1,0 +1,26 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:isee="http://www.hp.com/isee/webservices/">
+  <SOAP-ENV:Header>
+    <isee:IseeWebServicesHeader>
+        <isee:GDID><Gdid></isee:GDID>
+        <isee:registrationToken><Token></isee:registrationToken>
+        <isee:OSID/>
+        <isee:CSID/>
+    </isee:IseeWebServicesHeader>
+  </SOAP-ENV:Header>
+  <SOAP-ENV:Body>
+    <isee:GetOOSEntitlementList2>
+      <isee:request>
+        <![CDATA[<isee:ISEE-GetOOSEntitlementInfoRequest xmlns:isee="http://www.hp.com/schemas/isee/5.00/entitlement" schemaVersion="5.00">
+          <HP_ISEEEntitlementParameters>
+            <CountryCode>ES</CountryCode>
+            <SerialNumber><Serial></SerialNumber>
+            <ProductNumber><SKU></ProductNumber>
+            <EntitlementType></EntitlementType>
+            <EntitlementId></EntitlementId>
+            <ObligationId></ObligationId>
+          </HP_ISEEEntitlementParameters>
+        </isee:ISEE-GetOOSEntitlementInfoRequest>]]>
+      </isee:request>
+    </isee:GetOOSEntitlementList2>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

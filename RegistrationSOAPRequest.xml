@@ -1,0 +1,56 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:iseeReg="http://www.hp.com/isee/webservices/">
+  <SOAP-ENV:Body>
+    <iseeReg:RegisterClient2>
+      <iseeReg:request>
+        <![CDATA[<isee:ISEE-Registration xmlns:isee="http://www.hp.com/schemas/isee/5.00/event" schemaVersion="5.00">
+          <RegistrationSource>
+            <HP_OOSIdentifiers>
+              <OSID>
+                <Section name="SYSTEM_IDENTIFIERS">
+                  <Property name="TimestampGenerated" value=<UniversialDateTime>/> 
+                </Section>
+              </OSID>
+              <CSID>
+                <Section name="SYSTEM_IDENTIFIERS">
+                  <Property name="CollectorType" value="MC3"/>
+                  <Property name="CollectorVersion" value="T05.80.1 build 1"/>
+                  <Property name="AutoDetectedSystemSerialNumber" value=<SerialNumber>/>
+                  <Property name="SystemModel" value=<ProductModel>/>
+                  <Property name="TimestampGenerated" value=<UniversialDateTime>/> 
+                </Section>
+              </CSID>
+            </HP_OOSIdentifiers>
+            <PRS_Address>
+              <AddressType>0</AddressType>
+              <Address1/>
+              <Address2/>
+              <Address3/>
+              <Address4/>
+              <City/>
+              <Region/>
+              <PostalCode/>
+              <TimeZone/>
+              <Country/>
+            </PRS_Address>
+          </RegistrationSource>
+          <HP_ISEECustomer>
+            <Business/>
+            <Name/>
+          </HP_ISEECustomer>
+          <HP_ISEEPerson>
+            <CommunicationMode>255</CommunicationMode>
+            <ContactType/>
+            <FirstName/>
+            <LastName/>
+            <Salutation/>
+            <Title/>
+            <EmailAddress/>
+            <TelephoneNumber/>
+            <PreferredLanguage/>
+            <Availability/>
+          </HP_ISEEPerson>
+        </isee:ISEE-Registration>]]>
+      </iseeReg:request>
+    </iseeReg:RegisterClient2>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

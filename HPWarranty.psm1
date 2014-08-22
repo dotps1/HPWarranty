@@ -71,7 +71,6 @@
     http://stackoverflow.com/questions/19503442/hp-warranty-lookup-using-powershell-soap
     http://ocdnix.wordpress.com/2013/03/14/hp-server-warranty-via-the-isee-api/
     http://www.iislogs.com/steveschofield/execute-a-soap-request-from-powershell
-    https://github.com/ocdnix/hpisee
     http://dotps1.github.io
     Twitter: @dotps1
 #>
@@ -103,86 +102,38 @@ function Invoke-HPWarrantyRegistrationRequest
         $ProductModel
     )
     
-    try
+    if (-not($PSBoundParameters.ContainsValue($SerialNumber) -and $PSBoundParameters.ContainsValue($ProductModel)))
     {
-        if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
+        try
         {
-            $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-            $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
+            if ((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
+            {
+                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
+                $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
+            }
+            else
+            {
+                throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
+            }
         }
-        else
+        catch
         {
-            throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
+            throw "Unable to retrieve WMI Information from $ComputerName."
         }
-    }
-    catch
-    {
-        throw "Unable to retrieve WMI Information from $ComputerName."
     }
 
-[Xml]$registrationSOAPRequest = @"
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:iseeReg="http://www.hp.com/isee/webservices/">
-<SOAP-ENV:Body>
-    <iseeReg:RegisterClient2>
-    <iseeReg:request>&lt;isee:ISEE-Registration xmlns:isee="http://www.hp.com/schemas/isee/5.00/event" schemaVersion="5.00"&gt;
-&lt;RegistrationSource&gt;
-    &lt;HP_OOSIdentifiers&gt;
-    &lt;OSID&gt;
-        &lt;Section name="SYSTEM_IDENTIFIERS"&gt;
-        &lt;Property name="TimestampGenerated" value="$(Get-Date ((Get-Date).ToUniversalTime()) -Format 'yyyy&#47;MM&#47;dd HH:mm:ss \G\M\T')"/&gt; 
-        &lt;/Section&gt;
-    &lt;/OSID&gt;
-    &lt;CSID&gt;
-        &lt;Section name="SYSTEM_IDENTIFIERS"&gt;
-        &lt;Property name="CollectorType" value="MC3"/&gt;
-        &lt;Property name="CollectorVersion" value="T05.80.1 build 1"/&gt;
-        &lt;Property name="AutoDetectedSystemSerialNumber" value="$SerialNumber"/&gt;
-        &lt;Property name="SystemModel" value="$ProductModel"/&gt;
-        &lt;Property name="TimestampGenerated" value="$(Get-Date ((Get-Date).ToUniversalTime()) -Format 'yyyy&#47;MM&#47;dd HH:mm:ss \G\M\T')"/&gt; 
-        &lt;/Section&gt;
-    &lt;/CSID&gt;
-    &lt;/HP_OOSIdentifiers&gt;
-    &lt;PRS_Address&gt;
-    &lt;AddressType&gt;0&lt;/AddressType&gt;
-    &lt;Address1/&gt;
-    &lt;Address2/&gt;
-    &lt;Address3/&gt;
-    &lt;Address4/&gt;
-    &lt;City/&gt;
-    &lt;Region/&gt;
-    &lt;PostalCode/&gt;
-    &lt;TimeZone/&gt;
-    &lt;Country/&gt;
-    &lt;/PRS_Address&gt;
-&lt;/RegistrationSource&gt;
-&lt;HP_ISEECustomer&gt;
-    &lt;Business/&gt;
-    &lt;Name/&gt;
-&lt;/HP_ISEECustomer&gt;
-&lt;HP_ISEEPerson&gt;
-    &lt;CommunicationMode&gt;255&lt;/CommunicationMode&gt;
-    &lt;ContactType/&gt;
-    &lt;FirstName/&gt;
-    &lt;LastName/&gt;
-    &lt;Salutation/&gt;
-    &lt;Title/&gt;
-    &lt;EmailAddress/&gt;
-    &lt;TelephoneNumber/&gt;
-    &lt;PreferredLanguage/&gt;
-    &lt;Availability/&gt;
-&lt;/HP_ISEEPerson&gt;
-&lt;/isee:ISEE-Registration&gt;</iseeReg:request>
-    </iseeReg:RegisterClient2>
-</SOAP-ENV:Body>
-</SOAP-ENV:Envelope>
-"@
+    $UTC = Get-Date ((Get-Date).ToUniversalTime()) -Format 'yyyy/MM/dd HH:mm:ss \G\M\T'
+    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace "<UniversialDateTime>","`"$($UTC)`"" `
+        -replace '<SerialNumber>', "`"$($SerialNumber)`"" `
+        -replace '<ProductModel>',"`"$($ProductModel)`""
 
     $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
     [PSObject]$registration = @{
-                                    'Gdid'  = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.Gdid
-                                    'Token' = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.registrationtoken
-                               }
+        'Gdid'  = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.Gdid
+        'Token' = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.registrationtoken
+    }
+
     return $registration
 }
 
@@ -207,7 +158,6 @@ function Invoke-HPWarrantyRegistrationRequest
     http://stackoverflow.com/questions/19503442/hp-warranty-lookup-using-powershell-soap
     http://ocdnix.wordpress.com/2013/03/14/hp-server-warranty-via-the-isee-api/
     http://www.iislogs.com/steveschofield/execute-a-soap-request-from-powershell
-    https://github.com/ocdnix/hpisee
     http://dotps1.github.io
     Twitter: @dotps1
 #>
@@ -247,71 +197,48 @@ function Invoke-HPWarrantyLookup
         $ProductNumber
     )
 
-    try
+    if (-not($PSBoundParameters.ContainsValue($SerialNumber) -and $PSBoundParameters.ContainsValue($ProductNumber)))
     {
-        if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
+        try
         {
-            $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-            $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
-
-            if (-not($PSBoundParameters.ContainsValue($Gdid)) -or -not($PSBoundParameters.ContainsValue($Token)))
+            if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
             {
-                $reg = Invoke-HPWarrantyRegistrationRequest -ComputerName $ComputerName
-                $Gdid = $reg.Gdid
-                $Token = $reg.Token
+                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
+                $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
+
+                if (-not($PSBoundParameters.ContainsValue($Gdid)) -or -not($PSBoundParameters.ContainsValue($Token)))
+                {
+                    $reg = Invoke-HPWarrantyRegistrationRequest -ComputerName $ComputerName
+                    $Gdid = $reg.Gdid
+                    $Token = $reg.Token
+                }
+            }
+            else
+            {
+                throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
             }
         }
-        else
+        catch
         {
-            throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
+            throw "Unable to retrieve WMI Information from $ComputerName."
         }
     }
-    catch
-    {
-        throw "Unable to retrieve WMI Information from $ComputerName."
-    }
 
-[Xml]$entitlementSOAPRequest = @"
-<SOAP-ENV:Envelope
-    xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:isee="http://www.hp.com/isee/webservices/">
-  <SOAP-ENV:Header>
-    <isee:IseeWebServicesHeader>
-      <isee:GDID>$Gdid</isee:GDID>
-      <isee:registrationToken>$Token</isee:registrationToken>
-      <isee:OSID/>
-      <isee:CSID/>
-    </isee:IseeWebServicesHeader>
-  </SOAP-ENV:Header>
-  <SOAP-ENV:Body>
-    <isee:GetOOSEntitlementList2>
-      <isee:request>
-        &lt;isee:ISEE-GetOOSEntitlementInfoRequest
-    xmlns:isee="http://www.hp.com/schemas/isee/5.00/entitlement"
-    schemaVersion="5.00"&gt;
-  &lt;HP_ISEEEntitlementParameters&gt;
-    &lt;CountryCode&gt;ES&lt;/CountryCode&gt;
-    &lt;SerialNumber&gt;$SerialNumber&lt;/SerialNumber&gt;
-    &lt;ProductNumber&gt;$ProductNumber&lt;/ProductNumber&gt;
-    &lt;EntitlementType&gt;&lt;/EntitlementType&gt;
-    &lt;EntitlementId&gt;&lt;/EntitlementId&gt;
-    &lt;ObligationId&gt;&lt;/ObligationId&gt;
-  &lt;/HP_ISEEEntitlementParameters&gt;
-&lt;/isee:ISEE-GetOOSEntitlementInfoRequest&gt;
-      </isee:request>
-    </isee:GetOOSEntitlementList2>
-  </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>
-"@
+    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml") -replace '<Gdid>',$Gdid `
+        -replace '<Token>',$Token `
+        -replace '<Serial>',$SerialNumber `
+        -replace '<SKU>',$ProductNumber
 
-    $entitlementAction = Invoke-SOAPRequest -SOAPRequest $EntitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
+    $global:var = $entitlementSOAPRequest
+
+    $entitlementAction = Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
 
     [PSObject]$warranty = @{
-                                'SerialNumber'            = $SerialNumber
-                                'WarrantyStartDate'       = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("WarrantyStartDate").InnerText
-                                'WarrantyStandardEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[1]
-                                'WarrantyExtendedEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[0]
-                           }
+        'SerialNumber'            = $SerialNumber
+        'WarrantyStartDate'       = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("WarrantyStartDate").InnerText
+        'WarrantyStandardEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[1]
+        'WarrantyExtendedEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[0]
+    }
     
     if ($warranty -ne $null)
     {
@@ -367,7 +294,7 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
     $sqlConnection.ConnectionString="Server=$SqlServer,$ConnectionPort;Database=$Database;Integrated Security="
     if ($IntergratedSecurity)
     {
-        $sqlConnection.ConnectionString+="true;"
+        $sqlConnection.ConnectionString +="true;"
     }
     else
     {
