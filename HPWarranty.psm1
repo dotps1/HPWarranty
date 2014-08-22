@@ -168,9 +168,9 @@ function Invoke-HPWarrantyRegistrationRequest
 .DESCRIPTION
     Retrives the start date, standard end date and extened end date warranty information for an Hewlett-Packard system.
 .EXAMPLE
-    $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyLookup -Gdid $registration.Gdid -Token $registration.Token
+    Invoke-HPWarrantyLookup
 .EXAMPLE
-    $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyLookup -Gdid $registration.Gdid -Token $registration.Token -SerialNumber AABBCCD123 -ProductNumber F2R10UT#ABA
+    $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyLookup -Gdid $registration.Gdid -Token $registration.Token
 .NOTES
     Requires PowerShell V4.0
     A valid Gdid and Token are required to used this cmdlet.
@@ -352,7 +352,8 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
                                JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
 	                       WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
 	                           OR  MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
-	                           AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
+	                           AND PC_BIOS_DATA.SerialNumber00 <> ' '
+                               AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
 	                           AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
                            ORDER BY WorkstationStatus_DATA.LastHWScan"
 
