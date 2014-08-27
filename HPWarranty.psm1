@@ -128,7 +128,7 @@ function Invoke-HPWarrantyRegistrationRequest
         $ProductModel
     )
     
-    if (-not($PSBoundParameters.ContainsKey($SerialNumber) -and $PSBoundParameters.ContainsKey($ProductModel)))
+    if (-not($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductModel')))
     {
         try
         {
@@ -222,7 +222,7 @@ function Invoke-HPWarrantyLookup
         $ProductNumber
     )
 
-    if (-not($PSBoundParameters.ContainsKey($SerialNumber) -and $PSBoundParameters.ContainsKey($ProductNumber)))
+    if (-not($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductNumber')))
     {
         try
         {
