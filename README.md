@@ -12,71 +12,77 @@ The Invoke-SOAPRequst is not really used by a user, but it is used by the two ot
 
 
 Example 1:
-
-	# Execute from a local HP Workstation
-	Import-Module HPWarranty; Invoke-HPWarrantyLookup
+```PowerShell
+# Execute from a local HP Workstation
+Import-Module HPWarranty; Invoke-HPWarrantyLookup
+```
 
 Example 2:
+```PowerShell
+# Create one session but look up multiple warranty's
+Import-Module -Name HPWarranty
 
-	# Create one session but look up multiple warranty's
-	Import-Module -Name HPWarranty
+$HP1 = @{
+	'SerialNumber' = 'A1B2C3D4E5'
+	'ProductModel' = 'HP Laptop 100 G1'
+	'ProductNumber' = '123ABC'
+}
+
+$HP2 = @{
+	'SerialNumber' = '12345ABCDE'
+	'ProductModel' = 'HP Desktop 1100 G1'
+	'ProductNumber' = 'ABC123'
+}
+
 	
-	$HP1 = @{
-		'SerialNumber' = 'A1B2C3D4E5'
-		'ProductModel' = 'HP Laptop 100 G1'
-		'ProductNumber' = '123ABC'
-	}
-	
-	$HP2 = @{
-		'SerialNumber' = '12345ABCDE'
-		'ProductModel' = 'HP Desktop 1100 G1'
-		'ProductNumber' = 'ABC123'
-	}
-	
-	# Use either HP1 or HP2 properties to establish a session with the HP Web Services.
-	$reg = Invoke-HPWarrantyRegistrationRequest -SerialNumber $HP1.SerialNumber -ProductModel $HP1.ProductModel
-	
-	Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP1.SerialNumber -ProductNumber $HP1.ProductNumber
-	Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP2.SerialNumber -ProductNumber $HP2.ProductNumber
+# Use either HP1 or HP2 properties to establish a session with the HP Web Services.
+$reg = Invoke-HPWarrantyRegistrationRequest -SerialNumber $HP1.SerialNumber -ProductModel $HP1.ProductModel
+
+Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP1.SerialNumber -ProductNumber $HP1.ProductNumber
+Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP2.SerialNumber -ProductNumber $HP2.ProductNumber
+```
 
 Example 3:
+```PowerShell
+# Query a remote computer for information to create a session with the the HP Web Services.
+# Remote WMI access is necessary to use this function remotely.
+Import-Module -Name HPWarranty
 
-	# Query a remote computer for information to create a session with the the HP Web Services.
-	# Remote WMI access is necessary to use this function remotely.
-	Import-Module -Name HPWarranty
-	
-	$reg = Invoke-HPWarrantyRegistrationRequest -ComputerName HPComputer.mydomain.org
-	
-	Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -ComputerName HPComputer.mydomain.org
-	
+$reg = Invoke-HPWarrantyRegistrationRequest -ComputerName HPComputer.mydomain.org
+
+Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -ComputerName HPComputer.mydomain.org
+```
+
 Example 4:
+```PowerShell
+# Execute with information from ConfigMgr Database:
+Import-Module -Name HPWarranty
 
-	# Execute with information from ConfigMgr Database:
-	Import-Module -Name HPWarranty
+$reg = Invoke-HPWarrantyRegistrationRequest -SeralNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
 
-	$reg = Invoke-HPWarrantyRegistrationRequest -SeralNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
-
-	$HPs = Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity
-	foreach ($HP in $HPs)
-	{
-		 Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP.SerialNumber -ProductNumber $HP.ProductNumber
-	}
+$HPs = Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity
+foreach ($HP in $HPs)
+{
+	 Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP.SerialNumber -ProductNumber $HP.ProductNumber
+}
+```
 	
 Example 5:
+```PowerShell
+# Hashtables are a little tricky to export to CSV, so here is how I run my build date report:
+Import-Module -Name HPWarranty
+Import-Module -Name ActiveDirectory
 
-	# Hashtables are a little tricky to export to CSV, so here is how I run my build date report:
-	Import-Module -Name HPWarranty
-	Import-Module -Name ActiveDirectory
+$reg = Invoke-HPWarrantyRegistrationRequest
 
-	$reg = Invoke-HPWarrantyRegistrationRequest
-	
-	# This output is tailored to the request that was given to me, not all of these values maybe necessary to return.
-    Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MyCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
-    Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } }, 
-                            @{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } }, 
-                            @{ Name = 'ProductModel';     Expression = { $_.ProductModel } }, 
-                            @{ Name = 'BuildDate';        Expression = { (Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductNumber $_.ProductNumber).WarrantyStartDate } },
-                            @{ Name = 'LastHardwareScan'; Expression = { Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd' } },
-                            @{ Name = 'LastLoggedOnUser'; Expression = { $_.Username } },
-                            @{ Name = 'CompanyName';      Expression = { if ($_.Username -ne $null){ (Get-ADUser -Identity $_.Username.ToString().Trim('MYDOMAIN\') -Properties Company).Company } } } |
-    Export-Csv -Path C:\HPBuildInfo.csv -NoTypeInformation -Append 
+# This output is tailored to the request that was given to me, not all of these values maybe necessary to return.
+Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MyCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
+Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } }, 
+						@{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } }, 
+						@{ Name = 'ProductModel';     Expression = { $_.ProductModel } }, 
+						@{ Name = 'BuildDate';        Expression = { (Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductNumber $_.ProductNumber).WarrantyStartDate } },
+						@{ Name = 'LastHardwareScan'; Expression = { Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd' } },
+						@{ Name = 'LastLoggedOnUser'; Expression = { $_.Username } },
+						@{ Name = 'CompanyName';      Expression = { if ($_.Username -ne $null){ (Get-ADUser -Identity $_.Username.ToString().Trim('MYDOMAIN\') -Properties Company).Company } } } |
+Export-Csv -Path C:\HPBuildInfo.csv -NoTypeInformation -Append 
+```
