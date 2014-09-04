@@ -43,78 +43,79 @@
 <li> You can reuse the Gdid and Token from step one in a foreach loop to retrieve multiple warranty objects.  That is why I created the Get-HPComputerInformationForWarrantyRequestFromCCMDB.  If you configure your SCCM Client to inventory the MS_SystemInformation WMI Class (Found in the root namespace, not in CIMV2, root\MS_SystemInformation) you can then use this function to return form the CM_ database an array of objects containing the information needed to complete all actions.  SerialNumber,ProductModel,ProductNumber,ProductManufacturer.</li>
 </ol><p>Example 1:</p>
 
-<pre><code># Execute from a local HP Workstation
-Import-Module HPWarranty; Invoke-HPWarrantyLookup
-</code></pre>
+<div class="highlight highlight-PowerShell"><pre><span class="c"># Execute from a local HP Workstation</span>
+<span class="nb">Import-Module</span> <span class="n">HPWarranty</span><span class="p">;</span> <span class="nb">Invoke-HPWarrantyLookup</span>
+</pre></div>
 
 <p>Example 2:</p>
 
-<pre><code># Create one session but look up multiple warranty's
-Import-Module -Name HPWarranty
+<div class="highlight highlight-PowerShell"><pre><span class="c"># Create one session but look up multiple warranty's</span>
+<span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="n">HPWarranty</span>
 
-$HP1 = @{
-    'SerialNumber' = 'A1B2C3D4E5'
-    'ProductModel' = 'HP Laptop 100 G1'
-    'ProductNumber' = '123ABC'
-}
+<span class="nv">$HP1</span> <span class="p">=</span> <span class="p">@{</span>
+    <span class="s1">'SerialNumber'</span> <span class="p">=</span> <span class="s1">'A1B2C3D4E5'</span>
+    <span class="s1">'ProductModel'</span> <span class="p">=</span> <span class="s1">'HP Laptop 100 G1'</span>
+    <span class="s1">'ProductNumber'</span> <span class="p">=</span> <span class="s1">'123ABC'</span>
+<span class="p">}</span>
 
-$HP2 = @{
-    'SerialNumber' = '12345ABCDE'
-    'ProductModel' = 'HP Desktop 1100 G1'
-    'ProductNumber' = 'ABC123'
-}
+<span class="nv">$HP2</span> <span class="p">=</span> <span class="p">@{</span>
+    <span class="s1">'SerialNumber'</span> <span class="p">=</span> <span class="s1">'12345ABCDE'</span>
+    <span class="s1">'ProductModel'</span> <span class="p">=</span> <span class="s1">'HP Desktop 1100 G1'</span>
+    <span class="s1">'ProductNumber'</span> <span class="p">=</span> <span class="s1">'ABC123'</span>
+<span class="p">}</span>
 
-# Use either HP1 or HP2 properties to establish a session with the HP Web Services.
-$reg = Invoke-HPWarrantyRegistrationRequest -SerialNumber $HP1.SerialNumber -ProductModel $HP1.ProductModel
 
-Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP1.SerialNumber -ProductNumber $HP1.ProductNumber
-Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP2.SerialNumber -ProductNumber $HP2.ProductNumber
-</code></pre>
+<span class="c"># Use either HP1 or HP2 properties to establish a session with the HP Web Services.</span>
+<span class="nv">$reg</span> <span class="p">=</span> <span class="nb">Invoke-HPWarrantyRegistrationRequest</span> <span class="n">-SerialNumber</span> <span class="nv">$HP1</span><span class="p">.</span><span class="n">SerialNumber</span> <span class="n">-ProductModel</span> <span class="nv">$HP1</span><span class="p">.</span><span class="n">ProductModel</span>
+
+<span class="nb">Invoke-HPWarrantyLookup</span> <span class="n">-Gdid</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Gdid</span> <span class="n">-Token</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Token</span> <span class="n">-SerialNumber</span> <span class="nv">$HP1</span><span class="p">.</span><span class="n">SerialNumber</span> <span class="n">-ProductNumber</span> <span class="nv">$HP1</span><span class="p">.</span><span class="n">ProductNumber</span>
+<span class="nb">Invoke-HPWarrantyLookup</span> <span class="n">-Gdid</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Gdid</span> <span class="n">-Token</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Token</span> <span class="n">-SerialNumber</span> <span class="nv">$HP2</span><span class="p">.</span><span class="n">SerialNumber</span> <span class="n">-ProductNumber</span> <span class="nv">$HP2</span><span class="p">.</span><span class="n">ProductNumber</span>
+</pre></div>
 
 <p>Example 3:</p>
 
-<pre><code># Query a remote computer for information to create a session with the the HP Web Services.
-# Remote WMI access is necessary to use this function remotely.
-Import-Module -Name HPWarranty
+<div class="highlight highlight-PowerShell"><pre><span class="c"># Query a remote computer for information to create a session with the the HP Web Services.</span>
+<span class="c"># Remote WMI access is necessary to use this function remotely.</span>
+<span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="n">HPWarranty</span>
 
-$reg = Invoke-HPWarrantyRegistrationRequest -ComputerName HPComputer.mydomain.org
+<span class="nv">$reg</span> <span class="p">=</span> <span class="nb">Invoke-HPWarrantyRegistrationRequest</span> <span class="n">-ComputerName</span> <span class="n">HPComputer</span><span class="p">.</span><span class="n">mydomain</span><span class="p">.</span><span class="n">org</span>
 
-Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -ComputerName HPComputer.mydomain.org
-</code></pre>
+<span class="nb">Invoke-HPWarrantyLookup</span> <span class="n">-Gdid</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Gdid</span> <span class="n">-Token</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Token</span> <span class="n">-ComputerName</span> <span class="n">HPComputer</span><span class="p">.</span><span class="n">mydomain</span><span class="p">.</span><span class="n">org</span>
+</pre></div>
 
 <p>Example 4:</p>
 
-<pre><code># Execute with information from ConfigMgr Database:
-Import-Module -Name HPWarranty
+<div class="highlight highlight-PowerShell"><pre><span class="c"># Execute with information from ConfigMgr Database:</span>
+<span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="n">HPWarranty</span>
 
-$reg = Invoke-HPWarrantyRegistrationRequest -SeralNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
+<span class="nv">$reg</span> <span class="p">=</span> <span class="nb">Invoke-HPWarrantyRegistrationRequest</span> <span class="n">-SeralNumber</span> <span class="s2">"ABCDE12345"</span> <span class="n">-ProductModel</span> <span class="s2">"HP ProBook 645 G1"</span>
 
-$HPs = Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity
-foreach ($HP in $HPs)
-{
-     Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP.SerialNumber -ProductNumber $HP.ProductNumber
-}
-</code></pre>
+<span class="nv">$HPs</span> <span class="p">=</span> <span class="nb">Get-HPComputerInformationForWarrantyRequestFromCMDB</span> <span class="n">-SqlServer</span> <span class="n">MySccmDBServer</span> <span class="n">-Database</span> <span class="n">CM_MS1</span> <span class="n">-IntergratedSecurity</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$HP</span> <span class="k">in</span> <span class="nv">$HPs</span><span class="p">)</span>
+<span class="p">{</span>
+     <span class="nb">Invoke-HPWarrantyLookup</span> <span class="n">-Gdid</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Gdid</span> <span class="n">-Token</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Token</span> <span class="n">-SerialNumber</span> <span class="nv">$HP</span><span class="p">.</span><span class="n">SerialNumber</span> <span class="n">-ProductNumber</span> <span class="nv">$HP</span><span class="p">.</span><span class="n">ProductNumber</span>
+<span class="p">}</span>
+</pre></div>
 
 <p>Example 5:</p>
 
-<pre><code># Hashtables are a little tricky to export to CSV, so here is how I run my build date report:
-Import-Module -Name HPWarranty
-Import-Module -Name ActiveDirectory
+<div class="highlight highlight-PowerShell"><pre><span class="c"># Hashtables are a little tricky to export to CSV, so here is how I run my build date report:</span>
+<span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="n">HPWarranty</span>
+<span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="n">ActiveDirectory</span>
 
-$reg = Invoke-HPWarrantyRegistrationRequest
+<span class="nv">$reg</span> <span class="p">=</span> <span class="nb">Invoke-HPWarrantyRegistrationRequest</span>
 
-# This output is tailored to the request that was given to me, not all of these values maybe necessary to return.
-Get-HPComputerInformationForWarrantyRequestFromCMDB -SqlServer MyCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
-Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } }, 
-                        @{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } }, 
-                        @{ Name = 'ProductModel';     Expression = { $_.ProductModel } }, 
-                        @{ Name = 'BuildDate';        Expression = { (Invoke-HPWarrantyLookup -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductNumber $_.ProductNumber).WarrantyStartDate } },
-                        @{ Name = 'LastHardwareScan'; Expression = { Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd' } },
-                        @{ Name = 'LastLoggedOnUser'; Expression = { $_.Username } },
-                        @{ Name = 'CompanyName';      Expression = { if ($_.Username -ne $null){ (Get-ADUser -Identity $_.Username.ToString().Trim('MYDOMAIN\') -Properties Company).Company } } } |
-Export-Csv -Path C:\HPBuildInfo.csv -NoTypeInformation -Append 
-</code></pre>
+<span class="c"># This output is tailored to the request that was given to me, not all of these values maybe necessary to return.</span>
+<span class="nb">Get-HPComputerInformationForWarrantyRequestFromCMDB</span> <span class="n">-SqlServer</span> <span class="n">MyCMDB</span><span class="p">.</span><span class="n">mydomain</span><span class="p">.</span><span class="n">org</span> <span class="n">-Database</span> <span class="n">CM_MS1</span> <span class="n">-IntergratedSecurity</span> <span class="p">|</span>
+<span class="nb">Select-Object</span> <span class="n">-Property</span> <span class="p">@{</span> <span class="n">Name</span> <span class="p">=</span> <span class="s1">'ComputerName'</span><span class="p">;</span>     <span class="n">Expression</span> <span class="p">=</span> <span class="p">{</span> <span class="nv">$_</span><span class="p">.</span><span class="n">ComputerName</span> <span class="p">}</span> <span class="p">},</span> 
+                        <span class="p">@{</span> <span class="n">Name</span> <span class="p">=</span> <span class="s1">'SerialNumber'</span><span class="p">;</span>     <span class="n">Expression</span> <span class="p">=</span> <span class="p">{</span> <span class="nv">$_</span><span class="p">.</span><span class="n">SerialNumber</span> <span class="p">}</span> <span class="p">},</span> 
+                        <span class="p">@{</span> <span class="n">Name</span> <span class="p">=</span> <span class="s1">'ProductModel'</span><span class="p">;</span>     <span class="n">Expression</span> <span class="p">=</span> <span class="p">{</span> <span class="nv">$_</span><span class="p">.</span><span class="n">ProductModel</span> <span class="p">}</span> <span class="p">},</span> 
+                        <span class="p">@{</span> <span class="n">Name</span> <span class="p">=</span> <span class="s1">'BuildDate'</span><span class="p">;</span>        <span class="n">Expression</span> <span class="p">=</span> <span class="p">{</span> <span class="p">(</span><span class="nb">Invoke-HPWarrantyLookup</span> <span class="n">-Gdid</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Gdid</span> <span class="n">-Token</span> <span class="nv">$reg</span><span class="p">.</span><span class="n">Token</span> <span class="n">-SerialNumber</span> <span class="nv">$_</span><span class="p">.</span><span class="n">SerialNumber</span> <span class="n">-ProductNumber</span> <span class="nv">$_</span><span class="p">.</span><span class="n">ProductNumber</span><span class="p">).</span><span class="n">WarrantyStartDate</span> <span class="p">}</span> <span class="p">},</span>
+                        <span class="p">@{</span> <span class="n">Name</span> <span class="p">=</span> <span class="s1">'LastHardwareScan'</span><span class="p">;</span> <span class="n">Expression</span> <span class="p">=</span> <span class="p">{</span> <span class="nb">Get-Date</span> <span class="p">(</span><span class="nb">Get-Date</span> <span class="nv">$_</span><span class="p">.</span><span class="n">LastHardwareScan</span><span class="p">).</span><span class="n">ToShortDateString</span><span class="p">()</span> <span class="n">-Format</span> <span class="s1">'yyyy-MM-dd'</span> <span class="p">}</span> <span class="p">},</span>
+                        <span class="p">@{</span> <span class="n">Name</span> <span class="p">=</span> <span class="s1">'LastLoggedOnUser'</span><span class="p">;</span> <span class="n">Expression</span> <span class="p">=</span> <span class="p">{</span> <span class="nv">$_</span><span class="p">.</span><span class="n">Username</span> <span class="p">}</span> <span class="p">},</span>
+                        <span class="p">@{</span> <span class="n">Name</span> <span class="p">=</span> <span class="s1">'CompanyName'</span><span class="p">;</span>      <span class="n">Expression</span> <span class="p">=</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$_</span><span class="p">.</span><span class="n">Username</span> <span class="o">-ne</span> <span class="nv">$null</span><span class="p">){</span> <span class="p">(</span><span class="nb">Get-ADUser</span> <span class="n">-Identity</span> <span class="nv">$_</span><span class="p">.</span><span class="n">Username</span><span class="p">.</span><span class="n">ToString</span><span class="p">().</span><span class="n">Trim</span><span class="p">(</span><span class="s1">'MYDOMAIN\'</span><span class="p">)</span> <span class="n">-Properties</span> <span class="n">Company</span><span class="p">).</span><span class="n">Company</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">|</span>
+<span class="nb">Export-Csv</span> <span class="n">-Path</span> <span class="n">C</span><span class="err">:</span><span class="p">\</span><span class="n">HPBuildInfo</span><span class="p">.</span><span class="n">csv</span> <span class="n">-NoTypeInformation</span> <span class="n">-Append</span> 
+</pre></div>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/dotps1">dotps1</a></p>
