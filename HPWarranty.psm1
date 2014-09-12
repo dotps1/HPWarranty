@@ -254,8 +254,6 @@ function Invoke-HPWarrantyLookup
         -replace '<Serial>',$SerialNumber `
         -replace '<SKU>',$ProductNumber
 
-    $global:var = $entitlementSOAPRequest
-
     $entitlementAction = Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
 
     [PSObject]$warranty = @{
@@ -263,6 +261,7 @@ function Invoke-HPWarrantyLookup
         'WarrantyStartDate'       = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("WarrantyStartDate").InnerText
         'WarrantyStandardEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[1]
         'WarrantyExtendedEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[0]
+        'WarrantyCarePackEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[2]
     }
     
     if ($warranty -ne $null)
