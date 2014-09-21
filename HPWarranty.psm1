@@ -149,8 +149,8 @@ function Invoke-HPWarrantyRegistrationRequest
     }
 
     [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace "<UniversialDateTime>",((Get-Date).ToUniversalTime()).ToString('yyyy/MM/dd HH:mm:ss \G\M\T') `
-        -replace '<SerialNumber>',$SerialNumber `
-        -replace '<ProductModel>',$ProductModel
+        -replace '<SerialNumber>',$SerialNumber.Trim() `
+        -replace '<ProductModel>',$ProductModel.Trim()
 
     $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
@@ -249,10 +249,11 @@ function Invoke-HPWarrantyLookup
         }
     }
 
-    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml") -replace '<Gdid>',$Gdid `
+    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml")`
+        -replace '<Gdid>',$Gdid `
         -replace '<Token>',$Token `
-        -replace '<Serial>',$SerialNumber `
-        -replace '<SKU>',$ProductNumber
+        -replace '<Serial>',$SerialNumber.Trim() `
+        -replace '<SKU>',$ProductNumber.Trim()
 
     $entitlementAction = Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
 
