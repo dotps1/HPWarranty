@@ -378,3 +378,42 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
     $results.Close()
     $sqlConnection.Close()
 }
+
+Function Get-WmiObjectSafe {
+	<#
+	.DESCRIPTION
+	Get-WmiObject implemented as a background job to avoid freezing.
+	#>
+	[CmdletBinding()]
+    Param
+    (
+       
+        [Parameter(ParameterSetName = 'Default')]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String] $ComputerName,
+
+        [Parameter(ParameterSetName = 'Default', Mandatory = $false)]
+        [String] $Namespace,
+
+        [Parameter(ParameterSetName = 'Default', Mandatory = $false)]
+        [String] $Class,
+
+        [Parameter(ParameterSetName = 'Default', Mandatory = $false)]
+        [String] $Property,
+
+        [Parameter(ParameterSetName = 'Default', Mandatory = $false)]
+        [String] $Timeout = 5
+    )
+
+    $curJobName = (Get-WmiObject $class -comp $computerName -AsJob -namespace $Namespace).Name
+
+    $timeElapsed = 0
+
+    while ( (Get-Job -Name $curJobName).State -eq "Running" -and $timeElapsed -lt $timeout ) {
+        sleep -Seconds 1
+        $timeElapsed++
+    }
+
+    Receive-Job $curJobName
+
+}
