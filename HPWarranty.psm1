@@ -132,10 +132,10 @@ function Invoke-HPWarrantyRegistrationRequest
     {
         try
         {
-            if ((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
+            if ((Get-WmiObjectSafe -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObjectSafe -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
             {
-                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-                $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
+                $SerialNumber = (Get-WmiObjectSafe -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
+                $ProductModel = (Get-WmiObjectSafe -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
             }
             else
             {
@@ -226,10 +226,10 @@ function Invoke-HPWarrantyLookup
     {
         try
         {
-            if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
+            if((Get-WmiObjectSafe -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObjectSafe -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
             {
-                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-                $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
+                $SerialNumber = (Get-WmiObjectSafe -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
+                $ProductNumber = (Get-WmiObjectSafe -Namespace root\WMI -class MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
 
                 if (-not($PSBoundParameters.ContainsValue($Gdid)) -or -not($PSBoundParameters.ContainsValue($Token)))
                 {
@@ -381,11 +381,11 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
 
 ##############################################################################
 #.DESCRIPTION
-# Get-WmiObject implemented as a background job to avoid freezing.
+# Get-WmiObjectSafe implemented as a background job to avoid freezing.
 #.PARAMETER Timeout
 # Time in seconds before job is canceled
 ##############################################################################
-Function Get-WmiObjectSafe {
+Function Get-WmiObjectSafeSafe {
 
 	[CmdletBinding()]
     Param
@@ -408,7 +408,7 @@ Function Get-WmiObjectSafe {
         [String] $Timeout = 5
     )
 
-    $curJobName = (Get-WmiObject $class -comp $computerName -AsJob -namespace $Namespace).Name
+    $curJobName = (Get-WmiObjectSafe $class -comp $computerName -AsJob -namespace $Namespace).Name
 
     $timeElapsed = 0
 
