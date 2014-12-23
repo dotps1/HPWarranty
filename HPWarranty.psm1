@@ -219,7 +219,11 @@ function Invoke-HPWarrantyLookup
                    Mandatory = $true)]
         [Alias("PN")]
         [String]
-        $ProductNumber
+        $ProductNumber,
+		
+		 # 1 = Return full XML, 0 = reduced PSObject
+        [Parameter( Mandatory = $false)]
+        [Boolean] $ReturnXML = $false
     )
 
     if (-not($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductNumber')))
@@ -257,18 +261,101 @@ function Invoke-HPWarrantyLookup
 
     $entitlementAction = Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
 
-    [PSObject]$warranty = @{
-        'SerialNumber'            = $SerialNumber
-        'WarrantyStartDate'       = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("WarrantyStartDate").InnerText
-        'WarrantyStandardEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[1]
-        'WarrantyExtendedEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[0]
-        'WarrantyCarePackEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[2]
-    }
-    
-    if ($warranty -ne $null)
+    if ($ReturnXML) {
+		([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).('ISEE-GetOOSEntitlementInfoResponse').Data.EsReply
+    } else {
+		@{
+	        'SerialNumber'            = $SerialNumber
+	        'WarrantyStartDate'       = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("WarrantyStartDate").InnerText
+	        'WarrantyStandardEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[1]
+	        'WarrantyExtendedEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[0]
+	        'WarrantyCarePackEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[2]
+		}
+		
+	}
+}
+
+function Invoke-HPWarrantyLookupXML
+{
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
+    [OutputType([XML])]
+    Param
+    (
+        # Gdid, Type String, The Gdid Identitfier of the session with the HP ISEE Service.
+        [String]
+        $Gdid,
+
+        # Token, Type String, The Token of the session with the HP ISEE Service.
+        [String]
+        $Token,
+
+        # ComputerName, Type String, The remote Hewlett-Packard Computer.
+        [Parameter(ParameterSetName = 'Default')]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String]
+        $ComputerName = $env:COMPUTERNAME,
+
+        # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
+        [Parameter(ParameterSetName = 'Static',
+                   Mandatory = $true)]
+        [ValidateLength(10,10)]
+        [Alias("SN")]
+        [String]
+        $SerialNumber,
+
+        # ProductNumber, Type String, The product number (SKU) of the Hewlett-Packard System.
+        [Parameter(ParameterSetName = 'Static',
+                   Mandatory = $true)]
+        [Alias("PN")]
+        [String]
+        $ProductNumber
+    )
+	
+    if (-not($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductNumber')))
     {
-        return $warranty
+        try
+        {
+            $wmiObj = Get-WmiObjectSafe -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction SilentlyContinue
+			if( ($wmiObj.Manufacturer -eq "Hewlett-Packard") -or ($wmiObj.Manufacturer -eq "HP") )
+            {
+                $SerialNumber = (Get-WmiObjectSafe -Class Win32_Bios -ComputerName $ComputerName -ErrorAction SilentlyContinue).SerialNumber.Trim(" ")
+
+                $ProductNumber = (Get-WmiObjectSafe -Namespace root\WMI -class MS_SystemInformation -ComputerName $ComputerName).SystemSKU.Trim(" ")
+
+               if (-not($PSBoundParameters.ContainsValue($Gdid)) -or -not($PSBoundParameters.ContainsValue($Token)))
+                {
+                    $reg = Invoke-HPWarrantyRegistrationRequest -ComputerName $ComputerName
+                    $Gdid = $reg.Gdid
+                    $Token = $reg.Token
+                }
+            }
+            else
+            {
+                throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
+            }
+        }
+        catch
+        {
+			$_.Exception
+            #throw "Unable to retrieve WMI Information from $ComputerName."
+        }
     }
+
+    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml")`
+        -replace '<Gdid>',$Gdid `
+        -replace '<Token>',$Token `
+        -replace '<Serial>',$SerialNumber.Trim() `
+        -replace '<SKU>',$ProductNumber.Trim()
+
+    $entitlementAction = Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
+	$warrantyXML = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).('ISEE-GetOOSEntitlementInfoResponse').Data.EsReply
+
+	
+
+    #if ($warrantyXML -ne $null)
+    #{
+       $warrantyXML
+    #}
 }
 
 <#
