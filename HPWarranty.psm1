@@ -379,11 +379,14 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
     $sqlConnection.Close()
 }
 
+##############################################################################
+#.DESCRIPTION
+# Get-WmiObject implemented as a background job to avoid freezing.
+#.PARAMETER Timeout
+# Time in seconds before job is canceled
+##############################################################################
 Function Get-WmiObjectSafe {
-	<#
-	.DESCRIPTION
-	Get-WmiObject implemented as a background job to avoid freezing.
-	#>
+
 	[CmdletBinding()]
     Param
     (
