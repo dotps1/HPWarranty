@@ -3,6 +3,10 @@
     Executes a SOAP Request.
 .DESCRIPTION
     Sends a SOAP Request to Hewlett-Packard ISEE Servers to either create a Registration GDID and Token, or retrieve Warranty Info.
+.INPUTS
+    None.
+.OUTPUTS
+    System.Xml.
 .EXAMPLE
     Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 .EXAMPLE
@@ -18,10 +22,12 @@
         Steve Schofield Microsoft MVP - IIS
 .LINK
     http://stackoverflow.com/questions/19503442/hp-warranty-lookup-using-powershell-soap
+.LINK
     http://ocdnix.wordpress.com/2013/03/14/hp-server-warranty-via-the-isee-api/
+.LINK
     http://www.iislogs.com/steveschofield/execute-a-soap-request-from-powershell
+.LINK
     http://dotps1.github.io
-    Twitter: @dotps1
 #>
 function Invoke-SOAPRequest 
 {
@@ -80,6 +86,10 @@ function Invoke-SOAPRequest
     Creates a session with HP ISEE Web Servies.
 .DESCRIPTION
     Creates a session with HP ISEE Web Servies and returns the necassary information send Requests.
+.INPUTS
+    None.
+.OUTPUTS
+    System.Management.Automation.PSObject.
 .EXAMPLE
     Invoke-HPWarrantyRegistrationRequest
 .EXAMPLE
@@ -95,10 +105,12 @@ function Invoke-SOAPRequest
         Steve Schofield Microsoft MVP - IIS
 .LINK
     http://stackoverflow.com/questions/19503442/hp-warranty-lookup-using-powershell-soap
+.LINK
     http://ocdnix.wordpress.com/2013/03/14/hp-server-warranty-via-the-isee-api/
+.LINK
     http://www.iislogs.com/steveschofield/execute-a-soap-request-from-powershell
+.LINK
     http://dotps1.github.io
-    Twitter: @dotps1
 #>
 function Invoke-HPWarrantyRegistrationRequest
 {
@@ -155,8 +167,8 @@ function Invoke-HPWarrantyRegistrationRequest
     $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
     [PSObject]$registration = @{
-        'Gdid'  = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.Gdid
-        'Token' = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.registrationtoken
+        'Gdid'  = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
+        'Token' = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.registrationtoken
     }
 
     return $registration
@@ -167,6 +179,10 @@ function Invoke-HPWarrantyRegistrationRequest
     Uses the HP ISEE Web Services to retrive warranty information.
 .DESCRIPTION
     Retrives the start date, standard end date and extened end date warranty information for an Hewlett-Packard system.
+.INPUT
+    None.
+.OUTPUT
+    System.Management.Automation.PSObject.
 .EXAMPLE
     Invoke-HPWarrantyLookup
 .EXAMPLE
@@ -181,10 +197,12 @@ function Invoke-HPWarrantyRegistrationRequest
         Steve Schofield Microsoft MVP - IIS
 .LINK
     http://stackoverflow.com/questions/19503442/hp-warranty-lookup-using-powershell-soap
+.LINK
     http://ocdnix.wordpress.com/2013/03/14/hp-server-warranty-via-the-isee-api/
+.LINK
     http://www.iislogs.com/steveschofield/execute-a-soap-request-from-powershell
+.LINK
     http://dotps1.github.io
-    Twitter: @dotps1
 #>
 function Invoke-HPWarrantyLookup
 {
@@ -193,10 +211,12 @@ function Invoke-HPWarrantyLookup
     Param
     (
         # Gdid, Type String, The Gdid Identitfier of the session with the HP ISEE Service.
+        [Parameter()]
         [String]
         $Gdid,
 
         # Token, Type String, The Token of the session with the HP ISEE Service.
+        [Parameter()]
         [String]
         $Token,
 
@@ -249,7 +269,7 @@ function Invoke-HPWarrantyLookup
         }
     }
 
-    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml")`
+    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml") `
         -replace '<Gdid>',$Gdid `
         -replace '<Token>',$Token `
         -replace '<Serial>',$SerialNumber.Trim() `
@@ -276,15 +296,18 @@ function Invoke-HPWarrantyLookup
     Queries ConfigMgr Database for Information needed to query the Hewlett-Packard Servers for Warranty Information.
 .DESCRIPTION
     Queries inventored information from Microsoft System Center Configuration manager for data to allow for bulk Hewlett-Packard Warranty Lookups.
+.INPUT
+    None.
+.OUTPUT
+    System.Array.
 .EXAMPLE
     Get-ComputerInformationForHPWarrantyInformationFromCMDB -Database CM_ABC -IntergratedSecurity
 .EXAMPLE
     Get-ComputerInformationForHPWarrantyInformationFromCMDB -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
 .NOTES
-    The root\WMI MS_SystemInformation needs to be inventoried into ConfigMgr so the Product Number (SKU) can be retireved.
+    The root\WMI MS_SystemInformation Class needs to be inventoried into ConfigMgr so the Product Number (SKU) can be retireved.
 .LINK
     http://dotps1.github.io
-    Twitter: @dotps1
 #>
 function Get-HPComputerInformationForWarrantyRequestFromCMDB
 {
@@ -315,16 +338,16 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
         $IntergratedSecurity
     )
 
-    $sqlConnection = New-Object -TypeName System.Data.SqlClient.SqlConnection
-    $sqlConnection.ConnectionString = "Server=$SqlServer,$ConnectionPort;Database=$Database;Integrated Security="
+    $sqlConnection = New-Object -TypeName System.Data.SqlClient.SqlConnection -Property @{ ConnectionString = "Server=$SqlServer,$ConnectionPort;Database=$Database;" }
+
     if ($IntergratedSecurity.IsPresent)
     {
-        $sqlConnection.ConnectionString += "true;"
+        $sqlConnection.ConnectionString += "Integrated Security=true;"
     }
     else
     {
         $sqlCredentials = Get-Credential
-        $sqlConnection.ConnectionString += "false;User ID=$($sqlCredentials.Username);Password=$($sqlCredentials.GetNetworkCredential().Password);"
+        $sqlConnection.ConnectionString += "User ID=$($sqlCredentials.Username);Password=$($sqlCredentials.GetNetworkCredential().Password);"
     }
     
     try
@@ -336,28 +359,27 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
         throw $_
     }
 
-    $sqlCMD = New-Object -TypeName System.Data.SqlClient.SqlCommand
-    $sqlCMD.CommandText = "SELECT Computer_System_DATA.Name00 AS ComputerName,
-                                  Computer_System_Data.UserName00 AS Username,
-	                              PC_BIOS_DATA.SerialNumber00 AS SerialNumber,
-	                              MS_SYSTEMINFORMATION_DATA.SystemSKU00 AS ProductNumber,
-	                              MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
-	                              MS_SYSTEMINFORMATION_DATA.SystemProductName00 AS ProductModel,
-                                  System_DISC.AD_Site_Name0 AS ADSiteName,
-                                  WorkstationStatus_DATA.LastHWScan	AS LastHardwareScan
-                             FROM MS_SYSTEMINFORMATION_DATA
-	                              JOIN Computer_System_Data ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
-	                              JOIN PC_BIOS_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
-                                  JOIN System_DISC ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
-                                  JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
-	                         WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
-	                            OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
-	                           AND PC_BIOS_DATA.SerialNumber00 <> ' '
-                               AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
-	                           AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
-                             ORDER BY WorkstationStatus_DATA.LastHWScan"
-    $sqlCMD.Connection = $sqlConnection
-    $results = $sqlCMD.ExecuteReader()
+    $sql = "SELECT Computer_System_DATA.Name00 AS ComputerName, 
+       	           Computer_System_Data.UserName00 AS Username, 
+       	           PC_BIOS_DATA.SerialNumber00 AS SerialNumber, 
+       	           MS_SYSTEMINFORMATION_DATA.SystemSKU00 AS ProductNumber, 
+       	           MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer, 
+       	           MS_SYSTEMINFORMATION_DATA.SystemProductName00 AS ProductModel, 
+       	           System_DISC.AD_Site_Name0 AS ADSiteName, 
+       	           WorkstationStatus_DATA.LastHWScan AS LastHardwareScan
+              FROM MS_SYSTEMINFORMATION_DATA
+       	           JOIN Computer_System_Data ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
+       	           JOIN PC_BIOS_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
+       	           JOIN System_DISC ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
+       	           JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
+              WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP'
+       	         OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
+                AND PC_BIOS_DATA.SerialNumber00 <> ' '
+                AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' '
+                AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
+              ORDER BY WorkstationStatus_DATA.LastHWScan"
+
+    $results = (New-Object -TypeName System.Data.SqlClient.SqlCommand -Property @{ CommandText = $sql; Connection = $sqlConnection }).ExecuteReader()
     
     if ($results.HasRows)
     {
