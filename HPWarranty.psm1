@@ -6,7 +6,13 @@
 .INPUTS
     None.
 .OUTPUTS
-    System.Xml.
+    System.Xml
+.PARAMETER SOAPRequest
+    The Xml Formatted request to be sent.
+.PARAMETER Url
+    The ISEE URL to send the SOAP request.
+.PARAMETER Action
+    The ISEE Action to be performed.
 .EXAMPLE
     Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 .EXAMPLE
@@ -29,30 +35,27 @@
 .LINK
     http://dotps1.github.io
 #>
-function Invoke-SOAPRequest 
+Function Invoke-SOAPRequest 
 {
     [CmdletBinding()]
     [OutputType([Xml])]
     Param 
     (
-        # SOAPRequest, Type Xml, The request to be sent.
         [Parameter(Mandatory = $true)]
         [Xml]
         $SOAPRequest,
 
-        # URL, Type String, The URL to send the SOAP request.
         [Parameter(Mandatory = $true)]
         [ValidateSet('https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx','https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx')]
         [String]
         $URL,
 
-        # Action, Type String, The Acction to be performed.
         [Parameter(Mandatory = $true)]
         [ValidateSet('http://www.hp.com/isee/webservices/RegisterClient2','http://www.hp.com/isee/webservices/GetOOSEntitlementList2')]
         [String]
         $Action
     )
-     
+
     $soapWebRequest = [System.Net.WebRequest]::Create($URL) 
     $soapWebRequest.Headers.Add("SOAPAction",$Action)
 
@@ -90,6 +93,12 @@ function Invoke-SOAPRequest
     None.
 .OUTPUTS
     System.Management.Automation.PSObject.
+.PARAMETER ComputerName
+    The remote Hewlett-Packard Computer to retrive WMI Information from.
+.PARAMETER SerialNumber
+    The serial number of the Hewlett-Packard System.
+.PARAMETER ProductModel
+    The product Model of the Hewlett-Packard System.
 .EXAMPLE
     Invoke-HPWarrantyRegistrationRequest
 .EXAMPLE
@@ -112,19 +121,17 @@ function Invoke-SOAPRequest
 .LINK
     http://dotps1.github.io
 #>
-function Invoke-HPWarrantyRegistrationRequest
+Function Invoke-HPWarrantyRegistrationRequest
 {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType([PSObject])]
     Param
     (
-        # ComputerName, Type String, The remote Hewlett-Packard Computer.
         [Parameter(ParameterSetName = 'Default')]
-        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2) { $true } })]
         [String]
         $ComputerName = $env:COMPUTERNAME,
 
-        # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
         [ValidateLength(10,10)]
@@ -132,7 +139,6 @@ function Invoke-HPWarrantyRegistrationRequest
         [String]
         $SerialNumber,
 
-        # ProductModel, Type String, The product Model of the Hewlett-Packard System.
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
         [Alias("PN")]
@@ -140,7 +146,7 @@ function Invoke-HPWarrantyRegistrationRequest
         $ProductModel
     )
     
-    if (-not($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductModel')))
+    if (-not ($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductModel')))
     {
         try
         {
@@ -154,9 +160,9 @@ function Invoke-HPWarrantyRegistrationRequest
                 throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
             }
         }
-        catch
+        catch [System.Exception]
         {
-            throw "Unable to retrieve WMI Information from $ComputerName."
+            throw $_
         }
     }
 
@@ -167,8 +173,8 @@ function Invoke-HPWarrantyRegistrationRequest
     $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
     [PSObject]$registration = @{
-        'Gdid'  = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
-        'Token' = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.registrationtoken
+        'Gdid'  = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.Gdid
+        'Token' = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.registrationtoken
     }
 
     return $registration
@@ -179,14 +185,24 @@ function Invoke-HPWarrantyRegistrationRequest
     Uses the HP ISEE Web Services to retrive warranty information.
 .DESCRIPTION
     Retrives the start date, standard end date and extened end date warranty information for an Hewlett-Packard system.
-.INPUT
+.INPUTS
     None.
-.OUTPUT
+.OUTPUTS
     System.Management.Automation.PSObject.
+.PARAMETER Gdid
+    The Gdid Identitfier of the session with the HP ISEE Service.
+.PARAMETER Token
+    The Token of the session with the HP ISEE Service.
+.PARAMETER ComputerName
+    The remote Hewlett-Packard Computer to retrive WMI Information from.
+.PARAMETER SerialNumber
+    The serial number of a Hewlett-Packard System.
+.PARAMETER ProductNumber
+    The product number or (SKU) of a Hewlett-Packard System.
 .EXAMPLE
-    Invoke-HPWarrantyLookup
+    Invoke-HPWarrantyEntitlementList
 .EXAMPLE
-    $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyLookup -Gdid $registration.Gdid -Token $registration.Token
+    $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyEntitlementList -Gdid $registration.Gdid -Token $registration.Token
 .NOTES
     Requires PowerShell V4.0
     A valid Gdid and Token are required to used this cmdlet.
@@ -204,29 +220,25 @@ function Invoke-HPWarrantyRegistrationRequest
 .LINK
     http://dotps1.github.io
 #>
-function Invoke-HPWarrantyLookup
+Function Invoke-HPWarrantyEntitlementList
 {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType([PSObject])]
     Param
     (
-        # Gdid, Type String, The Gdid Identitfier of the session with the HP ISEE Service.
         [Parameter()]
         [String]
         $Gdid,
 
-        # Token, Type String, The Token of the session with the HP ISEE Service.
         [Parameter()]
         [String]
         $Token,
 
-        # ComputerName, Type String, The remote Hewlett-Packard Computer.
         [Parameter(ParameterSetName = 'Default')]
-        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2) { $true } })]
         [String]
         $ComputerName = $env:COMPUTERNAME,
 
-        # SerialNumber, Type String, The serial number of the Hewlett-Packard System.
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
         [ValidateLength(10,10)]
@@ -234,7 +246,6 @@ function Invoke-HPWarrantyLookup
         [String]
         $SerialNumber,
 
-        # ProductNumber, Type String, The product number (SKU) of the Hewlett-Packard System.
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
         [Alias("PN")]
@@ -242,7 +253,7 @@ function Invoke-HPWarrantyLookup
         $ProductNumber
     )
 
-    if (-not($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductNumber')))
+    if (-not ($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductNumber')))
     {
         try
         {
@@ -263,13 +274,13 @@ function Invoke-HPWarrantyLookup
                 throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
             }
         }
-        catch
+        catch [System.Exception]
         {
-            throw "Unable to retrieve WMI Information from $ComputerName."
+            throw $_
         }
     }
 
-    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml") `
+    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml")`
         -replace '<Gdid>',$Gdid `
         -replace '<Token>',$Token `
         -replace '<Serial>',$SerialNumber.Trim() `
@@ -296,49 +307,54 @@ function Invoke-HPWarrantyLookup
     Queries ConfigMgr Database for Information needed to query the Hewlett-Packard Servers for Warranty Information.
 .DESCRIPTION
     Queries inventored information from Microsoft System Center Configuration manager for data to allow for bulk Hewlett-Packard Warranty Lookups.
-.INPUT
+.INPUTS
     None.
-.OUTPUT
+.OUTPUTS
     System.Array.
+.PARAMETER SqlServer
+    The SQL Server containing the ConfigMgr database.
+.PARAMETER ConnectionPort
+    Port to connect to SQL server with, defualt value is 1433.
+.PARAMETER Database
+    The name of the ConfigMgr database.
+.PARAMETER IntergratedSecurity
+    Use the currently logged on users credentials.
 .EXAMPLE
-    Get-ComputerInformationForHPWarrantyInformationFromCMDB -Database CM_ABC -IntergratedSecurity
+    Get-HPComputerInformationForWarrantyFromCMDB -Database CM_ABC -IntergratedSecurity
 .EXAMPLE
-    Get-ComputerInformationForHPWarrantyInformationFromCMDB -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
+    Get-HPComputerInformationForWarrantyFromCMDB -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
 .NOTES
-    The root\WMI MS_SystemInformation Class needs to be inventoried into ConfigMgr so the Product Number (SKU) can be retireved.
+    The root\WMI MS_SystemInformation needs to be inventoried into ConfigMgr so the Product Number (SKU) can be retireved.
 .LINK
     http://dotps1.github.io
 #>
-function Get-HPComputerInformationForWarrantyRequestFromCMDB
+Function Get-HPComputerInformationForWarrantyFromCMDB
 {
     [CmdletBinding()]
     [OutputType([Array])]
     Param
     (
-        # SqlServer, Type String, The SQL Server containing the ConfigMgr database.
-        [Parameter()]
-        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2) { $true } })]
         [String]
         $SqlServer = $env:COMPUTERNAME,
 
-        # ConnectionPort, Type Int, Port to connect to SQL server with, defualt value is 1433.
         [ValidateRange(1,50009)]
         [Alias("Port")]
         [Int]
         $ConnectionPort = 1433,
 
-        # Database, Type String, The name of the ConfigMgr database.
         [Parameter(Mandatory = $true)]
         [Alias("CMDB")]
         [String]
         $Database,
 
-        # IntergratedSecurity, Type Switch, Use the currently logged on users credentials.
+        [Parameter()]
         [Switch]
         $IntergratedSecurity
     )
 
-    $sqlConnection = New-Object -TypeName System.Data.SqlClient.SqlConnection -Property @{ ConnectionString = "Server=$SqlServer,$ConnectionPort;Database=$Database;" }
+   $sqlConnection = New-Object -TypeName System.Data.SqlClient.SqlConnection -Property @{ ConnectionString = "Server=$SqlServer,$ConnectionPort;Database=$Database;" }
 
     if ($IntergratedSecurity.IsPresent)
     {
@@ -359,24 +375,24 @@ function Get-HPComputerInformationForWarrantyRequestFromCMDB
         throw $_
     }
 
-    $sql = "SELECT Computer_System_DATA.Name00 AS ComputerName, 
-       	           Computer_System_Data.UserName00 AS Username, 
-       	           PC_BIOS_DATA.SerialNumber00 AS SerialNumber, 
-       	           MS_SYSTEMINFORMATION_DATA.SystemSKU00 AS ProductNumber, 
-       	           MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer, 
-       	           MS_SYSTEMINFORMATION_DATA.SystemProductName00 AS ProductModel, 
-       	           System_DISC.AD_Site_Name0 AS ADSiteName, 
-       	           WorkstationStatus_DATA.LastHWScan AS LastHardwareScan
+    $sql = "SELECT Computer_System_DATA.Name00                    AS ComputerName,
+                   Computer_System_Data.UserName00                AS Username,
+	               PC_BIOS_DATA.SerialNumber00                    AS SerialNumber,
+	               MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
+	               MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
+	               MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
+                   System_DISC.AD_Site_Name0                      AS ADSiteName,
+                   WorkstationStatus_DATA.LastHWScan			  AS LastHardwareScan
               FROM MS_SYSTEMINFORMATION_DATA
-       	           JOIN Computer_System_Data ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
-       	           JOIN PC_BIOS_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
-       	           JOIN System_DISC ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
-       	           JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
-              WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP'
-       	         OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
-                AND PC_BIOS_DATA.SerialNumber00 <> ' '
-                AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' '
-                AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
+	               JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
+	               JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
+                   JOIN System_DISC            ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
+                   JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
+	          WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
+	             OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
+	            AND PC_BIOS_DATA.SerialNumber00 <> ' '
+                AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
+	            AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
               ORDER BY WorkstationStatus_DATA.LastHWScan"
 
     $results = (New-Object -TypeName System.Data.SqlClient.SqlCommand -Property @{ CommandText = $sql; Connection = $sqlConnection }).ExecuteReader()
