@@ -166,7 +166,7 @@ Function Invoke-HPWarrantyRegistrationRequest
         }
     }
 
-    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace "<UniversialDateTime>",$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString("yyyy/MM/dd hh:mm:ss \G\M\T")) `
+    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace "<UniversialDateTime>",$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString("yyyy\/MM\/dd hh:mm:ss \G\M\T")) `
         -replace '<SerialNumber>',$SerialNumber.Trim() `
         -replace '<ProductModel>',$ProductModel.Trim()
 
