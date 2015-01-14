@@ -166,18 +166,16 @@ Function Invoke-HPWarrantyRegistrationRequest
         }
     }
 
-    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace "<UniversialDateTime>",((Get-Date).ToUniversalTime()).ToString('yyyy/MM/dd HH:mm:ss \G\M\T') `
+    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace "<UniversialDateTime>",$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString("yyyy/MM/dd hh:mm:ss \G\M\T")) `
         -replace '<SerialNumber>',$SerialNumber.Trim() `
         -replace '<ProductModel>',$ProductModel.Trim()
 
     $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
-    [PSObject]$registration = @{
+    return [PSObject] @{
         'Gdid'  = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.Gdid
         'Token' = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.registrationtoken
     }
-
-    return $registration
 }
 
 <#
@@ -288,17 +286,13 @@ Function Invoke-HPWarrantyEntitlementList
 
     $entitlementAction = Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
 
-    [PSObject]$warranty = @{
+    return [PSObject] @{
         'SerialNumber'            = $SerialNumber
+        'ProductNumber'           = $ProductNumber
         'WarrantyStartDate'       = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("WarrantyStartDate").InnerText
         'WarrantyStandardEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[1]
         'WarrantyExtendedEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[0]
         'WarrantyCarePackEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[2]
-    }
-    
-    if ($warranty -ne $null)
-    {
-        return $warranty
     }
 }
 
