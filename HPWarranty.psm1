@@ -152,8 +152,8 @@ Function Invoke-HPWarrantyRegistrationRequest
         {
             if ((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
             {
-                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-                $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model
+                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber.Trim()
+                $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model.Trim()
             }
             else
             {
@@ -166,15 +166,15 @@ Function Invoke-HPWarrantyRegistrationRequest
         }
     }
 
-    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace "<UniversialDateTime>",$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString("yyyy\/MM\/dd hh:mm:ss \G\M\T")) `
+    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace '<UniversialDateTime>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString("yyyy\/MM\/dd hh:mm:ss \G\M\T")) `
         -replace '<SerialNumber>',$SerialNumber.Trim() `
         -replace '<ProductModel>',$ProductModel.Trim()
 
     $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
     return [PSObject] @{
-        'Gdid'  = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.Gdid
-        'Token' = $registrationAction.envelope.body.RegisterClient2Response.RegisterClient2Result.registrationtoken
+        'Gdid'  = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
+        'Token' = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.RegistrationToken
     }
 }
 
@@ -195,12 +195,14 @@ Function Invoke-HPWarrantyRegistrationRequest
     The remote Hewlett-Packard Computer to retrive WMI Information from.
 .PARAMETER SerialNumber
     The serial number of a Hewlett-Packard System.
-.PARAMETER ProductNumber
-    The product number or (SKU) of a Hewlett-Packard System.
+.PARAMETER ProductID
+    The product ID/number or (SKU) of a Hewlett-Packard System.
 .EXAMPLE
     Invoke-HPWarrantyEntitlementList
 .EXAMPLE
     $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyEntitlementList -Gdid $registration.Gdid -Token $registration.Token
+.EXAMPLE
+    Invoke-HPWarrantyRegistrationRequest -SerialNumber abcde12345 -ProductModel "HP Laptop" | Invoke-HPWarrantyEntitlementList -Gdid $_.Gdid -Token $_.Token -SerialNumber abcde12345 -ProductID ABCDE#ABA
 .NOTES
     Requires PowerShell V4.0
     A valid Gdid and Token are required to used this cmdlet.
@@ -224,11 +226,13 @@ Function Invoke-HPWarrantyEntitlementList
     [OutputType([PSObject])]
     Param
     (
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Default',
+                   ValueFromPipeLineByPropertyName = $true)]
         [String]
         $Gdid,
 
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Default',
+                   ValueFromPipeLineByPropertyName = $true)]
         [String]
         $Token,
 
@@ -246,9 +250,9 @@ Function Invoke-HPWarrantyEntitlementList
 
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
-        [Alias("PN")]
+        [Alias("ID")]
         [String]
-        $ProductNumber
+        $ProductID
     )
 
     if (-not ($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductNumber')))
@@ -258,7 +262,7 @@ Function Invoke-HPWarrantyEntitlementList
             if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
             {
                 $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-                $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
+                $ProductID= (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
 
                 if (-not($PSBoundParameters.ContainsValue($Gdid)) -or -not($PSBoundParameters.ContainsValue($Token)))
                 {
@@ -285,14 +289,17 @@ Function Invoke-HPWarrantyEntitlementList
         -replace '<SKU>',$ProductNumber.Trim()
 
     $entitlementAction = Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
-
+    $entitlement = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response)
+    
     return [PSObject] @{
-        'SerialNumber'            = $SerialNumber
-        'ProductNumber'           = $ProductNumber
-        'WarrantyStartDate'       = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("WarrantyStartDate").InnerText
-        'WarrantyStandardEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[1]
-        'WarrantyExtendedEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[0]
-        'WarrantyCarePackEndDate' = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response).GetElementsByTagName("EndDate").InnerText[2]
+        'SerialNumber' = $SerialNumber
+        'ProductID' = $ProductNumber
+        'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName("ActiveWarrantyEntitlement").InnerText
+        'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName("OverallWarrantyStartDate").InnerText
+        'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName("OverallWarrantyEndDate").InnerText
+        'OverallContractEndDate' = $entitlement.GetElementsByTagName("OverallContractEndDate").InnerText
+        'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName("WarrantyDeterminationDescription").InnerText
+        'GracePeriod' = $entitlement.GetElementsByTagName("GracePeriod").InnerText
     }
 }
 
@@ -372,7 +379,7 @@ Function Get-HPComputerInformationForWarrantyFromCMDB
     $sql = "SELECT Computer_System_DATA.Name00                    AS ComputerName,
                    Computer_System_Data.UserName00                AS Username,
 	               PC_BIOS_DATA.SerialNumber00                    AS SerialNumber,
-	               MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
+	               MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductID,
 	               MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
 	               MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
                    System_DISC.AD_Site_Name0                      AS ADSiteName,
@@ -395,14 +402,14 @@ Function Get-HPComputerInformationForWarrantyFromCMDB
     {
         While ($results.Read())
         {
-            $results.GetEnumerator() | %{ New-Object -TypeName PSObject -Property @{ ComputerName        = $_["ComputerName"]
-                                                                                     Username            = $_["Username"]
-                                                                                     SerialNumber        = $_["SerialNumber"]
-                                                                                     ProductNumber       = $_["ProductNumber"]
+            $results.GetEnumerator() | %{ New-Object -TypeName PSObject -Property @{ ComputerName = $_["ComputerName"]
+                                                                                     Username = $_["Username"]
+                                                                                     SerialNumber = $_["SerialNumber"]
+                                                                                     ProductID = $_["ProductID"]
                                                                                      ProductManufacturer = $_["ProductManufacturer"]
-                                                                                     ProductModel        = $_["ProductModel"]
-                                                                                     ADSiteName          = $_["ADSiteName"]
-                                                                                     LastHardwareScan    = $_["LastHardwareScan"] } }
+                                                                                     ProductModel = $_["ProductModel"]
+                                                                                     ADSiteName = $_["ADSiteName"]
+                                                                                     LastHardwareScan = $_["LastHardwareScan"] } }
         }
 	}
 	
