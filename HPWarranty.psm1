@@ -146,11 +146,12 @@ Function Invoke-HPWarrantyRegistrationRequest
         $ProductModel
     )
     
-    if (-not ($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductModel')))
+    if ($PSCmdlet.ParameterSetName -eq 'Default')
     {
         try
         {
-            if ((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
+            $manufacturer = (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer
+            if ($manufacturer -eq "Hewlett-Packard" -or $manufacturer -eq "HP")
             {
                 $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber.Trim()
                 $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model.Trim()
@@ -166,7 +167,8 @@ Function Invoke-HPWarrantyRegistrationRequest
         }
     }
 
-    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") -replace '<UniversialDateTime>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString("yyyy\/MM\/dd hh:mm:ss \G\M\T")) `
+    [Xml]$registrationSOAPRequest = (Get-Content "$PSScriptRoot\RegistrationSOAPRequest.xml") `
+        -replace '<UniversialDateTime>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString("yyyy\/MM\/dd hh:mm:ss \G\M\T")) `
         -replace '<SerialNumber>',$SerialNumber.Trim() `
         -replace '<ProductModel>',$ProductModel.Trim()
 
@@ -222,21 +224,24 @@ Function Invoke-HPWarrantyRegistrationRequest
 #>
 Function Invoke-HPWarrantyEntitlementList
 {
-    [CmdletBinding(DefaultParameterSetName = 'Default')]
+    [CmdletBinding(DefaultParameterSetName = "Default")]
     [OutputType([PSObject])]
     Param
     (
-        [Parameter(ParameterSetName = 'Default',
+        [Parameter(ParameterSetName = "Default",
+                   ValueFromPipeLineByPropertyName = $true)]
+        [Parameter(ParameterSetName = "Static",
                    ValueFromPipeLineByPropertyName = $true)]
         [String]
         $Gdid,
 
-        [Parameter(ParameterSetName = 'Default',
+        [Parameter(ParameterSetName = "Default",
+                   ValueFromPipeLineByPropertyName = $true)]
+        [Parameter(ParameterSetName = "Static",
                    ValueFromPipeLineByPropertyName = $true)]
         [String]
         $Token,
-
-        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = "Default")]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2) { $true } })]
         [String]
         $ComputerName = $env:COMPUTERNAME,
@@ -250,21 +255,21 @@ Function Invoke-HPWarrantyEntitlementList
 
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
-        [Alias("ID")]
         [String]
         $ProductID
     )
 
-    if (-not ($PSBoundParameters.ContainsKey('SerialNumber') -and $PSBoundParameters.ContainsKey('ProductNumber')))
+    if ($PSCmdlet.ParameterSetName -eq 'Default')
     {
         try
         {
-            if((Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "Hewlett-Packard" -or (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer -eq "HP")
+            $manufacturer = (Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop).Manufacturer
+            if ($manufacturer -eq "Hewlett-Packard" -or $manufacturer -eq "HP")
             {
-                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber
-                $ProductID= (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU
+                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber.Trim()
+                $ProductID = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU.Trim()
 
-                if (-not($PSBoundParameters.ContainsValue($Gdid)) -or -not($PSBoundParameters.ContainsValue($Token)))
+                if (-not ($PSBoundParameters.ContainsKey('Gdid')) -or -not($PSBoundParameters.ContainsKey('Token')))
                 {
                     $reg = Invoke-HPWarrantyRegistrationRequest -ComputerName $ComputerName
                     $Gdid = $reg.Gdid
@@ -282,18 +287,18 @@ Function Invoke-HPWarrantyEntitlementList
         }
     }
 
-    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml")`
+    [Xml]$entitlementSOAPRequest = (Get-Content "$PSScriptRoot\EntitlementSOAPRequest.xml") `
         -replace '<Gdid>',$Gdid `
         -replace '<Token>',$Token `
         -replace '<Serial>',$SerialNumber.Trim() `
-        -replace '<SKU>',$ProductNumber.Trim()
+        -replace '<SKU>',$ProductID.Trim()
 
     $entitlementAction = Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
     $entitlement = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response)
     
     return [PSObject] @{
         'SerialNumber' = $SerialNumber
-        'ProductID' = $ProductNumber
+        'ProductID' = $ProductID
         'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName("ActiveWarrantyEntitlement").InnerText
         'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName("OverallWarrantyStartDate").InnerText
         'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName("OverallWarrantyEndDate").InnerText
