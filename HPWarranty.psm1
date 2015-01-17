@@ -224,7 +224,7 @@ Function Invoke-HPWarrantyRegistrationRequest
 #>
 Function Invoke-HPWarrantyEntitlementList
 {
-    [CmdletBinding(DefaultParameterSetName = "Default")]
+    [CmdletBinding(DefaultParameterSetName = "__AllParameterSets")]
     [OutputType([PSObject])]
     Param
     (
@@ -241,6 +241,7 @@ Function Invoke-HPWarrantyEntitlementList
                    ValueFromPipeLineByPropertyName = $true)]
         [String]
         $Token,
+
         [Parameter(ParameterSetName = "Default")]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2) { $true } })]
         [String]
@@ -255,6 +256,7 @@ Function Invoke-HPWarrantyEntitlementList
 
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
+        [Alias("ID")]
         [String]
         $ProductID
     )
@@ -269,7 +271,7 @@ Function Invoke-HPWarrantyEntitlementList
                 $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber.Trim()
                 $ProductID = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU.Trim()
 
-                if (-not ($PSBoundParameters.ContainsKey('Gdid')) -or -not($PSBoundParameters.ContainsKey('Token')))
+                if (-not ($PSBoundParameters.ContainsKey('Gdid')) -or -not ($PSBoundParameters.ContainsKey('Token')))
                 {
                     $reg = Invoke-HPWarrantyRegistrationRequest -ComputerName $ComputerName
                     $Gdid = $reg.Gdid
@@ -340,7 +342,7 @@ Function Get-HPComputerInformationForWarrantyFromCMDB
     [OutputType([Array])]
     Param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2) { $true } })]
         [String]
         $SqlServer = $env:COMPUTERNAME,
