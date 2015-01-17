@@ -86,27 +86,37 @@ Function Invoke-SOAPRequest
 
 <#
 .SYNOPSIS
-    Creates a session with HP ISEE Web Servies.
+    Creates a session with HP ISEE Web Services.
 .DESCRIPTION
-    Creates a session with HP ISEE Web Servies and returns the necassary information send Requests.
+    Creates a session with HP ISEE Web Services and returns the a Gdid and Token, which are necessary for Warranty Lookups.
 .INPUTS
     None.
 .OUTPUTS
     System.Management.Automation.PSObject.
 .PARAMETER ComputerName
-    The remote Hewlett-Packard Computer to retrive WMI Information from.
+    The remote Hewlett-Packard Computer to retrieve WMI Information from.
 .PARAMETER SerialNumber
     The serial number of the Hewlett-Packard System.
 .PARAMETER ProductModel
     The product Model of the Hewlett-Packard System.
 .EXAMPLE
-    Invoke-HPWarrantyRegistrationRequest
+    PS C:\> Invoke-HPWarrantyRegistrationRequest
+
+    Name                           Value
+    ----                           -----
+    Token                          N0b2GQkmyM3CN23haBM6KSrnJ/VILMpnwwEjPFiuc8yQwDqtkig6Y1Z3j5Xyou2V4PTF1CbmxIljlZPCUaYjN/B4zDz3y8PugT2...
+    Gdid                           0b0de1fc-1abc-2def-3ghi-aa76cbbe8e8b
 .EXAMPLE
-    Invoke-HPWarrantyRegistrationRequest -SerialNumber ABCDE12345 -ProductModel "HP ProBook 645 G1"
+    PS C:\> Invoke-HPWarrantyRegistrationRequest -SerialNumber ABCDE12345 -ProductModel "HP ProBook 645 G1"
+
+    Name                           Value
+    ----                           -----
+    Token                          N0b2GQkmyM3CN23haBM6KSrnJ/VILMpnwwEjPFiuc8yQwDqtkig6Y1Z3j5Xyou2V4PTF1CbmxIljlZPCUaYjN/B4zDz3y8PugT2...
+    Gdid                           0b0de1fc-1abc-2def-3ghi-aa76cbbe8e8b
 .NOTES
     Requires PowerShell V4.0
     A valid serial number and computer model are required to establish the session.
-    Only one Registration Session needs to be established, the the Gdid and Token can be reused for the Invoke-HPWarrantyLookup Cmdlet.
+    Only one Registration Session needs to be established, the Gdid and Token can be reused for the Invoke-HPWarrantyLookup Cmdlet.
     Credits to:
         StackOverFlow:OneLogicalMyth
         StackOverFlow:user3076063
@@ -123,7 +133,7 @@ Function Invoke-SOAPRequest
 #>
 Function Invoke-HPWarrantyRegistrationRequest
 {
-    [CmdletBinding(DefaultParameterSetName = 'Default')]
+    [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
     [OutputType([PSObject])]
     Param
     (
@@ -182,29 +192,62 @@ Function Invoke-HPWarrantyRegistrationRequest
 
 <#
 .SYNOPSIS
-    Uses the HP ISEE Web Services to retrive warranty information.
+    Uses the HP ISEE Web Services to retrieve warranty information.
 .DESCRIPTION
     Retrives the start date, standard end date and extened end date warranty information for an Hewlett-Packard system.
 .INPUTS
-    None.
+    System.String.
 .OUTPUTS
     System.Management.Automation.PSObject.
 .PARAMETER Gdid
-    The Gdid Identitfier of the session with the HP ISEE Service.
+    The Gdid Identifier of the session with the HP ISEE Service.
 .PARAMETER Token
     The Token of the session with the HP ISEE Service.
 .PARAMETER ComputerName
-    The remote Hewlett-Packard Computer to retrive WMI Information from.
+    The remote Hewlett-Packard Computer to retrieve WMI Information from.
 .PARAMETER SerialNumber
     The serial number of a Hewlett-Packard System.
 .PARAMETER ProductID
     The product ID/number or (SKU) of a Hewlett-Packard System.
 .EXAMPLE
-    Invoke-HPWarrantyEntitlementList
+    PS C:\> Invoke-HPWarrantyEntitlementList
+
+    Name                           Value
+    ----                           -----
+    GracePeriod                    30
+    ProductID                      ABCD123#ABA
+    WarrantyDeterminationDescri... Serial Number decode
+    OverallWarrantyEndDate         2015-01-01
+    OverallWarrantyStartDate       2011-01-01
+    SerialNumber                   ABCDE12345
+    OverallContractEndDate
+    ActiveWarrantyEntitlement      false
 .EXAMPLE
-    $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyEntitlementList -Gdid $registration.Gdid -Token $registration.Token
+    PS C:\> $registration = Invoke-HPWarrantyRegistrationRequest; Invoke-HPWarrantyEntitlementList -Gdid $registration.Gdid -Token $registration.Token
+
+    Name                           Value
+    ----                           -----
+    GracePeriod                    30
+    ProductID                      ABCD123#ABA
+    WarrantyDeterminationDescri... Serial Number decode
+    OverallWarrantyEndDate         2015-01-01
+    OverallWarrantyStartDate       2011-01-01
+    SerialNumber                   ABCDE12345
+    OverallContractEndDate
+    ActiveWarrantyEntitlement      false
 .EXAMPLE
-    Invoke-HPWarrantyRegistrationRequest -SerialNumber abcde12345 -ProductModel "HP Laptop" | Invoke-HPWarrantyEntitlementList -Gdid $_.Gdid -Token $_.Token -SerialNumber abcde12345 -ProductID ABCDE#ABA
+    PS C:\> Invoke-HPWarrantyRegistrationRequest -SerialNumber abcde12345 -ProductModel "HP Laptop" | Invoke-HPWarrantyEntitlementList -Gdid $_.Gdid -Token $_.Token -SerialNumber abcde12345 -ProductID "ABCD123#ABA"
+
+    Name                           Value
+    ----                           -----
+    GracePeriod                    30
+    ProductID                      ABCD123#ABA
+    WarrantyDeterminationDescri... Ship date
+    OverallWarrantyEndDate         2016-01-01
+    OverallWarrantyStartDate       2012-01-01
+    SerialNumber                   ABCDE12345
+    OverallContractEndDate
+    ActiveWarrantyEntitlement      true
 .NOTES
     Requires PowerShell V4.0
     A valid Gdid and Token are required to used this cmdlet.
@@ -224,25 +267,25 @@ Function Invoke-HPWarrantyRegistrationRequest
 #>
 Function Invoke-HPWarrantyEntitlementList
 {
-    [CmdletBinding(DefaultParameterSetName = "__AllParameterSets")]
+    [CmdletBinding(DefaultParameterSetName = '"__AllParameterSets')]
     [OutputType([PSObject])]
     Param
     (
-        [Parameter(ParameterSetName = "Default",
+        [Parameter(ParameterSetName = 'Default',
                    ValueFromPipeLineByPropertyName = $true)]
-        [Parameter(ParameterSetName = "Static",
+        [Parameter(ParameterSetName = 'Static',
                    ValueFromPipeLineByPropertyName = $true)]
         [String]
         $Gdid,
 
-        [Parameter(ParameterSetName = "Default",
+        [Parameter(ParameterSetName = 'Default',
                    ValueFromPipeLineByPropertyName = $true)]
-        [Parameter(ParameterSetName = "Static",
+        [Parameter(ParameterSetName = 'Static',
                    ValueFromPipeLineByPropertyName = $true)]
         [String]
         $Token,
 
-        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = 'Default')]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2) { $true } })]
         [String]
         $ComputerName = $env:COMPUTERNAME,
@@ -314,7 +357,7 @@ Function Invoke-HPWarrantyEntitlementList
 .SYNOPSIS
     Queries ConfigMgr Database for Information needed to query the Hewlett-Packard Servers for Warranty Information.
 .DESCRIPTION
-    Queries inventored information from Microsoft System Center Configuration manager for data to allow for bulk Hewlett-Packard Warranty Lookups.
+    Queries inventoried information from Microsoft System Center Configuration manager for data to allow for bulk Hewlett-Packard Warranty Lookups.
 .INPUTS
     None.
 .OUTPUTS
@@ -322,17 +365,53 @@ Function Invoke-HPWarrantyEntitlementList
 .PARAMETER SqlServer
     The SQL Server containing the ConfigMgr database.
 .PARAMETER ConnectionPort
-    Port to connect to SQL server with, defualt value is 1433.
+    Port to connect to SQL server with, default value is 1433.
 .PARAMETER Database
     The name of the ConfigMgr database.
 .PARAMETER IntergratedSecurity
     Use the currently logged on users credentials.
 .EXAMPLE
-    Get-HPComputerInformationForWarrantyFromCMDB -Database CM_ABC -IntergratedSecurity
+    PS C:\> Get-HPComputerInformationForWarrantyFromCMDB -Database CM_ABC -IntergratedSecurity
+
+    ComputerName        : ComputerA
+    Username            : UserA
+    ADSiteName          : ADSiteA
+    LastHardwareScan    : 1/1/2015 12:00:00 AM
+    ProductManufacturer : Hewlett-Packard
+    ProductID           : ABCDE123#ABA
+    SerialNumber        : ABCDE12345
+    ProductModel        : HP ProBook 1000 G1
+
+    ComputerName        : ComputerB
+    Username            : UserB
+    ADSiteName          : ADSiteB
+    LastHardwareScan    : 1/1/2014 12:00:00 AM
+    ProductManufacturer : Hewlett-Packard
+    ProductID           : 123ABCDE#BAB
+    SerialNumber        : 12345ABCDE
+    ProductModel        : HP EliteBook 5000
 .EXAMPLE
-    Get-HPComputerInformationForWarrantyFromCMDB -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
+    PS C:\> Get-HPComputerInformationForWarrantyFromCMDB -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
+
+    ComputerName        : ComputerA
+    Username            : UserA
+    ADSiteName          : ADSiteA
+    LastHardwareScan    : 1/1/2015 12:00:00 AM
+    ProductManufacturer : Hewlett-Packard
+    ProductID           : ABCDE123#ABA
+    SerialNumber        : ABCDE12345
+    ProductModel        : HP ProBook 1000 G1
+
+    ComputerName        : ComputerB
+    Username            : UserB
+    ADSiteName          : ADSiteB
+    LastHardwareScan    : 1/1/2015 12:00:00 AM
+    ProductManufacturer : Hewlett-Packard
+    ProductID           : ABCDE123#ABA
+    SerialNumber        : ABCDE12345
+    ProductModel        : HP ProBook 1000 G1
 .NOTES
-    The root\WMI MS_SystemInformation needs to be inventoried into ConfigMgr so the Product Number (SKU) can be retireved.
+    The root\WMI MS_SystemInformation needs to be inventoried into ConfigMgr so the Product ID/Number (SKU) can be retireved.
 .LINK
     http://dotps1.github.io
 #>
