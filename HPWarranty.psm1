@@ -60,7 +60,6 @@ Function Invoke-HPWarrantyRegistrationRequest
 
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
-        [ValidateRange(10,12)]
         [String]
         $SerialNumber,
 
@@ -70,7 +69,7 @@ Function Invoke-HPWarrantyRegistrationRequest
         $ProductModel
     )
     
-    if ($PSCmdlet.ParameterSetName -eq 'Default')
+    if ($PSCmdlet.ParameterSetName -eq '__AllParameterSets' -or $PSCmdlet.ParameterSetName -eq 'Default')
     {
         try
         {
@@ -181,7 +180,7 @@ Function Invoke-HPWarrantyRegistrationRequest
 #>
 Function Invoke-HPWarrantyEntitlementList
 {
-    [CmdletBinding(DefaultParameterSetName = '"__AllParameterSets')]
+    [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
     [OutputType([PSObject])]
     Param
     (
@@ -206,7 +205,6 @@ Function Invoke-HPWarrantyEntitlementList
 
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
-        [ValidateRange(10,12)]
         [String]
         $SerialNumber,
 
@@ -216,7 +214,7 @@ Function Invoke-HPWarrantyEntitlementList
         $ProductID
     )
 
-    if ($PSCmdlet.ParameterSetName -eq 'Default')
+    if ($PSCmdlet.ParameterSetName -eq '__AllParameterSets' -or $PSCmdlet.ParameterSetName -eq 'Default')
     {
         try
         {
