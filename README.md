@@ -1,7 +1,8 @@
-This module contains three functions:
-* Invoke-HPWarrantyRegistrationRequest
-* Invoke-HPWarrantyEntitlementList
-* Get-HPComputerInformationForWarrantyFromCMDB
+## HPWarranty Cmdlets
+
+* [Invoke-HPWarrantyRegistrationRequest](https://github.com/dotps1/HPWarranty/wiki/Invoke-HPWarrantyRegistrationRequest)
+* [Invoke-HPWarrantyEntitlementList](https://github.com/dotps1/HPWarranty/wiki/Invoke-HPWarrantyEntitlementList)
+* [Get-HPComputerInformationForWarrantyFromCMDB](https://github.com/dotps1/HPWarranty/wiki/Get-HPComputerInformationForWarrantyFromCMDB)
 
 Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:
 
