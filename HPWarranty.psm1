@@ -122,8 +122,10 @@ Function Invoke-HPWarrantyRegistrationRequest
     The serial number of a Hewlett-Packard System.
 .PARAMETER ProductID
     The product ID/number or (SKU) of a Hewlett-Packard System.
+.PARAMETER PathToExportFullXml
+    Specify a full path to export the entire entitlement response for the system.
 .EXAMPLE
-    PS C:\> Invoke-HPWarrantyEntitlementList
+    PS C:\> Invoke-HPWarrantyEntitlementList -PathToExportFullXml "$env:USERPROFILE\Desktop\"
 
     Name                           Value
     ----                           -----
@@ -211,7 +213,13 @@ Function Invoke-HPWarrantyEntitlementList
         [Parameter(ParameterSetName = 'Static',
                    Mandatory = $true)]
         [String]
-        $ProductID
+        $ProductID,
+        
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Static')]
+        [ValidateScript({ if (Test-Path -Path $_) { $true } })]
+        [String]
+        $PathToExportFullXml
     )
 
     if ($PSCmdlet.ParameterSetName -eq '__AllParameterSets' -or $PSCmdlet.ParameterSetName -eq 'Default')
@@ -251,6 +259,16 @@ Function Invoke-HPWarrantyEntitlementList
     $entitlementAction = Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -URL 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
     $entitlement = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response)
     
+    if ($PSBoundParameters.ContainsKey('PathToExportFullXml'))
+    {
+        if (-not ($PSBoundParameters.PathToExportFullXml.ToString().EndsWith("\")))
+        {
+            $PathToExportFullXml += "\"
+        }
+
+        $entitlement.Save($PathToExportFullXml + $SerialNumber + "_WarrantyEntitlement.xml")
+    }
+
     return [PSObject] @{
         'SerialNumber' = $SerialNumber
         'ProductID' = $ProductID
