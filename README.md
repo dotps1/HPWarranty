@@ -58,7 +58,7 @@ Example 4:
 # Execute with information from ConfigMgr Database:
 Import-Module -Name HPWarranty
 
-$reg = Invoke-HPWarrantyRegistrationRequest -SeralNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
+$reg = Invoke-HPWarrantyRegistrationRequest -SerialNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
 
 $HPs = Get-HPComputerInformationForWarrantyFromCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity
 foreach ($HP in $HPs)
