@@ -4,6 +4,17 @@
 * [Invoke-HPWarrantyEntitlementList](https://github.com/dotps1/HPWarranty/wiki/Invoke-HPWarrantyEntitlementList)
 * [Get-HPComputerInformationForWarrantyFromCMDB](https://github.com/dotps1/HPWarranty/wiki/Get-HPComputerInformationForWarrantyFromCMDB)
 
+You can install this module with [PsGet](http://psget.net/), if you don't have PsGet, I highly recommend you get it!
+```PowerShell
+# Install PsGet
+(New-Object -TypeName Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | Invoke-Expression
+```
+
+```PowerShell
+# Install WinSCP module with PsGet
+Install-Module -ModuleUrl "https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip" -ModuleName WinSCP -Type ZIP
+```
+
 Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:
 
 1.  A Session needs to be established with their Web Services, this is done by using the Invoke-HPWarrantyRegistrationRequest.  You need a valid SerialNumber and Product Model to do this.  If successful, it will return a Gdid and a Session Token, that then needs to be passed to the Invoke-HPWarrantyEntitlementList.
