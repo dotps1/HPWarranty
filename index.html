@@ -28,6 +28,14 @@
 <li><a href="https://github.com/dotps1/HPWarranty/wiki/Get-HPComputerInformationForWarrantyFromCMDB">Get-HPComputerInformationForWarrantyFromCMDB</a></li>
 </ul>
 
+<p>You can install this module with <a href="http://psget.net/">PsGet</a>, if you don't have PsGet, I highly recommend you get it!</p>
+
+<div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Install PsGet</span>
+<span class="pl-k">(</span><span class="pl-c1">New-Object</span> <span class="pl-k">-</span>TypeName Net.WebClient<span class="pl-k">)</span>.DownloadString<span class="pl-k">(</span><span class="pl-s">"http://psget.net/GetPsGet.ps1"</span><span class="pl-k">)</span> <span class="pl-k">|</span> <span class="pl-c1">Invoke-Expression</span></pre></div>
+
+<div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Install WinSCP module with PsGet</span>
+<span class="pl-c1">Install-Module</span> <span class="pl-k">-</span>ModuleUrl <span class="pl-s">"https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip"</span> <span class="pl-k">-</span>ModuleName HPWarranty <span class="pl-k">-</span>Type ZIP</pre></div>
+
 <p>Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
 
 <ol>
