@@ -1,34 +1,25 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>HPWarranty by dotps1</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>HPWarranty</h1>
-        <p>PowerShell module to help retrieve Hewlett-Packard Warranty Information</p>
+    <section class="page-header">
+      <h1 class="project-name">HPWarranty</h1>
+      <h2 class="project-tagline">PowerShell module to help retrieve Hewlett-Packard Warranty Information</h2>
+      <a href="https://github.com/dotps1/HPWarranty" class="btn">View on GitHub</a>
+      <a href="https://github.com/dotps1/HPWarranty/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/dotps1/HPWarranty/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <p class="view"><a href="https://github.com/dotps1/HPWarranty">View the Project on GitHub <small>dotps1/HPWarranty</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/dotps1/HPWarranty/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/dotps1/HPWarranty/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/dotps1/HPWarranty">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h2>
+    <section class="main-content">
+      <h2>
 <a id="hpwarranty-cmdlets" class="anchor" href="#hpwarranty-cmdlets" aria-hidden="true"><span class="octicon octicon-link"></span></a>HPWarranty Cmdlets</h2>
 
 <ul>
@@ -48,80 +39,83 @@
 <p>Example 1:</p>
 
 <div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Execute from a local HP Workstation</span>
-<span class="pl-s3">Import-Module</span> HPWarranty<span class="pl-k">;</span> <span class="pl-s3">Invoke-HPWarrantyEntitlementList</span></pre></div>
+<span class="pl-c1">Import-Module</span> HPWarranty<span class="pl-k">;</span> <span class="pl-c1">Invoke-HPWarrantyEntitlementList</span></pre></div>
 
 <p>Example 2:</p>
 
 <div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Create one session but look up multiple warranty's</span>
-<span class="pl-s3">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
+<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
 
-<span class="pl-k">$</span><span class="pl-vo">HP1</span> <span class="pl-k">=</span> @{
-    <span class="pl-s1">'SerialNumber'</span> <span class="pl-k">=</span> <span class="pl-s1">'A1B2C3D4E5'</span>
-    <span class="pl-s1">'ProductModel'</span> <span class="pl-k">=</span> <span class="pl-s1">'HP Laptop 100 G1'</span>
-    <span class="pl-s1">'ProductID'</span> <span class="pl-k">=</span> <span class="pl-s1">'123ABC'</span>
+<span class="pl-k">$</span><span class="pl-smi">HP1</span> <span class="pl-k">=</span> @{
+    <span class="pl-s">'SerialNumber'</span> <span class="pl-k">=</span> <span class="pl-s">'A1B2C3D4E5'</span>
+    <span class="pl-s">'ProductModel'</span> <span class="pl-k">=</span> <span class="pl-s">'HP Laptop 100 G1'</span>
+    <span class="pl-s">'ProductID'</span> <span class="pl-k">=</span> <span class="pl-s">'123ABC'</span>
 }
 
-<span class="pl-k">$</span><span class="pl-vo">HP2</span> <span class="pl-k">=</span> @{
-    <span class="pl-s1">'SerialNumber'</span> <span class="pl-k">=</span> <span class="pl-s1">'12345ABCDE'</span>
-    <span class="pl-s1">'ProductModel'</span> <span class="pl-k">=</span> <span class="pl-s1">'HP Desktop 1100 G1'</span>
-    <span class="pl-s1">'ProductID'</span> <span class="pl-k">=</span> <span class="pl-s1">'ABC123'</span>
+<span class="pl-k">$</span><span class="pl-smi">HP2</span> <span class="pl-k">=</span> @{
+    <span class="pl-s">'SerialNumber'</span> <span class="pl-k">=</span> <span class="pl-s">'12345ABCDE'</span>
+    <span class="pl-s">'ProductModel'</span> <span class="pl-k">=</span> <span class="pl-s">'HP Desktop 1100 G1'</span>
+    <span class="pl-s">'ProductID'</span> <span class="pl-k">=</span> <span class="pl-s">'ABC123'</span>
 }
 
 
 <span class="pl-c"># Use either HP1 or HP2 properties to establish a session with the HP Web Services.</span>
-<span class="pl-k">$</span><span class="pl-vo">reg</span> <span class="pl-k">=</span> <span class="pl-s3">Invoke-HPWarrantyRegistrationRequest</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-vo">HP1</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductModel <span class="pl-k">$</span><span class="pl-vo">HP1</span><span class="pl-en">.ProductModel</span>
+<span class="pl-k">$</span><span class="pl-smi">reg</span> <span class="pl-k">=</span> <span class="pl-c1">Invoke-HPWarrantyRegistrationRequest</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-smi">HP1</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductModel <span class="pl-k">$</span><span class="pl-smi">HP1</span><span class="pl-en">.ProductModel</span>
 
-<span class="pl-s3">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-vo">HP1</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-vo">HP1</span><span class="pl-en">.ProductID</span>
-<span class="pl-s3">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-vo">HP2</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-vo">HP2</span><span class="pl-en">.ProductID</span></pre></div>
+<span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-smi">HP1</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-smi">HP1</span><span class="pl-en">.ProductID</span>
+<span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-smi">HP2</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-smi">HP2</span><span class="pl-en">.ProductID</span></pre></div>
 
 <p>Example 3:</p>
 
 <div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Query a remote computer for information to create a session with the the HP Web Services.</span>
 <span class="pl-c"># Remote WMI access is necessary to use this function remotely.</span>
-<span class="pl-s3">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
+<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
 
-<span class="pl-k">$</span><span class="pl-vo">reg</span> <span class="pl-k">=</span> <span class="pl-s3">Invoke-HPWarrantyRegistrationRequest</span> <span class="pl-k">-</span>ComputerName HPComputer.mydomain.org
+<span class="pl-k">$</span><span class="pl-smi">reg</span> <span class="pl-k">=</span> <span class="pl-c1">Invoke-HPWarrantyRegistrationRequest</span> <span class="pl-k">-</span>ComputerName HPComputer.mydomain.org
 
-<span class="pl-s3">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>ComputerName HPComputer.mydomain.org</pre></div>
+<span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>ComputerName HPComputer.mydomain.org</pre></div>
 
 <p>Example 4:</p>
 
 <div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Execute with information from ConfigMgr Database:</span>
-<span class="pl-s3">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
+<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
 
-<span class="pl-k">$</span><span class="pl-vo">reg</span> <span class="pl-k">=</span> <span class="pl-s3">Invoke-HPWarrantyRegistrationRequest</span> <span class="pl-k">-</span>SerialNumber <span class="pl-s1">"ABCDE12345"</span> <span class="pl-k">-</span>ProductModel <span class="pl-s1">"HP ProBook 645 G1"</span>
+<span class="pl-k">$</span><span class="pl-smi">reg</span> <span class="pl-k">=</span> <span class="pl-c1">Invoke-HPWarrantyRegistrationRequest</span> <span class="pl-k">-</span>SerialNumber <span class="pl-s">"ABCDE12345"</span> <span class="pl-k">-</span>ProductModel <span class="pl-s">"HP ProBook 645 G1"</span>
 
-<span class="pl-k">$</span><span class="pl-vo">HPs</span> <span class="pl-k">=</span> <span class="pl-s3">Get-HPComputerInformationForWarrantyFromCMDB</span> <span class="pl-k">-</span>SqlServer MySccmDBServer <span class="pl-k">-</span>Database CM_MS1 <span class="pl-k">-</span>IntergratedSecurity
-<span class="pl-k">foreach</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-vo">HP</span> <span class="pl-k">in</span> <span class="pl-k">$</span><span class="pl-vo">HPs</span><span class="pl-k">)</span>
+<span class="pl-k">$</span><span class="pl-smi">HPs</span> <span class="pl-k">=</span> <span class="pl-c1">Get-HPComputerInformationForWarrantyFromCMDB</span> <span class="pl-k">-</span>SqlServer MySccmDBServer <span class="pl-k">-</span>Database CM_MS1 <span class="pl-k">-</span>IntergratedSecurity
+<span class="pl-k">foreach</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-smi">HP</span> <span class="pl-k">in</span> <span class="pl-k">$</span><span class="pl-smi">HPs</span><span class="pl-k">)</span>
 {
-     <span class="pl-s3">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-vo">HP</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-vo">HP</span><span class="pl-en">.ProductID</span>
+     <span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-smi">HP</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-smi">HP</span><span class="pl-en">.ProductID</span>
 }</pre></div>
 
 <p>Example 5:</p>
 
 <div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Hashtables are a little tricky to export to CSV, so here is how I run my build date report:</span>
-<span class="pl-s3">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
-<span class="pl-s3">Import-Module</span> <span class="pl-k">-</span>Name ActiveDirectory
+<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
+<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name ActiveDirectory
 
-<span class="pl-k">$</span><span class="pl-vo">reg</span> <span class="pl-k">=</span> <span class="pl-s3">Invoke-HPWarrantyRegistrationRequest</span>
+<span class="pl-k">$</span><span class="pl-smi">reg</span> <span class="pl-k">=</span> <span class="pl-c1">Invoke-HPWarrantyRegistrationRequest</span>
 
 <span class="pl-c"># This output is tailored to the request that was given to me, not all of these values maybe necessary to return.</span>
-<span class="pl-s3">Get-HPComputerInformationForWarrantyFromCMDB</span> <span class="pl-k">-</span>SqlServer MyCMDB.mydomain.org <span class="pl-k">-</span>Database CM_MS1 <span class="pl-k">-</span>IntergratedSecurity <span class="pl-k">|</span>
-<span class="pl-s3">Select-Object</span> <span class="pl-k">-</span>Property @{ Name <span class="pl-k">=</span> <span class="pl-s1">'ComputerName'</span><span class="pl-k">;</span>     Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-sc">_</span><span class="pl-en">.ComputerName</span> } }<span class="pl-k">,</span> 
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s1">'SerialNumber'</span><span class="pl-k">;</span>     Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-sc">_</span><span class="pl-en">.SerialNumber</span> } }<span class="pl-k">,</span> 
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s1">'ProductModel'</span><span class="pl-k">;</span>     Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-sc">_</span><span class="pl-en">.ProductModel</span> } }<span class="pl-k">,</span> 
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s1">'BuildDate'</span><span class="pl-k">;</span>        Expression <span class="pl-k">=</span> { <span class="pl-k">(</span><span class="pl-s3">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-vo">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-sc">_</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-sc">_</span><span class="pl-en">.ProductID</span><span class="pl-k">)</span>.OverallWarrantyStartDate } }<span class="pl-k">,</span>
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s1">'LastHardwareScan'</span><span class="pl-k">;</span> Expression <span class="pl-k">=</span> { <span class="pl-s3">Get-Date</span> <span class="pl-k">(</span><span class="pl-s3">Get-Date</span> <span class="pl-k">$</span><span class="pl-sc">_</span><span class="pl-en">.LastHardwareScan</span><span class="pl-k">)</span>.ToShortDateString<span class="pl-k">()</span> <span class="pl-k">-</span>Format <span class="pl-s1">'yyyy-MM-dd'</span> } }<span class="pl-k">,</span>
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s1">'LastLoggedOnUser'</span><span class="pl-k">;</span> Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-sc">_</span><span class="pl-en">.Username</span> } }<span class="pl-k">,</span>
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s1">'CompanyName'</span><span class="pl-k">;</span>      Expression <span class="pl-k">=</span> { <span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-sc">_</span><span class="pl-en">.Username</span> <span class="pl-k">-ne</span> <span class="pl-k">$</span><span class="pl-c1">null</span><span class="pl-k">)</span>{ <span class="pl-k">(</span><span class="pl-s3">Get-ADUser</span> <span class="pl-k">-</span>Identity <span class="pl-k">$</span><span class="pl-sc">_</span><span class="pl-en">.Username.ToString</span><span class="pl-k">()</span>.Trim<span class="pl-k">(</span><span class="pl-s1">'MYDOMAIN\'</span><span class="pl-k">)</span> <span class="pl-k">-</span>Properties Company<span class="pl-k">)</span>.Company } } } <span class="pl-k">|</span>
-<span class="pl-s3">Export-Csv</span> <span class="pl-k">-</span>Path C:\HPBuildInfo.csv <span class="pl-k">-</span>NoTypeInformation <span class="pl-k">-</span>Append </pre></div>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/dotps1">dotps1</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+<span class="pl-c1">Get-HPComputerInformationForWarrantyFromCMDB</span> <span class="pl-k">-</span>SqlServer MyCMDB.mydomain.org <span class="pl-k">-</span>Database CM_MS1 <span class="pl-k">-</span>IntergratedSecurity <span class="pl-k">|</span>
+<span class="pl-c1">Select-Object</span> <span class="pl-k">-</span>Property @{ Name <span class="pl-k">=</span> <span class="pl-s">'ComputerName'</span><span class="pl-k">;</span>     Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.ComputerName</span> } }<span class="pl-k">,</span> 
+                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'SerialNumber'</span><span class="pl-k">;</span>     Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.SerialNumber</span> } }<span class="pl-k">,</span> 
+                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'ProductModel'</span><span class="pl-k">;</span>     Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.ProductModel</span> } }<span class="pl-k">,</span> 
+                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'BuildDate'</span><span class="pl-k">;</span>        Expression <span class="pl-k">=</span> { <span class="pl-k">(</span><span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.ProductID</span><span class="pl-k">)</span>.OverallWarrantyStartDate } }<span class="pl-k">,</span>
+                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'LastHardwareScan'</span><span class="pl-k">;</span> Expression <span class="pl-k">=</span> { <span class="pl-c1">Get-Date</span> <span class="pl-k">(</span><span class="pl-c1">Get-Date</span> <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.LastHardwareScan</span><span class="pl-k">)</span>.ToShortDateString<span class="pl-k">()</span> <span class="pl-k">-</span>Format <span class="pl-s">'yyyy-MM-dd'</span> } }<span class="pl-k">,</span>
+                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'LastLoggedOnUser'</span><span class="pl-k">;</span> Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.Username</span> } }<span class="pl-k">,</span>
+                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'CompanyName'</span><span class="pl-k">;</span>      Expression <span class="pl-k">=</span> { <span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.Username</span> <span class="pl-k">-ne</span> <span class="pl-k">$</span><span class="pl-c1">null</span><span class="pl-k">)</span>{ <span class="pl-k">(</span><span class="pl-c1">Get-ADUser</span> <span class="pl-k">-</span>Identity <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.Username.ToString</span><span class="pl-k">()</span>.Trim<span class="pl-k">(</span><span class="pl-s">'MYDOMAIN\'</span><span class="pl-k">)</span> <span class="pl-k">-</span>Properties Company<span class="pl-k">)</span>.Company } } } <span class="pl-k">|</span>
+<span class="pl-c1">Export-Csv</span> <span class="pl-k">-</span>Path C:\HPBuildInfo.csv <span class="pl-k">-</span>NoTypeInformation <span class="pl-k">-</span>Append </pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/dotps1/HPWarranty">HPWarranty</a> is maintained by <a href="https://github.com/dotps1">dotps1</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+
+    </section>
+
+  
   </body>
 </html>
+
