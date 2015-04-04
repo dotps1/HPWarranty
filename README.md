@@ -12,7 +12,7 @@ You can install this module with [PsGet](http://psget.net/), if you don't have P
 
 ```PowerShell
 # Install WinSCP module with PsGet
-Install-Module -ModuleUrl "https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip" -ModuleName WinSCP -Type ZIP
+Install-Module -ModuleUrl "https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip" -ModuleName HPWarranty -Type ZIP
 ```
 
 Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:
