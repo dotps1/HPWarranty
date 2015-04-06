@@ -1,6 +1,6 @@
 # HPWarranty PowerShell Module
 
-This module can be installed with [chocolatey]("https://chocolatey.org/packages/hpwarranty.powershell"):
+This module can be installed with [chocolatey](https://chocolatey.org/packages/hpwarranty.powershell):
 ```PowerShell
 choco install hpwarranty.powershell -version 0.0.2.4
 Import-Module -Name HPWarranty
