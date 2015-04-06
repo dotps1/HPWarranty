@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <!-- Read this before publishing packages to chocolatey.org: https://github.com/chocolatey/chocolatey/wiki/CreatePackages -->
+    <id>hpwarranty.powershell</id>
+    <title>HPWarranty PowerShell Module (Install)</title>
+    <version>0.0.2.4</version>
+    <authors>Thomas J. Malkewitz @dotps1</authors>
+    <owners>Thomas J. Malkewitz @dotps1</owners>
+    <summary>Get HP Warranty info with PowerShell.</summary>
+    <description>A PowerShell Module to automate and obtain Hewlett-Packard System Warranty Information.</description>
+    <projectUrl>https://github.com/dotps1/HPWarranty</projectUrl>
+    <tags>hp hpwarranty hewlett-packard powershell powershellmodule admin</tags>
+    <licenseUrl>https://github.com/dotps1/HPWarranty/blob/master/LICENSE.md</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!--<iconUrl>http://cdn.rawgit.com/__REPLACE_YOUR_REPO__/master/icons/winscpsmodule.png</iconUrl>-->
+    <releaseNotes></releaseNotes>
+  </metadata>
+  <files>
+    <file src="HPWarranty.psm1" target="Tools" />
+	<file src="HPWarranty.psd1" target="Tools" />
+	<file src="README.md" target="Tools" />
+	<file src="LICENSE.md" target="Tools" />
+	<file src="EntitlementSOAPRequest.xml" target="Tools" />
+	<file src="RegistrationSOAPRequest.xml" target="Tools" />
+	<file src="chocolateyinstall.ps1" />
+  </files>
+</package>

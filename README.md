@@ -1,19 +1,21 @@
+# HPWarranty PowerShell Module
+
+This module can be installed with [chocolatey[("https://chocolatey.org/packages/hpwarranty.powershell"):
+```PowerShell
+choco install hpwarranty.powershell -version 0.0.2.4
+Import-Module -Name HPWarranty
+```
+
+This module can be installed with [PsGet](http://psget.net/):
+```PowerShell
+Install-Module -ModuleUrl "https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip" -ModuleName HPWarranty -Type ZIP
+```
+
 ## HPWarranty Cmdlets
 
 * [Invoke-HPWarrantyRegistrationRequest](https://github.com/dotps1/HPWarranty/wiki/Invoke-HPWarrantyRegistrationRequest)
 * [Invoke-HPWarrantyEntitlementList](https://github.com/dotps1/HPWarranty/wiki/Invoke-HPWarrantyEntitlementList)
 * [Get-HPComputerInformationForWarrantyFromCMDB](https://github.com/dotps1/HPWarranty/wiki/Get-HPComputerInformationForWarrantyFromCMDB)
-
-You can install this module with [PsGet](http://psget.net/), if you don't have PsGet, I highly recommend you get it!
-```PowerShell
-# Install PsGet
-(New-Object -TypeName Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | Invoke-Expression
-```
-
-```PowerShell
-# Install WinSCP module with PsGet
-Install-Module -ModuleUrl "https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip" -ModuleName HPWarranty -Type ZIP
-```
 
 Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:
 

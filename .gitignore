@@ -1,3 +1,6 @@
+# Local Repository Files To Ignore:
+*.nupkg
+
 #################
 ## Eclipse
 #################
