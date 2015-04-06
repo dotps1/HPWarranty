@@ -19,7 +19,19 @@
     </section>
 
     <section class="main-content">
-      <h2>
+      <h1>
+<a id="hpwarranty-powershell-module" class="anchor" href="#hpwarranty-powershell-module" aria-hidden="true"><span class="octicon octicon-link"></span></a>HPWarranty PowerShell Module</h1>
+
+<p>This module can be installed with chocolatey:</p>
+
+<div class="highlight highlight-PowerShell"><pre>choco install hpwarranty.powershell <span class="pl-k">-</span>version <span class="pl-c1"><span class="pl-c1">0.0</span></span>.<span class="pl-c1"><span class="pl-c1">2.4</span></span>
+<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty</pre></div>
+
+<p>This module can be installed with <a href="http://psget.net/">PsGet</a>:</p>
+
+<div class="highlight highlight-PowerShell"><pre><span class="pl-c1">Install-Module</span> <span class="pl-k">-</span>ModuleUrl <span class="pl-s">"https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip"</span> <span class="pl-k">-</span>ModuleName HPWarranty <span class="pl-k">-</span>Type ZIP</pre></div>
+
+<h2>
 <a id="hpwarranty-cmdlets" class="anchor" href="#hpwarranty-cmdlets" aria-hidden="true"><span class="octicon octicon-link"></span></a>HPWarranty Cmdlets</h2>
 
 <ul>
@@ -27,14 +39,6 @@
 <li><a href="https://github.com/dotps1/HPWarranty/wiki/Invoke-HPWarrantyEntitlementList">Invoke-HPWarrantyEntitlementList</a></li>
 <li><a href="https://github.com/dotps1/HPWarranty/wiki/Get-HPComputerInformationForWarrantyFromCMDB">Get-HPComputerInformationForWarrantyFromCMDB</a></li>
 </ul>
-
-<p>You can install this module with <a href="http://psget.net/">PsGet</a>, if you don't have PsGet, I highly recommend you get it!</p>
-
-<div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Install PsGet</span>
-<span class="pl-k">(</span><span class="pl-c1">New-Object</span> <span class="pl-k">-</span>TypeName Net.WebClient<span class="pl-k">)</span>.DownloadString<span class="pl-k">(</span><span class="pl-s">"http://psget.net/GetPsGet.ps1"</span><span class="pl-k">)</span> <span class="pl-k">|</span> <span class="pl-c1">Invoke-Expression</span></pre></div>
-
-<div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Install WinSCP module with PsGet</span>
-<span class="pl-c1">Install-Module</span> <span class="pl-k">-</span>ModuleUrl <span class="pl-s">"https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip"</span> <span class="pl-k">-</span>ModuleName HPWarranty <span class="pl-k">-</span>Type ZIP</pre></div>
 
 <p>Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
 
