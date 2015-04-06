@@ -1,2 +1,2 @@
-﻿$p = Join-Path $env:ProgramFiles WindowsPowerShell\Modules; $e = Get-EnvironmentVariable PSModulePath Process; if (($e -split ";") -notcontains $p) { Set-EnvironmentVariable PSModulePath ($e += ";$p") Process }
-Install-ChocolateyZipPackage 'hpwarranty.powershell' 'https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip' "$($env:PSModulePath -split ';' | ?{ $_ -match 'Program Files' })\HPWarranty"
+﻿$p = Join-Path $env:ProgramFiles WindowsPowerShell\Modules; $e = Get-EnvironmentVariable PSModulePath Process; if (($e -split ';') -notcontains $p) { Set-EnvironmentVariable PSModulePath ($e += ";$p") Process }
+Install-ChocolateyZipPackage 'hpwarranty.powershell' 'https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip' "$($env:PSModulePath -split ';' | ?{ $_ -eq $p })\HPWarranty"
