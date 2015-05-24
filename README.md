@@ -59,11 +59,7 @@ Example 3:
 ```PowerShell
 # Query a remote computer for information to create a session with the the HP Web Services.
 # Remote WMI access is necessary to use this function remotely.
-Import-Module -Name HPWarranty
-
-$reg = Invoke-HPWarrantyRegistrationRequest -ComputerName HPComputer.mydomain.org
-
-Invoke-HPWarrantyEntitlementList -Gdid $reg.Gdid -Token $reg.Token -ComputerName HPComputer.mydomain.org
+Import-Module -Name HPWarranty; Invoke-HPWarrantyEntitlementList -ComputerName 'HPComputer.mydomain.org'
 ```
 
 Example 4:
