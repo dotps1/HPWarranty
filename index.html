@@ -22,10 +22,9 @@
       <h1>
 <a id="hpwarranty-powershell-module" class="anchor" href="#hpwarranty-powershell-module" aria-hidden="true"><span class="octicon octicon-link"></span></a>HPWarranty PowerShell Module</h1>
 
-<p>This module can be installed with chocolatey:</p>
+<p>This module can be installed with <a href="https://chocolatey.org/packages/hpwarranty.powershell">chocolatey</a>:</p>
 
-<div class="highlight highlight-PowerShell"><pre>choco install hpwarranty.powershell <span class="pl-k">-</span>version <span class="pl-c1"><span class="pl-c1">0.0</span></span>.<span class="pl-c1"><span class="pl-c1">2.4</span></span>
-<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty</pre></div>
+<div class="highlight highlight-PowerShell"><pre>choco install hpwarranty.powershell <span class="pl-k">-</span>version <span class="pl-c1"><span class="pl-c1">0.0</span></span>.<span class="pl-c1"><span class="pl-c1">2.4</span></span></pre></div>
 
 <p>This module can be installed with <a href="http://psget.net/">PsGet</a>:</p>
 
@@ -81,11 +80,7 @@
 
 <div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Query a remote computer for information to create a session with the the HP Web Services.</span>
 <span class="pl-c"># Remote WMI access is necessary to use this function remotely.</span>
-<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
-
-<span class="pl-k">$</span><span class="pl-smi">reg</span> <span class="pl-k">=</span> <span class="pl-c1">Invoke-HPWarrantyRegistrationRequest</span> <span class="pl-k">-</span>ComputerName HPComputer.mydomain.org
-
-<span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>ComputerName HPComputer.mydomain.org</pre></div>
+<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty<span class="pl-k">;</span> <span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>ComputerName <span class="pl-s">'HPComputer.mydomain.org'</span></pre></div>
 
 <p>Example 4:</p>
 
