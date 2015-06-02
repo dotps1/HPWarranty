@@ -1,9 +1,13 @@
 # HPWarranty PowerShell Module
 
+This module can be installed from the [PowerShellGallery](https://www.powershellgallery.com/packages/HPWarranty/).  You need [WMF 5](https://www.microsoft.com/en-us/download/details.aspx?id=44987) to use this feature.
+```PowerShell
+Install-Module -Name HPWarranty
+```
+
 This module can be installed with [chocolatey](https://chocolatey.org/packages/hpwarranty.powershell):
 ```PowerShell
 choco install hpwarranty.powershell -version 0.0.2.4
-Import-Module -Name HPWarranty
 ```
 
 This module can be installed with [PsGet](http://psget.net/):
