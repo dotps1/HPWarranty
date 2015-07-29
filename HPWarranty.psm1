@@ -54,7 +54,7 @@ Function Invoke-HPWarrantyRegistrationRequest
     Param
     (
         [Parameter(ParameterSetName = 'Default')]
-        [ValidateScript({ if ($_ -eq $env:COMPUTERNAME){ $true } else { try { Test-WSMan -ComputerName $_ -ErrorAction Stop ; $true } catch { throw "Unable to connect to WSMan on $_." } } })]
+        [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2) { $true } })]
         [String]
         $ComputerName = $env:COMPUTERNAME,
 
@@ -201,7 +201,7 @@ Function Invoke-HPWarrantyEntitlementList
         $Token,
 
         [Parameter(ParameterSetName = 'Default')]
-        [ValidateScript({ if ($_ -eq $env:COMPUTERNAME){ $true } else { try { Test-WSMan -ComputerName $_ -ErrorAction Stop ; $true } catch { throw "Unable to connect to WSMan on $_." } } })]
+        [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2) { $true } })]
         [String]
         $ComputerName = $env:COMPUTERNAME,
 
