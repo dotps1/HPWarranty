@@ -113,7 +113,6 @@ Function Invoke-HPWarrantyEntitlementList
         
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Static')]
-        #[ValidateScript({ if (Test-Path -Path $_) { $true } })]
         [String]
         $PathToExportFullXml
     )

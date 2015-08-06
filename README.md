@@ -5,16 +5,6 @@ This module can be installed from the [PowerShellGallery](https://www.powershell
 Install-Module -Name HPWarranty
 ```
 
-This module can be installed with [chocolatey](https://chocolatey.org/packages/hpwarranty.powershell):
-```PowerShell
-choco install hpwarranty.powershell -version 0.0.2.4
-```
-
-This module can be installed with [PsGet](http://psget.net/):
-```PowerShell
-Install-Module -ModuleUrl "https://github.com/dotps1/HPWarranty/raw/master/HPWarranty.zip" -ModuleName HPWarranty -Type ZIP
-```
-
 ## HPWarranty Cmdlets
 
 * [Invoke-HPWarrantyRegistrationRequest](https://github.com/dotps1/HPWarranty/wiki/Invoke-HPWarrantyRegistrationRequest)
@@ -31,7 +21,7 @@ Basically, to use HPs ISEE to get warranty info, there are a few things that nee
 Example 1:
 ```PowerShell
 # Execute from a local HP Workstation
-Import-Module HPWarranty; Invoke-HPWarrantyEntitlementList
+Import-Module -Name HPWarranty; Invoke-HPWarrantyEntitlementList
 ```
 
 Example 2:
@@ -51,8 +41,9 @@ $HP2 = @{
 	'ProductID' = 'ABC123'
 }
 
-	
+
 # Use either HP1 or HP2 properties to establish a session with the HP Web Services.
+Import-Module -Name HPWarranty
 $reg = Invoke-HPWarrantyRegistrationRequest -SerialNumber $HP1.SerialNumber -ProductModel $HP1.ProductModel
 
 Invoke-HPWarrantyEntitlementList -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP1.SerialNumber -ProductID $HP1.ProductID
@@ -70,7 +61,6 @@ Example 4:
 ```PowerShell
 # Execute with information from ConfigMgr Database:
 Import-Module -Name HPWarranty
-
 $reg = Invoke-HPWarrantyRegistrationRequest -SerialNumber "ABCDE12345" -ProductModel "HP ProBook 645 G1"
 
 $HPs = Get-HPComputerInformationForWarrantyFromCMDB -SqlServer MySccmDBServer -Database CM_MS1 -IntergratedSecurity
@@ -79,7 +69,7 @@ foreach ($HP in $HPs)
 	 Invoke-HPWarrantyEntitlementList -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $HP.SerialNumber -ProductID $HP.ProductID
 }
 ```
-	
+
 Example 5:
 ```PowerShell
 # Hashtables are a little tricky to export to CSV, so here is how I run my build date report:
@@ -90,12 +80,12 @@ $reg = Invoke-HPWarrantyRegistrationRequest
 
 # This output is tailored to the request that was given to me, not all of these values maybe necessary to return.
 Get-HPComputerInformationForWarrantyFromCMDB -SqlServer MyCMDB.mydomain.org -Database CM_MS1 -IntergratedSecurity |
-Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } }, 
-						@{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } }, 
-						@{ Name = 'ProductModel';     Expression = { $_.ProductModel } }, 
+Select-Object -Property @{ Name = 'ComputerName';     Expression = { $_.ComputerName } },
+						@{ Name = 'SerialNumber';     Expression = { $_.SerialNumber } },
+						@{ Name = 'ProductModel';     Expression = { $_.ProductModel } },
 						@{ Name = 'BuildDate';        Expression = { (Invoke-HPWarrantyEntitlementList -Gdid $reg.Gdid -Token $reg.Token -SerialNumber $_.SerialNumber -ProductID $_.ProductID).OverallWarrantyStartDate } },
 						@{ Name = 'LastHardwareScan'; Expression = { Get-Date (Get-Date $_.LastHardwareScan).ToShortDateString() -Format 'yyyy-MM-dd' } },
 						@{ Name = 'LastLoggedOnUser'; Expression = { $_.Username } },
 						@{ Name = 'CompanyName';      Expression = { if ($_.Username -ne $null){ (Get-ADUser -Identity $_.Username.ToString().Trim('MYDOMAIN\') -Properties Company).Company } } } |
-Export-Csv -Path C:\HPBuildInfo.csv -NoTypeInformation -Append 
+Export-Csv -Path C:\HPBuildInfo.csv -NoTypeInformation -Append
 ```
