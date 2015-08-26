@@ -1,3 +1,5 @@
+# HP has recently changed how the ISEE functions, and this module does not work at the moment.
+
 # HPWarranty PowerShell Module
 
 This module can be installed from the [PowerShellGallery](https://www.powershellgallery.com/packages/HPWarranty/).  You need [WMF 5](https://www.microsoft.com/en-us/download/details.aspx?id=44987) to use this feature.

@@ -57,11 +57,11 @@ Function Invoke-SOAPRequest
     )
 
     $soapWebRequest = [System.Net.WebRequest]::Create($URL) 
-    $soapWebRequest.Headers.Add("SOAPAction",$Action)
+    $soapWebRequest.Headers.Add('SOAPAction', $Action)
 
     $soapWebRequest.ContentType = 'text/xml; charset=utf-8'
-    $soapWebRequest.Accept = "text/xml" 
-    $soapWebRequest.Method = "POST" 
+    $soapWebRequest.Accept = 'text/xml'
+    $soapWebRequest.Method = 'POST' 
     $soapWebRequest.UserAgent = 'RemoteSupport/A.05.05 - gSOAP/2.7'
 
     $soapWebRequest.Timeout = 30000
