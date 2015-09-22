@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EIAMessage>
+	<MessageHeader>
+		<MessageID></MessageID>
+		<TimeStamp></TimeStamp>
+		<MessageType>request</MessageType>
+		<ServiceDescriptor>
+			<ServiceID>ES</ServiceID>
+			<MajorVersion>8</MajorVersion>
+			<MinorVersion>0</MinorVersion>
+		</ServiceDescriptor>
+		<MessageSecurity>
+			<SecurityCredentials>
+				<UserName>HPSF</UserName>
+				<UserPassword>answer42</UserPassword>
+			</SecurityCredentials>
+		</MessageSecurity>
+	</MessageHeader>
+	<MessageBody>
+		<EsRequestComplexType>
+			<Operation>getEntitlementBySn</Operation>
+			<ClientAppID/>
+			<EntitlementBySnRequest>
+				<IsoCountryCd><#COUNTRYCODE#></IsoCountryCd>
+				<EntitlementCheckDate><#CHECKDATE#></EntitlementCheckDate>
+				<SerialNumber><#SERIAL#></SerialNumber>
+				<ProductID><#PRODID#></ProductID>
+				<ActiveContractsOnly>false</ActiveContractsOnly>
+				<ActiveServicesOnly>false</ActiveServicesOnly>
+				<ActiveWarrantyOnly>false</ActiveWarrantyOnly>
+				<IncludeWarranty>true</IncludeWarranty>
+				<IncludeContracts>true</IncludeContracts>
+				<IncludeContacts>false</IncludeContacts>
+				<IncludeAddresses>false</IncludeAddresses>
+				<IncludeOffers>false</IncludeOffers>
+				<IncludeDeliverables>false</IncludeDeliverables>
+				<IncludeModifiers>false</IncludeModifiers>
+				<IncludeServiceNotes>true</IncludeServiceNotes>
+				<IncludeWorkings>false</IncludeWorkings>
+				<WarrantySourceSystem />
+			</EntitlementBySnRequest>
+		</EsRequestComplexType>
+	</MessageBody>
+	<MessageTrailer/>
+</EIAMessage>
