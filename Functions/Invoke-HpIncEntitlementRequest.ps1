@@ -19,6 +19,8 @@
     PS C:\> Invoke-HpIncRequest -RequestTemplate ".\ReqTemp.xml" -Serial "ABCDEF123" -ProductNo "123453#ABC"
 .EXAMPLE
     PS C:\> Invoke-HpIncRequest -RequestTemplate ".\ReqTemp.xml" -Serial "ABCDEF123" -ProductNo "123453#ABC" -CountryCode "US"
+.NOTES
+	Thanks to https://github.com/kelmansoury
 #>
 Function Invoke-HpIncRequest {
 	param(
