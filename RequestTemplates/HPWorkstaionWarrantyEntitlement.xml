@@ -21,10 +21,10 @@
          <Operation>getEntitlementBySn</Operation>
          <ClientAppID>HPSF</ClientAppID>
          <EntitlementBySnRequest>
-            <IsoCountryCd><COUNTRYCODE></IsoCountryCd>
-            <EntitlementCheckDate><CHECKDATE></EntitlementCheckDate>
-            <SerialNumber><SERIAL></SerialNumber>
-            <ProductID><PRODUCT></ProductID>
+            <IsoCountryCd><[!--CountryCode--!]></IsoCountryCd>
+            <EntitlementCheckDate><[!--EntitlementCheckDate--!]></EntitlementCheckDate>
+            <SerialNumber><[!--SerialNumber--!]></SerialNumber>
+            <ProductID><[!--ProductID--!]></ProductID>
             <ActiveContractsOnly>false</ActiveContractsOnly>
             <ActiveServicesOnly>false</ActiveServicesOnly>
             <ActiveWarrantyOnly>false</ActiveWarrantyOnly>

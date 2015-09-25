@@ -14,14 +14,14 @@
 .PARAMETER ProductModel
     The product Model of the Hewlett-Packard System.
 .EXAMPLE
-    PS C:\> Invoke-HPWarrantyRegistrationRequest
+    Invoke-HPWarrantyRegistrationRequest
 
     Name                           Value
     ----                           -----
     Token                          N0b2GQkmyM3CN23haBM6KSrnJ/VILMpnwwEjPFiuc8yQwDqtkig6Y1Z3j5Xyou2V4PTF1CbmxIljlZPCUaYjN/B4zDz3y8PugT2...
     Gdid                           0b0de1fc-1abc-2def-3ghi-aa76cbbe8e8b
 .EXAMPLE
-    PS C:\> Invoke-HPWarrantyRegistrationRequest -SerialNumber ABCDE12345 -ProductModel "HP ProBook 645 G1"
+    Invoke-HPWarrantyRegistrationRequest -SerialNumber ABCDE12345 -ProductModel "HP ProBook 645 G1"
 
     Name                           Value
     ----                           -----
@@ -45,57 +45,72 @@
 .LINK
     http://dotps1.github.io
 #>
-Function Invoke-HPWarrantyRegistrationRequest
-{
+Function Invoke-HPWarrantyRegistrationRequest {
+    
     [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
-    [OutputType([PSObject])]
-    Param
-    (
-        [Parameter(ParameterSetName = 'Default')]
-        [ValidateScript({ if ($_ -eq $env:COMPUTERNAME){ $true } else { try { Test-Connection -ComputerName $_ -Count 2 -ErrorAction Stop ; $true } catch { throw "Unable to connect to $_." } } })]
+    [OutputType([PSCustomObject])]
+    
+    Param (
+        [Parameter(
+            ParameterSetName = 'Default'
+        )]
+        [ValidateScript({ 
+            if ($_ -eq $env:COMPUTERNAME){ 
+                $true 
+            } else { 
+                try { 
+                    Test-Connection -ComputerName $_ -Count 2 -ErrorAction Stop
+                    $true 
+                } catch { 
+                    throw "Unable to connect to $_." 
+                } 
+            } 
+        })]
         [String]
         $ComputerName = $env:COMPUTERNAME,
 
-        [Parameter(ParameterSetName = 'Static',
-                   Mandatory = $true)]
+        [Parameter(
+            Mandatory = $true,
+            ParameterSetName = 'Static',
+            ValueFromPipelineByPropertyName = $true
+        )]
         [String]
         $SerialNumber,
 
-        [Parameter(ParameterSetName = 'Static',
-                   Mandatory = $true)]
+        [Parameter(
+            Mandatory = $true,
+            ParameterSetName = 'Static',
+            ValueFromPipelineByPropertyName = $true
+        )]
         [String]
         $ProductModel
     )
     
-    if ($PSCmdlet.ParameterSetName -eq '__AllParameterSets' -or $PSCmdlet.ParameterSetName -eq 'Default')
-    {
-        try
-        {
+    if ($PSCmdlet.ParameterSetName -eq '__AllParameterSets' -or $PSCmdlet.ParameterSetName -eq 'Default') {
+        try {
             $manufacturer = (Get-WmiObject -Class Win32_ComputerSystem -Namespace 'root\CIMV2' -Property 'Manufacturer' -ComputerName $ComputerName -ErrorAction Stop).Manufacturer
-            if ($manufacturer -eq 'Hewlett-Packard' -or $manufacturer -eq 'HP')
-            {
+            if ($manufacturer -eq 'Hewlett-Packard' -or $manufacturer -eq 'HP') {
                 $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber.Trim()
                 $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model.Trim()
-            }
-            else
-            {
+            } else {
                 throw 'Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems.'
             }
-        }
-        catch 
-        {
-            throw $_
+        } catch {
+            throw "Failed to retrieve SerialNumber and ProductModel from $ComputerName."
         }
     }
 
-    [Xml]$registrationSOAPRequest = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\RegistrationSOAPRequest.xml") `
-        -replace '<UniversialDateTime>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T')) `
-        -replace '<SerialNumber>',$SerialNumber.Trim() `
-        -replace '<ProductModel>',$ProductModel.Trim()
+    [Xml]$registrationSOAPRequest = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\RegistrationSOAPRequest.xml").Replace(
+        '<UniversialDateTime>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
+    ).Replace(
+        '<SerialNumber>',$SerialNumber
+    ).Replace(
+        '<ProductModel>',$ProductModel
+    )
 
     $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
-    return [PSObject] @{
+    [PSCustomObject]@{
         'Gdid'  = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
         'Token' = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.RegistrationToken
     }
