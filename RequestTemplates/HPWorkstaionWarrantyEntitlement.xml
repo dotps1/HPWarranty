@@ -24,7 +24,7 @@
             <IsoCountryCd><[!--CountryCode--!]></IsoCountryCd>
             <EntitlementCheckDate><[!--EntitlementCheckDate--!]></EntitlementCheckDate>
             <SerialNumber><[!--SerialNumber--!]></SerialNumber>
-            <ProductID><[!--ProductID--!]></ProductID>
+            <ProductID><[!--ProductNumber--!]></ProductID>
             <ActiveContractsOnly>false</ActiveContractsOnly>
             <ActiveServicesOnly>false</ActiveServicesOnly>
             <ActiveWarrantyOnly>false</ActiveWarrantyOnly>

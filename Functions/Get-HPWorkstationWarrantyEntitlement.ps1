@@ -37,7 +37,7 @@
             ValueFromPipeLineByPropertyName = $true
         )]
 		[String]
-        $ProductID,
+        $ProductNumber,
 
 		[Parameter(
             ParameterSetName = 'Default'
@@ -68,12 +68,12 @@
     }
 
     Process {
-        if ($PSCmdlet.ParameterSetName -eq '__AllParameterSets' -or $PSCmdlet.ParameterSetName -eq 'Default') {
+        if (-not $PSCmdlet.ParameterSetName -eq 'Static') {
             try {
                 $manufacturer = (Get-WmiObject -Class Win32_ComputerSystem -Namespace 'root\CIMV2' -Property 'Manufacturer' -ComputerName $ComputerName -ErrorAction Stop).Manufacturer
                 if ($manufacturer -eq 'Hewlett-Packard' -or $manufacturer -eq 'HP') {
                     $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber.Trim()
-                    $ProductID = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU.Trim()
+                    $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU.Trim()
                 } else {
                     'Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems.'
                 }
@@ -85,7 +85,7 @@
         $request = $request.Replace(
             '<[!--SerialNumber--!]>', $SerialNumber
         ).Replace(
-            '<[!--ProductID--!]>', $ProductID
+            '<[!--ProductNumber--!]>', $ProductNumber
         )
 
         try {
@@ -104,7 +104,7 @@
 
         [PSCustomObject]@{
             'SerialNumber' = $SerialNumber
-            'ProductID' = $ProductID
+            'ProductNumber' = $ProductNumber
             'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
             'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
             'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText

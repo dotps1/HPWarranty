@@ -45,7 +45,7 @@
 .LINK
     http://dotps1.github.io
 #>
-Function Invoke-HPWarrantyRegistrationRequest {
+Function Invoke-HPServerWarrantyRegistration {
     
     [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
     [OutputType([PSCustomObject])]
@@ -86,32 +86,38 @@ Function Invoke-HPWarrantyRegistrationRequest {
         $ProductModel
     )
     
-    if ($PSCmdlet.ParameterSetName -eq '__AllParameterSets' -or $PSCmdlet.ParameterSetName -eq 'Default') {
-        try {
-            $manufacturer = (Get-WmiObject -Class Win32_ComputerSystem -Namespace 'root\CIMV2' -Property 'Manufacturer' -ComputerName $ComputerName -ErrorAction Stop).Manufacturer
-            if ($manufacturer -eq 'Hewlett-Packard' -or $manufacturer -eq 'HP') {
-                $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber.Trim()
-                $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model.Trim()
-            } else {
-                throw 'Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems.'
-            }
-        } catch {
-            throw "Failed to retrieve SerialNumber and ProductModel from $ComputerName."
-        }
+    Begin {
+        [Xml]$registration = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPServerWarrantyRegistration.xml").Replace(
+            '<[!--UniversialDateTime--!]>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
+        )
     }
+    
+    Process {
+        if (-not $PSCmdlet.ParameterSetName -eq 'Static') {
+            try {
+                $manufacturer = (Get-WmiObject -Class Win32_ComputerSystem -Namespace 'root\CIMV2' -Property 'Manufacturer' -ComputerName $ComputerName -ErrorAction Stop).Manufacturer
+                if ($manufacturer -eq 'Hewlett-Packard' -or $manufacturer -eq 'HP') {
+                    $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber.Trim()
+                    $ProductModel = (Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop).Model.Trim()
+                } else {
+                    throw 'Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems.'
+                }
+            } catch {
+                throw "Failed to retrieve SerialNumber and ProductModel from $ComputerName."
+            }
+        }
 
-    [Xml]$registrationSOAPRequest = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\RegistrationSOAPRequest.xml").Replace(
-        '<UniversialDateTime>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
-    ).Replace(
-        '<SerialNumber>',$SerialNumber
-    ).Replace(
-        '<ProductModel>',$ProductModel
-    )
+        $registration = $registration.Replace(
+            '<[!--SerialNumber--!]>',$SerialNumber
+        ).Replace(
+            '<[!--ProductModel--!]>',$ProductModel
+        )
 
-    $registrationAction = Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
+        $registration = Invoke-SOAPRequest -SOAPRequest $registration-URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
-    [PSCustomObject]@{
-        'Gdid'  = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
-        'Token' = $registrationAction.Envelope.Body.RegisterClient2Response.RegisterClient2Result.RegistrationToken
+        [PSCustomObject]@{
+            'Gdid'  = $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
+            'Token' = $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.RegistrationToken
+        }
     }
 }
