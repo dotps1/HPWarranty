@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <ModuleObject xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" fVersion="1.1" type="Script" mclass="External" useSupports="false">
   <Name>HPWarranty</Name>
-  <Version>2.0.0.0</Version>
+  <Version>2.1.0.0</Version>
   <Description>PowerShell Module designed to retrieve Hewlett-Packard Warranty Information.</Description>
   <ModulePath>C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty.psd1</ModulePath>
   <HasManifest>false</HasManifest>
   <OverridePostCount>false</OverridePostCount>
   <FetchPostCount xsi:nil="true" />
   <Cmdlets>
-    <CmdletObject verb="Get" noun="HPServerWarrantyEntitlement">
-      <Name>Get-HPServerWarrantyEntitlement</Name>
+    <CmdletObject verb="Get" noun="HPWarrantyEntitlement">
+      <Name>Get-HPWarrantyEntitlement</Name>
       <GeneralHelp>
-        <Synopsis>Get Hewlett-Packard warranty entitlement for a server.</Synopsis>
-        <Description>Uses the Hewlett-Packard ISEE 'API' to get the warranty entitlement for a server class system.</Description>
+        <Synopsis>Gets Hewlett-Packard warranty entitlement for a workstation or server.</Synopsis>
+        <Description>Uses both available APIs for HP ISEE and HPInc to retrieve warranty entitlements for Hewlett-Packard systems.</Description>
         <Notes />
         <InputType>System.String</InputType>
         <InputUrl>https://msdn.microsoft.com/en-us/library/system.string(v=vs.110).aspx</InputUrl>
@@ -22,132 +22,26 @@
         <ReturnTypeDescription>Serves as a placeholder object that is used when the PSObject constructor, which has no parameters, is used. </ReturnTypeDescription>
       </GeneralHelp>
       <ParamSets>
-        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
-        <CommandParameterSetInfo2 Name="Default" Params="ComputerName XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
-        <CommandParameterSetInfo2 Name="Static" Params="SerialNumber ProductNumber XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
-      </ParamSets>
-      <Syntax>
-        <string>Get-HPServerWarrantyEntitlement [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
-        <string>Get-HPServerWarrantyEntitlement [-ComputerName &lt;String[]&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
-        <string>Get-HPServerWarrantyEntitlement -SerialNumber &lt;String&gt; -ProductNumber &lt;String&gt; [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
-      </Syntax>
-      <Parameters>
-        <ParameterDescription type="ActionPreference" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
-          <Name>InformationAction</Name>
-          <Attributes>
-            <string>System.Management.Automation.AliasAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-          </Attributes>
-          <Aliases>
-            <string>infa</string>
-          </Aliases>
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
-          <Name>InformationVariable</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.Internal.CommonParameters+ValidateVariableName</string>
-            <string>System.Management.Automation.AliasAttribute</string>
-          </Attributes>
-          <Aliases>
-            <string>iv</string>
-          </Aliases>
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String[]" varLen="true" required="false" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="false" pos="named" globbing="false">
-          <Name>ComputerName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ValidateScriptAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Name of the system to get warranty entitlements for.</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
-          <Name>XmlExportPath</Name>
-          <Attributes>
-            <string>System.Management.Automation.ValidateNotNullOrEmptyAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Export the reply envelope to a file.</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="true" isPos="false" pos="named" globbing="false">
-          <Name>SerialNumber</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Serial number for static lookups, ProductNumber is mandatory when using this parameter set.</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="true" isPos="false" pos="named" globbing="false">
-          <Name>ProductNumber</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Product number (SKU) for static lookups, SerialNumber is mandatory when using this parameter set.</Description>
-          <DefaultValue />
-        </ParameterDescription>
-      </Parameters>
-      <Examples>
-        <Example>
-          <Name>Example 1</Name>
-          <Cmd>Get-HPServerWarrantyEntitlement</Cmd>
-          <Description>Gets the warranty entitlement for the local Hewlett-Packard server.</Description>
-          <Output />
-        </Example>
-        <Example>
-          <Name>Example 2</Name>
-          <Cmd>Get-HPServerWarrantyEntitlement -ComputerName 'MyHPServer.mydomain.org'</Cmd>
-          <Description>Gets the warranty entitlement for a remote Hewlett-Packard server.</Description>
-          <Output />
-        </Example>
-      </Examples>
-      <RelatedLinks>
-        <RelatedLink>
-          <LinkText>Project Home Page</LinkText>
-          <LinkUrl>http://dotps1.github.io/HPWarranty</LinkUrl>
-        </RelatedLink>
-      </RelatedLinks>
-      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
-      <Publish>false</Publish>
-    </CmdletObject>
-    <CmdletObject verb="Get" noun="HPWorkstationWarrantyEntitlement">
-      <Name>Get-HPWorkstationWarrantyEntitlement</Name>
-      <GeneralHelp>
-        <Synopsis>Get Hewlett-Packard warranty entitlement for a workstation.</Synopsis>
-        <Description>Uses a REST method to get the warranty entitlement for a workstation class system.</Description>
-        <Notes />
-        <InputType>System.String</InputType>
-        <InputUrl>https://msdn.microsoft.com/en-us/library/system.string(v=vs.110).aspx</InputUrl>
-        <InputTypeDescription>Represents text as a series of Unicode characters.</InputTypeDescription>
-        <ReturnType>System.Management.Automation.PSCustomObject</ReturnType>
-        <ReturnUrl>https://msdn.microsoft.com/en-us/library/system.management.automation.pscustomobject(v=vs.85).aspx</ReturnUrl>
-        <ReturnTypeDescription>Serves as a placeholder object that is used when the PSObject constructor, which has no parameters, is used. </ReturnTypeDescription>
-      </GeneralHelp>
-      <ParamSets>
-        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="CountryCode Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
         <CommandParameterSetInfo2 Name="Default" Params="ComputerName CountryCode XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
         <CommandParameterSetInfo2 Name="Static" Params="SerialNumber ProductNumber CountryCode XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Syntax>
-        <string>Get-HPWorkstationWarrantyEntitlement [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
-        <string>Get-HPWorkstationWarrantyEntitlement [-ComputerName &lt;String[]&gt;] [-CountryCode &lt;String&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
-        <string>Get-HPWorkstationWarrantyEntitlement -SerialNumber &lt;String&gt; -ProductNumber &lt;String&gt; [-CountryCode &lt;String&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
+        <string>Get-HPWarrantyEntitlement [-CountryCode &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
+        <string>Get-HPWarrantyEntitlement [-ComputerName &lt;String[]&gt;] [-CountryCode &lt;String&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
+        <string>Get-HPWarrantyEntitlement -SerialNumber &lt;String&gt; -ProductNumber &lt;String&gt; [-CountryCode &lt;String&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
       </Syntax>
       <Parameters>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>CountryCode</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
         <ParameterDescription type="ActionPreference" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>InformationAction</Name>
           <Attributes>
@@ -181,18 +75,7 @@
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Name of the system to get warranty entitlements for.</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
-          <Name>CountryCode</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>The country of the warranty, default value 'EN'.</Description>
+          <Description>Represents a remote system to retrieve a warranty entitlement for.</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -204,7 +87,7 @@
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Export the reply envelope to a file.</Description>
+          <Description>Path to place the response in xml format.</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="true" isPos="false" pos="named" globbing="false">
@@ -214,7 +97,7 @@
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Serial number for static lookups, ProductNumber is mandatory when using this parameter set.</Description>
+          <Description>Static entry to retrieving warranty by data value.</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="true" isPos="false" pos="named" globbing="false">
@@ -224,22 +107,27 @@
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Product number (SKU) for static lookups, SerialNumber is mandatory when using this parameter set.</Description>
+          <Description>Static entry to retrieving warranty by data value.</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>
       <Examples>
         <Example>
           <Name>Example 1</Name>
-          <Cmd>Get-HPWorkstationWarrantyEntitlement</Cmd>
-          <Description>Gets the warranty entitlement for the local Hewlett-Packard workstation.</Description>
-          <Output />
-        </Example>
-        <Example>
-          <Name>Example 2</Name>
-          <Cmd>Get-HPServerWarrantyEntitlement -ComputerName 'MyHPWorkstation.mydomain.org'</Cmd>
-          <Description>Gets the warranty entitlement for a remote Hewlett-Packard workstation.</Description>
-          <Output />
+          <Cmd>Get-HPWarrantyEntitlement</Cmd>
+          <Description />
+          <Output>SerialNumber                     : ABCDE12345
+ProductNumber                    : F2R10UT#ABA
+ProductLineDescription           : Commercial Notebooks
+ProductLineCode                  : AN
+ActiveWarrantyEntitlement        : true
+OverallWarrantyStartDate         : 2013-12-30
+OverallWarrantyEndDate           : 2017-02-02
+OverallContractEndDate           : 
+WarrantyDeterminationDescription : Ship date
+WarrantyDeterminationCode        : 26
+WarrantyExtension                : 0
+GracePeriod                      : 0</Output>
         </Example>
       </Examples>
       <RelatedLinks>
