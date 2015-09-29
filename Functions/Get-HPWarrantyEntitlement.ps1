@@ -75,7 +75,7 @@ Function Get-HPWarrantyEntitlement {
                     $SerialNumber = $systemInformation.SerialNumber
                     $ProductNumber = $systemInformation.ProductNumber
                 } else {
-                    return
+                    continue
                 }
             }
 
