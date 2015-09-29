@@ -20,7 +20,7 @@ Function Get-HPServerWarrantyEntitlement {
                 }
             }
         })]
-        [String]
+        [String[]]
         $ComputerName = $env:ComputerName,
 
 		[Parameter(
@@ -65,54 +65,49 @@ Function Get-HPServerWarrantyEntitlement {
     }
 
     Process {
-        if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
-            try {
-                $manufacturer = (Get-WmiObject -Class Win32_ComputerSystem -Namespace 'root\CIMV2' -Property 'Manufacturer' -ComputerName $ComputerName -ErrorAction Stop).Manufacturer
-                if ($manufacturer -eq 'Hewlett-Packard' -or $manufacturer -eq 'HP') {
-                    $SerialNumber = (Get-WmiObject -Class Win32_Bios -ComputerName $ComputerName -ErrorAction Stop).SerialNumber.Trim()
-                    $ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU.Trim()
+        foreach ($c in $ComputerName) {
+            if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
+                if (($systemInformation = Get-HPSerialNumberAndProductNumber -ComputerName $c) -ne $null) {
+                    $SerialNumber = $systemInformation.SerialNumber
+                    $ProductNumber = $systemInformation.ProductNumber
                 } else {
-                    throw 'Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems.'
+                    return
                 }
-            } catch {
-                throw "Failed to retrive SerailNumber and ProductID from $ComputerName."
             }
-        }
 
-        $request = $request.Replace(
-            '<[!--SerialNumber--!]>', $SerialNumber
-        ).Replace(
-            '<[!--ProductNumber--!]>', $ProductNumber
-        )
-
-        try {
-            $entitlementAction = Invoke-SOAPRequest -SOAPRequest $request -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2' 
-            $entitlement = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response) 
-        } catch {
-            throw 'Failed to invoke SOAP request.'
-        }
-
-        if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
             try {
-                $entitlement.Save("$XmlExportPath\${SerialNumber}_entitlement.xml")
+                $entitlementAction = Invoke-SOAPRequest -SOAPRequest $request.Replace(
+                    '<[!--SerialNumber--!]>', $SerialNumber
+                ).Replace(
+                    '<[!--ProductNumber--!]>', $ProductNumber
+                ) -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
+                $entitlement = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response) 
             } catch {
-                Write-Error -Message 'Failed to save xml file.'
+                throw 'Failed to invoke SOAP request.'
             }
-        }
 
-        [PSCustomObject]@{
-            'SerialNumber' = $SerialNumber
-            'ProductNumber' = $ProductNumber
-            'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
-            'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
-            'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
-            'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
-            'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
-            'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
-            'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
-            'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
-            'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-            'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+            if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
+                try {
+                    $entitlement.Save("$XmlExportPath\${SerialNumber}_entitlement.xml")
+                } catch {
+                    Write-Error -Message 'Failed to save xml file.'
+                }
+            }
+
+            [PSCustomObject]@{
+                'SerialNumber' = $SerialNumber
+                'ProductNumber' = $ProductNumber
+                'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
+                'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
+                'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
+                'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
+                'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
+                'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
+                'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
+                'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
+                'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+                'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+            }
         }
     }
 }

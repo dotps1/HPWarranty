@@ -33,7 +33,7 @@
 .LINK
     http://www.iislogs.com/steveschofield/execute-a-soap-request-from-powershell
 .LINK
-    http://dotps1.github.io
+    http://dotps1.github.io/HPWarranty
 #>
 Function Invoke-SOAPRequest  {
     
