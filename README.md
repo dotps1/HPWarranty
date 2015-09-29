@@ -24,13 +24,13 @@ Basically, to use HPs ISEE to get warranty info, there are a few things that nee
 Example 1:
 ```PowerShell
 # Execute from local HP workstation.
-Get-HPWorkstationWarrantyEntitlment
+Get-HPWorkstationWarrantyEntitlement
 ```
 
 Example 2:
 ```PowerShell
 # Execute against remote HP workstation (must be on).
-Get-HPWorkstationWarrantyEntitlment -ComputerName 'MyFriendsHP.ourdomain.org'
+Get-HPWorkstationWarrantyEntitlement -ComputerName 'MyFriendsHP.ourdomain.org'
 ```
 
 Example 3:
