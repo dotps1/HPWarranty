@@ -39,6 +39,10 @@ Function Get-HPWarrantyEntitlement {
 		[String]
         $ProductNumber,
 
+        [Parameter()]
+		[String]
+        $CountryCode = 'US',
+
 		[Parameter(
             ParameterSetName = 'Default'
         )]
@@ -88,7 +92,17 @@ Function Get-HPWarrantyEntitlement {
             }
 
             if ($entitlement.GetElementsByTagName('ErrorID').InnerText -eq '214' -and $entitlement.GetElementsByTagName('ErrorClass').InnerText -eq 'DataNotFound') {
-                Get-HPWorkstationWarrantyEntitlement -SerialNumber $SerialNumber -ProductNumber $ProductNumber
+                $params = @{
+                    SerialNumber = $SerialNumber
+                    ProductNumber = $ProductNumber
+                    CountryCode = $CountryCode
+                }
+
+                if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
+                    $params.Add('XmlExportPath', $XmlExportPath)
+                }
+
+                Get-HPWorkstationWarrantyEntitlement @params
             } else {
                 if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
                     try {
