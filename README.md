@@ -12,24 +12,23 @@ This is still very beta, so please report any issues.  Thanks.
 
 ## HPWarranty Cmdlets
 
-* [Get-HPServerWarrantyEntitlement]()
-* [Get-HPWorkstationWarrantyEntitlement]()
+* Get-HPWarrantyEntitlement
 
 
 Example 1:
 ```PowerShell
 # Execute from local HP workstation.
-Get-HPWorkstationWarrantyEntitlement
+Get-HPWarrantyEntitlement
 ```
 
 Example 2:
 ```PowerShell
 # Execute against remote HP workstation (must be on).
-Get-HPWorkstationWarrantyEntitlement -ComputerName 'MyFriendsHP.ourdomain.org'
+Get-HPWarrantyEntitlement -ComputerName 'MyFriendsHP.ourdomain.org'
 ```
 
 Example 3:
 ```PowerShell
 # Execute against multipule HP workstations
-@('HP1', 'HP2') | Get-HPWorkstationWarrantyEntitlement
+@('HP1', 'HP2') | Get-HPWarrantyEntitlement
 ```

@@ -1,4 +1,4 @@
-Function Get-HPServerWarrantyEntitlement {
+Function Get-HPWarrantyEntitlement {
     
     [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
     [OutputType([PSCustomObject])]
@@ -88,31 +88,30 @@ Function Get-HPServerWarrantyEntitlement {
             }
 
             if ($entitlement.GetElementsByTagName('ErrorID').InnerText -eq '214' -and $entitlement.GetElementsByTagName('ErrorClass').InnerText -eq 'DataNotFound') {
-                Write-Error -Message 'This cmdlet cannot be used for this system type.' -RecommendedAction 'Use Get-HPWorkstationWarrantyEntitlement.'
-                continue
-            }
-
-            if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
-                try {
-                    $entitlement.Save("$XmlExportPath\${SerialNumber}_entitlement.xml")
-                } catch {
-                    Write-Error -Message 'Failed to save xml file.'
+                Get-HPWorkstationWarrantyEntitlement -SerialNumber $SerialNumber -ProductNumber $ProductNumber
+            } else {
+                if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
+                    try {
+                        $entitlement.Save("$XmlExportPath\${SerialNumber}_entitlement.xml")
+                    } catch {
+                        Write-Error -Message 'Failed to save xml file.'
+                    }
                 }
-            }
 
-            [PSCustomObject]@{
-                'SerialNumber' = $SerialNumber
-                'ProductNumber' = $ProductNumber
-                'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
-                'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
-                'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
-                'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
-                'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
-                'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
-                'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
-                'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
-                'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+                [PSCustomObject]@{
+                    'SerialNumber' = $SerialNumber
+                    'ProductNumber' = $ProductNumber
+                    'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
+                    'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
+                    'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
+                    'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
+                    'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
+                    'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
+                    'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
+                    'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
+                    'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+                    'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+                }
             }
         }
     }
