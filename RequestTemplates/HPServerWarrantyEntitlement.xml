@@ -13,8 +13,8 @@
         <![CDATA[<isee:ISEE-GetOOSEntitlementInfoRequest xmlns:isee="http://www.hp.com/schemas/isee/5.00/entitlement" schemaVersion="5.00">
           <HP_ISEEEntitlementParameters>
             <CountryCode>ES</CountryCode>
-            <SerialNumber><[!--Gdid--!]></SerialNumber>
-            <ProductNumber><[!--ProductID--!]></ProductNumber>
+            <SerialNumber><[!--SerialNumber--!]></SerialNumber>
+            <ProductNumber><[!--ProductNumber--!]></ProductNumber>
             <EntitlementType></EntitlementType>
             <EntitlementId></EntitlementId>
             <ObligationId></ObligationId>

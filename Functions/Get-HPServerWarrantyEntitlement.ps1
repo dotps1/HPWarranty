@@ -47,7 +47,7 @@ Function Get-HPServerWarrantyEntitlement {
         )]
         [String]
         [ValidateNotNullOrEmpty()]
-        $XmlExportPath
+        $XmlExportPath = $null
 	)
 
     Begin {
@@ -83,7 +83,13 @@ Function Get-HPServerWarrantyEntitlement {
                 ) -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
                 $entitlement = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response) 
             } catch {
-                throw 'Failed to invoke SOAP request.'
+                Write-Error -Message 'Failed to invoke SOAP request.'
+                continue
+            }
+
+            if ($entitlement.GetElementsByTagName('ErrorID').InnerText -eq '214' -and $entitlement.GetElementsByTagName('ErrorClass').InnerText -eq 'DataNotFound') {
+                Write-Error -Message 'This cmdlet cannot be used for this system type.' -RecommendedAction 'Use Get-HPWorkstationWarrantyEntitlement.'
+                continue
             }
 
             if ($PSBoundParameters.ContainsKey('XmlExportPath')) {

@@ -56,7 +56,7 @@
         )]
         [String]
         [ValidateNotNullOrEmpty()]
-        $XmlExportPath
+        $XmlExportPath = $null
 	)
 
     Begin {
