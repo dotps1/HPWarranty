@@ -23,95 +23,43 @@
 <a id="hp-has-recently-changed-how-the-isee-functions-and-this-module-does-not-work-at-the-moment" class="anchor" href="#hp-has-recently-changed-how-the-isee-functions-and-this-module-does-not-work-at-the-moment" aria-hidden="true"><span class="octicon octicon-link"></span></a>HP has recently changed how the ISEE functions, and this module does not work at the moment.</h1>
 
 <h1>
+<a id="edit-it-is-kind-of-working-again-im-still-testing--feel-free-to-try-it-out" class="anchor" href="#edit-it-is-kind-of-working-again-im-still-testing--feel-free-to-try-it-out" aria-hidden="true"><span class="octicon octicon-link"></span></a>EDIT: It is kind of working again, im still testing.  Feel free to try it out.</h1>
+
+<h1>
 <a id="hpwarranty-powershell-module" class="anchor" href="#hpwarranty-powershell-module" aria-hidden="true"><span class="octicon octicon-link"></span></a>HPWarranty PowerShell Module</h1>
 
 <p>This module can be installed from the <a href="https://www.powershellgallery.com/packages/HPWarranty/">PowerShellGallery</a>.  You need <a href="https://www.microsoft.com/en-us/download/details.aspx?id=44987">WMF 5</a> to use this feature.</p>
 
-<div class="highlight highlight-PowerShell"><pre><span class="pl-c1">Install-Module</span> <span class="pl-k">-</span>Name HPWarranty</pre></div>
+<div class="highlight highlight-source-powershell"><pre><span class="pl-c1">Install-Module</span> <span class="pl-k">-</span>Name HPWarranty</pre></div>
+
+<p>HP has recently split into two divisions, and this a first attempt to support both HP server and workstation warranty via PowerShell.
+I currently have no way to check if a machine is a 'Server' or a 'Workstaion', so that falls on you, for now.
+This is still very beta, so pleae report any issues.  Thanks.</p>
 
 <h2>
 <a id="hpwarranty-cmdlets" class="anchor" href="#hpwarranty-cmdlets" aria-hidden="true"><span class="octicon octicon-link"></span></a>HPWarranty Cmdlets</h2>
 
 <ul>
-<li><a href="https://github.com/dotps1/HPWarranty/wiki/Invoke-HPWarrantyRegistrationRequest">Invoke-HPWarrantyRegistrationRequest</a></li>
-<li><a href="https://github.com/dotps1/HPWarranty/wiki/Invoke-HPWarrantyEntitlementList">Invoke-HPWarrantyEntitlementList</a></li>
-<li><a href="https://github.com/dotps1/HPWarranty/wiki/Get-HPComputerInformationForWarrantyFromCMDB">Get-HPComputerInformationForWarrantyFromCMDB</a></li>
+<li><a href="">Get-HPServerWarrantyEntitlement</a></li>
+<li><a href="">Get-HPWorkstationWarrantyEntitlement</a></li>
 </ul>
 
 <p>Basically, to use HPs ISEE to get warranty info, there are a few things that need to happen:</p>
 
-<ol>
-<li> A Session needs to be established with their Web Services, this is done by using the Invoke-HPWarrantyRegistrationRequest.  You need a valid SerialNumber and Product Model to do this.  If successful, it will return a Gdid and a Session Token, that then needs to be passed to the Invoke-HPWarrantyEntitlementList.</li>
-<li> Using the Gdid and the Token from step 1, and a valid SerialNumber and ProductNumber you can request the information for that device, returning the SerialNumber,ProductID,ActiveWarrantyEntitlement,OverallWarrantyStartDate,OverallWarrantyEndDate,WarrantyDeterminationDescription,GracePeriod (The return SOAP Envelop contains much more information, but that is was I parse and return).</li>
-<li> You can reuse the Gdid and Token from step one in a foreach loop to retrieve multiple warranty objects.  That is why I created the Get-HPComputerInformationForWarrantyRequestFromCMDB (only tested on SCCM 2012 SP1 DB).  If you configure your SCCM Client to inventory the MS_SystemInformation WMI Class (Found in the root namespace, not in CIMV2, root\MS_SystemInformation) you can then use this function to return form the CM_ database an array of objects containing the information needed to complete all actions.  SerialNumber,ProductModel,ProductID.</li>
-</ol>
-
 <p>Example 1:</p>
 
-<div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Execute from a local HP Workstation</span>
-<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty<span class="pl-k">;</span> <span class="pl-c1">Invoke-HPWarrantyEntitlementList</span></pre></div>
+<div class="highlight highlight-source-powershell"><pre><span class="pl-c"># Execute from local HP workstation.</span>
+<span class="pl-c1">Get-HPWorkstationWarrantyEntitlement</span></pre></div>
 
 <p>Example 2:</p>
 
-<div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Create one session but look up multiple warranty's</span>
-<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
-
-<span class="pl-k">$</span><span class="pl-smi">HP1</span> <span class="pl-k">=</span> @{
-    <span class="pl-s">'SerialNumber'</span> <span class="pl-k">=</span> <span class="pl-s">'A1B2C3D4E5'</span>
-    <span class="pl-s">'ProductModel'</span> <span class="pl-k">=</span> <span class="pl-s">'HP Laptop 100 G1'</span>
-    <span class="pl-s">'ProductID'</span> <span class="pl-k">=</span> <span class="pl-s">'123ABC'</span>
-}
-
-<span class="pl-k">$</span><span class="pl-smi">HP2</span> <span class="pl-k">=</span> @{
-    <span class="pl-s">'SerialNumber'</span> <span class="pl-k">=</span> <span class="pl-s">'12345ABCDE'</span>
-    <span class="pl-s">'ProductModel'</span> <span class="pl-k">=</span> <span class="pl-s">'HP Desktop 1100 G1'</span>
-    <span class="pl-s">'ProductID'</span> <span class="pl-k">=</span> <span class="pl-s">'ABC123'</span>
-}
-
-
-<span class="pl-c"># Use either HP1 or HP2 properties to establish a session with the HP Web Services.</span>
-<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
-<span class="pl-k">$</span><span class="pl-smi">reg</span> <span class="pl-k">=</span> <span class="pl-c1">Invoke-HPWarrantyRegistrationRequest</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-smi">HP1</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductModel <span class="pl-k">$</span><span class="pl-smi">HP1</span><span class="pl-en">.ProductModel</span>
-
-<span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-smi">HP1</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-smi">HP1</span><span class="pl-en">.ProductID</span>
-<span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-smi">HP2</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-smi">HP2</span><span class="pl-en">.ProductID</span></pre></div>
+<div class="highlight highlight-source-powershell"><pre><span class="pl-c"># Execute against remote HP workstation (must be on).</span>
+<span class="pl-c1">Get-HPWorkstationWarrantyEntitlement</span> <span class="pl-k">-</span>ComputerName <span class="pl-s">'MyFriendsHP.ourdomain.org'</span></pre></div>
 
 <p>Example 3:</p>
 
-<div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Query a remote computer for information to create a session with the the HP Web Services.</span>
-<span class="pl-c"># Remote WMI access is necessary to use this function remotely.</span>
-<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty<span class="pl-k">;</span> <span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>ComputerName <span class="pl-s">'HPComputer.mydomain.org'</span></pre></div>
-
-<p>Example 4:</p>
-
-<div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Execute with information from ConfigMgr Database:</span>
-<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
-<span class="pl-k">$</span><span class="pl-smi">reg</span> <span class="pl-k">=</span> <span class="pl-c1">Invoke-HPWarrantyRegistrationRequest</span> <span class="pl-k">-</span>SerialNumber <span class="pl-s">"ABCDE12345"</span> <span class="pl-k">-</span>ProductModel <span class="pl-s">"HP ProBook 645 G1"</span>
-
-<span class="pl-k">$</span><span class="pl-smi">HPs</span> <span class="pl-k">=</span> <span class="pl-c1">Get-HPComputerInformationForWarrantyFromCMDB</span> <span class="pl-k">-</span>SqlServer MySccmDBServer <span class="pl-k">-</span>Database CM_MS1 <span class="pl-k">-</span>IntergratedSecurity
-<span class="pl-k">foreach</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-smi">HP</span> <span class="pl-k">in</span> <span class="pl-k">$</span><span class="pl-smi">HPs</span><span class="pl-k">)</span>
-{
-     <span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-smi">HP</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-smi">HP</span><span class="pl-en">.ProductID</span>
-}</pre></div>
-
-<p>Example 5:</p>
-
-<div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Hashtables are a little tricky to export to CSV, so here is how I run my build date report:</span>
-<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name HPWarranty
-<span class="pl-c1">Import-Module</span> <span class="pl-k">-</span>Name ActiveDirectory
-
-<span class="pl-k">$</span><span class="pl-smi">reg</span> <span class="pl-k">=</span> <span class="pl-c1">Invoke-HPWarrantyRegistrationRequest</span>
-
-<span class="pl-c"># This output is tailored to the request that was given to me, not all of these values maybe necessary to return.</span>
-<span class="pl-c1">Get-HPComputerInformationForWarrantyFromCMDB</span> <span class="pl-k">-</span>SqlServer MyCMDB.mydomain.org <span class="pl-k">-</span>Database CM_MS1 <span class="pl-k">-</span>IntergratedSecurity <span class="pl-k">|</span>
-<span class="pl-c1">Select-Object</span> <span class="pl-k">-</span>Property @{ Name <span class="pl-k">=</span> <span class="pl-s">'ComputerName'</span><span class="pl-k">;</span>     Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.ComputerName</span> } }<span class="pl-k">,</span>
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'SerialNumber'</span><span class="pl-k">;</span>     Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.SerialNumber</span> } }<span class="pl-k">,</span>
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'ProductModel'</span><span class="pl-k">;</span>     Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.ProductModel</span> } }<span class="pl-k">,</span>
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'BuildDate'</span><span class="pl-k">;</span>        Expression <span class="pl-k">=</span> { <span class="pl-k">(</span><span class="pl-c1">Invoke-HPWarrantyEntitlementList</span> <span class="pl-k">-</span>Gdid <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Gdid</span> <span class="pl-k">-</span>Token <span class="pl-k">$</span><span class="pl-smi">reg</span><span class="pl-en">.Token</span> <span class="pl-k">-</span>SerialNumber <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.SerialNumber</span> <span class="pl-k">-</span>ProductID <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.ProductID</span><span class="pl-k">)</span>.OverallWarrantyStartDate } }<span class="pl-k">,</span>
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'LastHardwareScan'</span><span class="pl-k">;</span> Expression <span class="pl-k">=</span> { <span class="pl-c1">Get-Date</span> <span class="pl-k">(</span><span class="pl-c1">Get-Date</span> <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.LastHardwareScan</span><span class="pl-k">)</span>.ToShortDateString<span class="pl-k">()</span> <span class="pl-k">-</span>Format <span class="pl-s">'yyyy-MM-dd'</span> } }<span class="pl-k">,</span>
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'LastLoggedOnUser'</span><span class="pl-k">;</span> Expression <span class="pl-k">=</span> { <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.Username</span> } }<span class="pl-k">,</span>
-                        @{ Name <span class="pl-k">=</span> <span class="pl-s">'CompanyName'</span><span class="pl-k">;</span>      Expression <span class="pl-k">=</span> { <span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.Username</span> <span class="pl-k">-ne</span> <span class="pl-k">$</span><span class="pl-c1">null</span><span class="pl-k">)</span>{ <span class="pl-k">(</span><span class="pl-c1">Get-ADUser</span> <span class="pl-k">-</span>Identity <span class="pl-k">$</span><span class="pl-c1">_</span><span class="pl-en">.Username.ToString</span><span class="pl-k">()</span>.Trim<span class="pl-k">(</span><span class="pl-s">'MYDOMAIN\'</span><span class="pl-k">)</span> <span class="pl-k">-</span>Properties Company<span class="pl-k">)</span>.Company } } } <span class="pl-k">|</span>
-<span class="pl-c1">Export-Csv</span> <span class="pl-k">-</span>Path C:\HPBuildInfo.csv <span class="pl-k">-</span>NoTypeInformation <span class="pl-k">-</span>Append</pre></div>
+<div class="highlight highlight-source-powershell"><pre><span class="pl-c"># Execute against multipule HP workstations</span>
+<span class="pl-k">@(</span><span class="pl-s">'HP1'</span><span class="pl-k">,</span> <span class="pl-s">'HP2'</span><span class="pl-k">)</span> <span class="pl-k">|</span> <span class="pl-c1">Get-HPWorkstationWarrantyEntitlement</span></pre></div>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/dotps1/HPWarranty">HPWarranty</a> is maintained by <a href="https://github.com/dotps1">dotps1</a>.</span>
