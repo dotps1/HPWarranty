@@ -39,10 +39,9 @@ Function Get-HPWarrantyEntitlement {
 		[String]
         $ProductNumber,
 
-        [Parameter()]
-		[String]
-        $CountryCode = 'US',
-
+        [Parameter(
+            ParameterSetName = '__AllParameterSets'
+        )]
 		[Parameter(
             ParameterSetName = 'Default'
         )]
@@ -55,13 +54,13 @@ Function Get-HPWarrantyEntitlement {
 	)
 
     Begin {
-        [Xml]$registration = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPServerWarrantyRegistration.xml").Replace(
+        [Xml]$registration = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPWarrantyRegistration.xml").Replace(
             '<[!--UniversialDateTime--!]>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
         )
 
         $registration = Invoke-SOAPRequest -SOAPRequest $registration -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
         
-        $request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPServerWarrantyEntitlement.xml").Replace(
+        $request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPWarrantyEntitlement.xml").Replace(
             '<[!--Gdid--!]>', $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
         ).Replace(
             '<[!--Token--!]>', $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.RegistrationToken
@@ -71,7 +70,7 @@ Function Get-HPWarrantyEntitlement {
     Process {
         foreach ($c in $ComputerName) {
             if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
-                if (($systemInformation = Get-HPSerialNumberAndProductNumber -ComputerName $c) -ne $null) {
+                if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $c) -ne $null) {
                     $SerialNumber = $systemInformation.SerialNumber
                     $ProductNumber = $systemInformation.ProductNumber
                 } else {
@@ -91,18 +90,18 @@ Function Get-HPWarrantyEntitlement {
                 continue
             }
 
+            # If an error is returned from HP ISEE, attempt HPInc Warranty Lookup. 
             if ($entitlement.GetElementsByTagName('ErrorID').InnerText -eq '214' -and $entitlement.GetElementsByTagName('ErrorClass').InnerText -eq 'DataNotFound') {
                 $params = @{
                     SerialNumber = $SerialNumber
                     ProductNumber = $ProductNumber
-                    CountryCode = $CountryCode
                 }
 
                 if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
                     $params.Add('XmlExportPath', $XmlExportPath)
                 }
 
-                Get-HPWorkstationWarrantyEntitlement @params
+                Get-HPIncWarrantyEntitlement @params
             } else {
                 if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
                     try {
