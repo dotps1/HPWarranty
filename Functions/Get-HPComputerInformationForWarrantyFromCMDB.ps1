@@ -57,7 +57,7 @@ Function Get-HPComputerInformationForWarrantyFromCMDB {
     $sql = "SELECT Computer_System_DATA.Name00                    AS ComputerName,
                    Computer_System_Data.UserName00                AS Username,
 	               PC_BIOS_DATA.SerialNumber00                    AS SerialNumber,
-	               MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductID,
+	               MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
 	               MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
 	               MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
                    System_DISC.AD_Site_Name0                      AS ADSiteName,
@@ -86,7 +86,7 @@ Function Get-HPComputerInformationForWarrantyFromCMDB {
                     ComputerName = $_["ComputerName"]
                     Username = $_["Username"]
                     SerialNumber = $_["SerialNumber"]
-                    ProductID = $_["ProductID"]
+                    ProductNumber = $_["ProductNumber"]
                     ProductManufacturer = $_["ProductManufacturer"]
                     ProductModel = $_["ProductModel"]
                     ADSiteName = $_["ADSiteName"]
