@@ -23,38 +23,39 @@
 <a id="hpwarranty-powershell-module" class="anchor" href="#hpwarranty-powershell-module" aria-hidden="true"><span class="octicon octicon-link"></span></a>HPWarranty PowerShell Module</h1>
 
 <h2>
-<a id="as-hp-has-recently-split-into-two-different-companies-this-is-a-complete-rewrite-and-is-still-beta" class="anchor" href="#as-hp-has-recently-split-into-two-different-companies-this-is-a-complete-rewrite-and-is-still-beta" aria-hidden="true"><span class="octicon octicon-link"></span></a>As HP has recently split into two different companies, this is a complete rewrite, and is still beta.</h2>
+<a id="as-hp-has-recently-split-into-two-different-companies-this-is-a-complete-rewrite-and-is-still-beta--cmdlet-names-and-functionallity-may-change-i-will-not-be-supporting-backwards-compatibility" class="anchor" href="#as-hp-has-recently-split-into-two-different-companies-this-is-a-complete-rewrite-and-is-still-beta--cmdlet-names-and-functionallity-may-change-i-will-not-be-supporting-backwards-compatibility" aria-hidden="true"><span class="octicon octicon-link"></span></a>As HP has recently split into two different companies, this is a complete rewrite, and is still beta.  Cmdlet names and functionallity may change, I will not be supporting backwards compatibility.</h2>
 
 <p>This module can be installed from the <a href="https://www.powershellgallery.com/packages/HPWarranty/">PowerShellGallery</a>.  You need <a href="https://www.microsoft.com/en-us/download/details.aspx?id=44987">WMF 5</a> to use this feature.</p>
 
 <div class="highlight highlight-source-powershell"><pre><span class="pl-c1">Install-Module</span> <span class="pl-k">-</span>Name HPWarranty</pre></div>
 
 <p>HP has recently split into two divisions, and this a first attempt to support both HP server and workstation warranty via PowerShell.
-I currently have no way to check if a machine is a 'Server' or a 'Workstaion', so that falls on you, for now.
+I currently have no way to check if a machine is a 'Server' or a 'Workstaion', so that falls on you, for now.  I have added the error returned from HP to the errorstream, so you should be able to tell what the issue is more easily.
 This is still very beta, so please report any issues.  Thanks.</p>
 
 <h2>
 <a id="hpwarranty-cmdlets" class="anchor" href="#hpwarranty-cmdlets" aria-hidden="true"><span class="octicon octicon-link"></span></a>HPWarranty Cmdlets</h2>
 
 <ul>
-<li><a href="">Get-HPServerWarrantyEntitlement</a></li>
-<li><a href="">Get-HPWorkstationWarrantyEntitlement</a></li>
+<li>Get-HPComputerInformationForWarrantyFromCMDB</li>
+<li>Get-HPIncWarrantyEntitlement</li>
+<li>Get-HPWarrantyEntitlement</li>
 </ul>
 
 <p>Example 1:</p>
 
 <div class="highlight highlight-source-powershell"><pre><span class="pl-c"># Execute from local HP workstation.</span>
-<span class="pl-c1">Get-HPWorkstationWarrantyEntitlement</span></pre></div>
+<span class="pl-c1">Get-HPIncWarrantyEntitlement</span></pre></div>
 
 <p>Example 2:</p>
 
 <div class="highlight highlight-source-powershell"><pre><span class="pl-c"># Execute against remote HP workstation (must be on).</span>
-<span class="pl-c1">Get-HPWorkstationWarrantyEntitlement</span> <span class="pl-k">-</span>ComputerName <span class="pl-s">'MyFriendsHP.ourdomain.org'</span></pre></div>
+<span class="pl-c1">Get-HPIncWarrantyEntitlement</span> <span class="pl-k">-</span>ComputerName <span class="pl-s">'MyFriendsHP.ourdomain.org'</span></pre></div>
 
 <p>Example 3:</p>
 
-<div class="highlight highlight-source-powershell"><pre><span class="pl-c"># Execute against multipule HP workstations</span>
-<span class="pl-k">@(</span><span class="pl-s">'HP1'</span><span class="pl-k">,</span> <span class="pl-s">'HP2'</span><span class="pl-k">)</span> <span class="pl-k">|</span> <span class="pl-c1">Get-HPWorkstationWarrantyEntitlement</span></pre></div>
+<div class="highlight highlight-source-powershell"><pre><span class="pl-c"># Execute for local HP Server</span>
+<span class="pl-c1">Get-HPWarrantyEntitlement</span></pre></div>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/dotps1/HPWarranty">HPWarranty</a> is maintained by <a href="https://github.com/dotps1">dotps1</a>.</span>
