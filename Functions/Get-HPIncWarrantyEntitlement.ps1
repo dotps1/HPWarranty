@@ -6,7 +6,8 @@
 	Param (
         [Parameter(
             ParameterSetName = 'Default',
-            ValueFromPipeLine = $true
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true
         )]
         [ValidateScript({
             if ($_ -eq $env:COMPUTERNAME) { 
@@ -29,15 +30,15 @@
             ValueFromPipelineByPropertyName = $true
         )]
 		[String]
-        $SerialNumber,
+        $ProductNumber,
 
-		[Parameter(
+        [Parameter(
             Mandatory = $true,
             ParameterSetName = 'Static',
-            ValueFromPipeLineByPropertyName = $true
+            ValueFromPipelineByPropertyName = $true
         )]
 		[String]
-        $ProductNumber,
+        $SerialNumber,
 
         [Parameter(
             ParameterSetName = '__AllParameterSets'
@@ -93,27 +94,32 @@
                 throw 'Failed to invoke rest method.'
             }
 
-            if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
-                try {
-                    $entitlement.Save("$XmlExportPath\${SerialNumber}_entitlement.xml")
-                } catch {
-                    Write-Error -Message 'Failed to save xml file.'
+            if ($entitlement.GetElementsByTagName('ErrorID').InnerText -ne $null) {
+                Write-Error -Message $($entitlement.GetElementsByTagName('DataPayLoad').InnerText) -ErrorId $($entitlement.GetElementsByTagName('ErrorID').InnerText)
+                continue
+            } else {
+                if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
+                    try {
+                        $entitlement.Save("$XmlExportPath\${SerialNumber}_entitlement.xml")
+                    } catch {
+                        Write-Error -Message 'Failed to save xml file.'
+                    }
                 }
-            }
 
-            [PSCustomObject]@{
-                'SerialNumber' = $SerialNumber
-                'ProductNumber' = $ProductNumber
-                'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
-                'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
-                'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
-                'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
-                'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
-                'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
-                'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
-                'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
-                'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+                [PSCustomObject]@{
+                    'SerialNumber' = $SerialNumber
+                    'ProductNumber' = $ProductNumber
+                    'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
+                    'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
+                    'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
+                    'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
+                    'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
+                    'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
+                    'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
+                    'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
+                    'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+                    'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+                }
             }
         }
     }

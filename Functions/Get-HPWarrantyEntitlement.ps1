@@ -6,7 +6,8 @@ Function Get-HPWarrantyEntitlement {
 	Param (
         [Parameter(
             ParameterSetName = 'Default',
-            ValueFromPipeLine = $true
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true
         )]
         [ValidateScript({
             if ($_ -eq $env:COMPUTERNAME) { 
@@ -26,18 +27,18 @@ Function Get-HPWarrantyEntitlement {
 		[Parameter(
             Mandatory = $true,
             ParameterSetName = 'Static',
-            ValueFromPipelineByPropertyName = $true
-        )]
-		[String]
-        $SerialNumber,
-
-		[Parameter(
-            Mandatory = $true,
-            ParameterSetName = 'Static',
             ValueFromPipeLineByPropertyName = $true
         )]
 		[String]
         $ProductNumber,
+
+        [Parameter(
+            Mandatory = $true,
+            ParameterSetName = 'Static',
+            ValueFromPipelineByPropertyName = $true
+        )]
+		[String]
+        $SerialNumber,
 
         [Parameter(
             ParameterSetName = '__AllParameterSets'
@@ -71,8 +72,8 @@ Function Get-HPWarrantyEntitlement {
         foreach ($c in $ComputerName) {
             if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
                 if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $c) -ne $null) {
-                    $SerialNumber = $systemInformation.SerialNumber
                     $ProductNumber = $systemInformation.ProductNumber
+                    $SerialNumber = $systemInformation.SerialNumber
                 } else {
                     continue
                 }
@@ -80,9 +81,9 @@ Function Get-HPWarrantyEntitlement {
 
             try {
                 $entitlementAction = Invoke-SOAPRequest -SOAPRequest $request.Replace(
-                    '<[!--SerialNumber--!]>', $SerialNumber
-                ).Replace(
                     '<[!--ProductNumber--!]>', $ProductNumber
+                ).Replace(
+                    '<[!--SerialNumber--!]>', $SerialNumber
                 ) -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
                 $entitlement = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response) 
             } catch {
@@ -90,18 +91,9 @@ Function Get-HPWarrantyEntitlement {
                 continue
             }
 
-            # If an error is returned from HP ISEE, attempt HPInc Warranty Lookup. 
-            if ($entitlement.GetElementsByTagName('ErrorID').InnerText -eq '214' -and $entitlement.GetElementsByTagName('ErrorClass').InnerText -eq 'DataNotFound') {
-                $params = @{
-                    SerialNumber = $SerialNumber
-                    ProductNumber = $ProductNumber
-                }
-
-                if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
-                    $params.Add('XmlExportPath', $XmlExportPath)
-                }
-
-                Get-HPIncWarrantyEntitlement @params
+            if ($entitlement.GetElementsByTagName('ErrorID').InnerText -ne [String]::Empty) {
+                Write-Error -Message $($entitlement.GetElementsByTagName('DataPayLoad').InnerText) -ErrorId $($entitlement.GetElementsByTagName('ErrorID').InnerText)
+                continue
             } else {
                 if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
                     try {
