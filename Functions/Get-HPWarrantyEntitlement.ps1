@@ -91,7 +91,7 @@ Function Get-HPWarrantyEntitlement {
                 continue
             }
 
-            if ($entitlement.GetElementsByTagName('ErrorID').InnerText -ne [String]::Empty) {
+            if ($entitlement.GetElementsByTagName('ErrorID').InnerText -ne $null) {
                 Write-Error -Message $($entitlement.GetElementsByTagName('DataPayLoad').InnerText) -ErrorId $($entitlement.GetElementsByTagName('ErrorID').InnerText)
                 continue
             } else {

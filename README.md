@@ -7,15 +7,14 @@ Install-Module -Name HPWarranty
 ```
 
 HP has recently split into two divisions, and this a first attempt to support both HP server and workstation warranty via PowerShell.
-I currently have no way to check if a machine is a 'Server' or a 'Workstaion', so that falls on you, for now.
+I currently have no way to check if a machine is a 'Server' or a 'Workstaion', so that falls on you, for now.  I have added the error returned from HP to the errorstream, so you should be able to tell what the issue is more easily.
 This is still very beta, so please report any issues.  Thanks.
 
 ## HPWarranty Cmdlets
 
 * Get-HPComputerInformationForWarrantyFromCMDB
-* Get-HPWarrantyEntitlement
 * Get-HPIncWarrantyEntitlement
-
+* Get-HPWarrantyEntitlement
 
 Example 1:
 ```PowerShell
