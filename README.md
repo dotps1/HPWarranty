@@ -12,9 +12,9 @@ This is still very beta, so please report any issues.  Thanks.
 
 ## HPWarranty Cmdlets
 
-* Get-HPComputerInformationForWarrantyFromCMDB
-* Get-HPIncWarrantyEntitlement
-* Get-HPWarrantyEntitlement
+* [Get-HPComputerInformationForWarrantyFromCMDB](https://github.com/dotps1/HPWarranty/wiki/Get-HPComputerInformationForWarrantyFromCMDB)
+* [Get-HPIncWarrantyEntitlement](https://github.com/dotps1/HPWarranty/wiki/Get-HPIncWarrantyEntitlement)
+* [Get-HPWarrantyEntitlement](https://github.com/dotps1/HPWarranty/wiki/Get-HPWarrantyEntitlement)
 
 Example 1:
 ```PowerShell

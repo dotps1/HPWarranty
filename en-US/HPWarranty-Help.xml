@@ -319,16 +319,16 @@ This function is primarily used for workstation class systems.</maml:para>
 		<command:syntaxItem>
 			<maml:name>Get-HPIncWarrantyEntitlement</maml:name>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByPropertyName)" position="named">
-				<maml:name>SerialNumber</maml:name>
+				<maml:name>ProductNumber</maml:name>
 				<maml:description>
-					<maml:para>A static serial number, must be used with the ProductNumber parameter.</maml:para>
+					<maml:para>A static product number, must be used with the SerialNumber parameter.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByPropertyName)" position="named">
-				<maml:name>ProductNumber</maml:name>
+				<maml:name>SerialNumber</maml:name>
 				<maml:description>
-					<maml:para>A static product number, must be used with the SerialNumber parameter.</maml:para>
+					<maml:para>A static serial number, must be used with the ProductNumber parameter.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -641,16 +641,16 @@ This function is primarily used for server class systems.</maml:para>
 		<command:syntaxItem>
 			<maml:name>Get-HPWarrantyEntitlement</maml:name>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByPropertyName)" position="named">
-				<maml:name>SerialNumber</maml:name>
+				<maml:name>ProductNumber</maml:name>
 				<maml:description>
-					<maml:para>A static serial number, must be used with the ProductNumber parameter.</maml:para>
+					<maml:para>A static product number, must be used with the SerialNumber parameter.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByPropertyName)" position="named">
-				<maml:name>ProductNumber</maml:name>
+				<maml:name>SerialNumber</maml:name>
 				<maml:description>
-					<maml:para>A static product number, must be used with the SerialNumber parameter.</maml:para>
+					<maml:para>A static serial number, must be used with the ProductNumber parameter.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>

@@ -77,8 +77,8 @@ Represents a 32-bit signed integer.</InputTypeDescription>
         <ParameterDescription type="ActionPreference" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>InformationAction</Name>
           <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.AliasAttribute</string>
+            <string>System.Management.Automation.ParameterAttribute</string>
           </Attributes>
           <Aliases>
             <string>infa</string>
@@ -150,12 +150,12 @@ This function is primarily used for workstation class systems.</Description>
       <ParamSets>
         <CommandParameterSetInfo2 Name="__AllParameterSets" Params="CountryCode XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
         <CommandParameterSetInfo2 Name="Default" Params="ComputerName CountryCode XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
-        <CommandParameterSetInfo2 Name="Static" Params="SerialNumber ProductNumber CountryCode XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="Static" Params="ProductNumber SerialNumber CountryCode XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Syntax>
         <string>Get-HPIncWarrantyEntitlement [-CountryCode &lt;String&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
         <string>Get-HPIncWarrantyEntitlement [-ComputerName &lt;String[]&gt;] [-CountryCode &lt;String&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
-        <string>Get-HPIncWarrantyEntitlement -SerialNumber &lt;String&gt; -ProductNumber &lt;String&gt; [-CountryCode &lt;String&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
+        <string>Get-HPIncWarrantyEntitlement -ProductNumber &lt;String&gt; -SerialNumber &lt;String&gt; [-CountryCode &lt;String&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
       </Syntax>
       <Parameters>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -186,8 +186,8 @@ This function is primarily used for workstation class systems.</Description>
         <ParameterDescription type="ActionPreference" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>InformationAction</Name>
           <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.AliasAttribute</string>
+            <string>System.Management.Automation.ParameterAttribute</string>
           </Attributes>
           <Aliases>
             <string>infa</string>
@@ -315,12 +315,12 @@ This function is primarily used for server class systems.</Description>
       <ParamSets>
         <CommandParameterSetInfo2 Name="__AllParameterSets" Params="XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
         <CommandParameterSetInfo2 Name="Default" Params="ComputerName XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
-        <CommandParameterSetInfo2 Name="Static" Params="SerialNumber ProductNumber XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="Static" Params="ProductNumber SerialNumber XmlExportPath Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Syntax>
         <string>Get-HPWarrantyEntitlement [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
         <string>Get-HPWarrantyEntitlement [-ComputerName &lt;String[]&gt;] [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
-        <string>Get-HPWarrantyEntitlement -SerialNumber &lt;String&gt; -ProductNumber &lt;String&gt; [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
+        <string>Get-HPWarrantyEntitlement -ProductNumber &lt;String&gt; -SerialNumber &lt;String&gt; [-XmlExportPath &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
       </Syntax>
       <Parameters>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -339,8 +339,8 @@ This function is primarily used for server class systems.</Description>
         <ParameterDescription type="ActionPreference" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>InformationAction</Name>
           <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.AliasAttribute</string>
+            <string>System.Management.Automation.ParameterAttribute</string>
           </Attributes>
           <Aliases>
             <string>infa</string>
