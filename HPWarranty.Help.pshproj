@@ -290,7 +290,7 @@ GracePeriod                      : 0</Output>
       <RelatedLinks>
         <RelatedLink>
           <LinkText>Project Home Page</LinkText>
-          <LinkUrl />
+          <LinkUrl>http://dotps1.github.io/HPWarranty</LinkUrl>
         </RelatedLink>
       </RelatedLinks>
       <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
@@ -420,6 +420,22 @@ ProductManufacturer : Hewlett-Packard
 SerialNumber        : 12345ABCDE
 ProductNumber       : QE588AV
 ProductModel        : HP ProBook 6475b</Output>
+        </Example>
+        <Example>
+          <Name>Example 2</Name>
+          <Cmd>PS C:\&gt; Get-HPComputerInformationForWarrantyFromCMDB -SqlServer 'SCCM.domain.org' -Database 'CM_123' -IntergratedSecurity -ComputerName ABCDE12345 | Get-HPIncWarrantyEntitlement</Cmd>
+          <Description />
+          <Output>SerialNumber                     : ABCDE12345
+ProductNumber                    : F2R10UT#ABA
+ProductLineDescription           : Commercial Notebooks
+ProductLineCode                  : AN
+ActiveWarrantyEntitlement        : true
+OverallWarrantyStartDate         : 2013-12-30
+OverallWarrantyEndDate           : 2017-02-02
+OverallContractEndDate           : 
+WarrantyDeterminationDescription : Ship date
+WarrantyDeterminationCode        : 26
+WarrantyExtension                : 0</Output>
         </Example>
       </Examples>
       <RelatedLinks>
