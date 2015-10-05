@@ -6,8 +6,7 @@
 	Param (
         [Parameter(
             ParameterSetName = 'Default',
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true
+            ValueFromPipeline = $true
         )]
         [ValidateScript({
             if ($_ -eq $env:COMPUTERNAME) { 

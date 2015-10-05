@@ -12,8 +12,8 @@ This is still very beta, so please report any issues.  Thanks.
 
 ## HPWarranty Cmdlets
 
-* [Get-HPComputerInformationForWarrantyFromCMDB](https://github.com/dotps1/HPWarranty/wiki/Get-HPComputerInformationForWarrantyFromCMDB)
 * [Get-HPIncWarrantyEntitlement](https://github.com/dotps1/HPWarranty/wiki/Get-HPIncWarrantyEntitlement)
+* [Get-HPSystemInformationFromCMDB](https://github.com/dotps1/HPWarranty/wiki/Get-HPSystemInformationFromCMDB)
 * [Get-HPWarrantyEntitlement](https://github.com/dotps1/HPWarranty/wiki/Get-HPWarrantyEntitlement)
 
 Example 1:
@@ -32,4 +32,10 @@ Example 3:
 ```PowerShell
 # Execute for local HP Server
 Get-HPWarrantyEntitlement
+```
+
+Example 4:
+```PowerShell
+# Get info from ConfigMgr DB and then get warranty info.
+Get-HPSystemInformationFromCMDB -SqlServer 'mysccmserver' -Database 'CM_AB1' -IntergratedSecurity -ComputerName 'mycomputer' | Get-HPWarrantyEntitlement
 ```

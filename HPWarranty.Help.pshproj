@@ -8,131 +8,6 @@
   <OverridePostCount>false</OverridePostCount>
   <FetchPostCount xsi:nil="true" />
   <Cmdlets>
-    <CmdletObject verb="Get" noun="HPComputerInformationForWarrantyFromCMDB">
-      <Name>Get-HPComputerInformationForWarrantyFromCMDB</Name>
-      <GeneralHelp>
-        <Synopsis>Gets the needed information from a Configuration Manager database to execute warranty lookups.</Synopsis>
-        <Description>Queries the SQL Server where the Microsoft System Center Configuration Manager database resides.
-In order for the ProductModel property to be populated, the MS_SystemInformation WMI class needs to be inventoried, it is located in the root\WMI namespace.</Description>
-        <Notes>Read access is needed to query the SQL database.</Notes>
-        <InputType>System.String;
-System.Int</InputType>
-        <InputUrl>https://msdn.microsoft.com/en-us/library/system.string(v=vs.110).aspx;
-https://msdn.microsoft.com/en-us/library/system.int32(v=vs.110).aspx</InputUrl>
-        <InputTypeDescription>Represents text as a series of Unicode characters.;
-Represents a 32-bit signed integer.</InputTypeDescription>
-        <ReturnType>System.Array</ReturnType>
-        <ReturnUrl>https://msdn.microsoft.com/en-us/library/system.array(v=vs.110).aspx</ReturnUrl>
-        <ReturnTypeDescription>Provides methods for creating, manipulating, searching, and sorting arrays, thereby serving as the base class for all arrays in the common language runtime.</ReturnTypeDescription>
-      </GeneralHelp>
-      <ParamSets>
-        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="SqlServer ConnectionPort Database IntergratedSecurity Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
-      </ParamSets>
-      <Syntax>
-        <string>Get-HPComputerInformationForWarrantyFromCMDB [[-SqlServer] &lt;String&gt;] [[-ConnectionPort] &lt;Int32&gt;] [-Database] &lt;String&gt; [-IntergratedSecurity] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
-      </Syntax>
-      <Parameters>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
-          <Name>SqlServer</Name>
-          <Attributes>
-            <string>System.Management.Automation.ValidateScriptAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>The SQL Server where the Microsoft System Center Configuration Manager database is located.</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
-          <Name>ConnectionPort</Name>
-          <Attributes>
-            <string>System.Management.Automation.ValidateRangeAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>The port in which to connect to the server, default is 1433.</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="2" globbing="false">
-          <Name>Database</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>The name of the Microsoft System Center Configuration Manager database.</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="SwitchParameter" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
-          <Name>IntergratedSecurity</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Use current executing context credentials.</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="ActionPreference" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
-          <Name>InformationAction</Name>
-          <Attributes>
-            <string>System.Management.Automation.AliasAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-          </Attributes>
-          <Aliases>
-            <string>infa</string>
-          </Aliases>
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
-          <Name>InformationVariable</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.Internal.CommonParameters+ValidateVariableName</string>
-            <string>System.Management.Automation.AliasAttribute</string>
-          </Attributes>
-          <Aliases>
-            <string>iv</string>
-          </Aliases>
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-      </Parameters>
-      <Examples>
-        <Example>
-          <Name>Example 1</Name>
-          <Cmd>PS C:\&gt; Get-HPComputerInformationForWarrantyFromCMDB -SqlServer 'SCCM.domain.org' -Database 'CM_123' -IntergratedSecurity</Cmd>
-          <Description />
-          <Output>ComputerName        : ABCDE12345
-Username            : domain\jdoe
-ADSiteName          : United-States
-LastHardwareScan    : 9/16/2015 6:24:23 PM
-ProductManufacturer : Hewlett-Packard
-SerialNumber        : ABCDE12345
-ProductNumber       : QE588AV
-ProductModel        : HP ProBook 6475b
-
-ComputerName        : 12345ABCDE
-Username            : domain\jsmith
-ADSiteName          : Europe
-LastHardwareScan    : 9/16/2015 7:32:22 PM
-ProductManufacturer : Hewlett-Packard
-SerialNumber        : 12345ABCDE
-ProductNumber       : QE588AV
-ProductModel        : HP ProBook 6475b</Output>
-        </Example>
-      </Examples>
-      <RelatedLinks>
-        <RelatedLink>
-          <LinkText>Project Home Page</LinkText>
-          <LinkUrl>http://dotps1.github.io/HPWarranty</LinkUrl>
-        </RelatedLink>
-      </RelatedLinks>
-      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
-      <Publish>false</Publish>
-    </CmdletObject>
     <CmdletObject verb="Get" noun="HPIncWarrantyEntitlement">
       <Name>Get-HPIncWarrantyEntitlement</Name>
       <GeneralHelp>
@@ -208,7 +83,7 @@ This function is primarily used for workstation class systems.</Description>
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String[]" varLen="true" required="false" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="true" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String[]" varLen="true" required="false" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ComputerName</Name>
           <Attributes>
             <string>System.Management.Automation.ValidateScriptAttribute</string>
@@ -361,7 +236,7 @@ This function is primarily used for server class systems.</Description>
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String[]" varLen="true" required="false" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="true" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String[]" varLen="true" required="false" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ComputerName</Name>
           <Attributes>
             <string>System.Management.Automation.ValidateScriptAttribute</string>
@@ -416,6 +291,141 @@ GracePeriod                      : 0</Output>
         <RelatedLink>
           <LinkText>Project Home Page</LinkText>
           <LinkUrl />
+        </RelatedLink>
+      </RelatedLinks>
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="Get" noun="HPSystemInformationFromCMDB">
+      <Name>Get-HPSystemInformationFromCMDB</Name>
+      <GeneralHelp>
+        <Synopsis>Gets the needed information from a Configuration Manager database to execute warranty lookups.</Synopsis>
+        <Description>Queries the SQL Server where the Microsoft System Center Configuration Manager database resides.
+In order for the ProductModel property to be populated, the MS_SystemInformation WMI class needs to be inventoried, it is located in the root\WMI namespace.</Description>
+        <Notes>Read access is needed to query the SQL database.</Notes>
+        <InputType>System.String;
+System.Int</InputType>
+        <InputUrl>https://msdn.microsoft.com/en-us/library/system.string(v=vs.110).aspx;
+https://msdn.microsoft.com/en-us/library/system.int32(v=vs.110).aspx</InputUrl>
+        <InputTypeDescription>Represents text as a series of Unicode characters.;
+Represents a 32-bit signed integer.</InputTypeDescription>
+        <ReturnType>System.Array</ReturnType>
+        <ReturnUrl>https://msdn.microsoft.com/en-us/library/system.array(v=vs.110).aspx</ReturnUrl>
+        <ReturnTypeDescription>Provides methods for creating, manipulating, searching, and sorting arrays, thereby serving as the base class for all arrays in the common language runtime.</ReturnTypeDescription>
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="SqlServer ConnectionPort Database IntergratedSecurity ComputerName Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Syntax>
+        <string>Get-HPSystemInformationFromCMDB [[-SqlServer] &lt;String&gt;] [[-ConnectionPort] &lt;Int32&gt;] [-Database] &lt;String&gt; [-IntergratedSecurity] [[-ComputerName] &lt;String&gt;] [-InformationAction &lt;ActionPreference&gt;] [-InformationVariable &lt;String&gt;]</string>
+      </Syntax>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
+          <Name>SqlServer</Name>
+          <Attributes>
+            <string>System.Management.Automation.ValidateScriptAttribute</string>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>The SQL Server where the Microsoft System Center Configuration Manager database is located.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
+          <Name>ConnectionPort</Name>
+          <Attributes>
+            <string>System.Management.Automation.ValidateRangeAttribute</string>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>The port in which to connect to the server.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="2" globbing="false">
+          <Name>Database</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>The name of the Microsoft System Center Configuration Manager database.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="SwitchParameter" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>IntergratedSecurity</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Use current executing context credentials.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
+          <Name>ComputerName</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Filter returned results to matching computer name(s).</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="ActionPreference" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>InformationAction</Name>
+          <Attributes>
+            <string>System.Management.Automation.AliasAttribute</string>
+            <string>System.Management.Automation.ParameterAttribute</string>
+          </Attributes>
+          <Aliases>
+            <string>infa</string>
+          </Aliases>
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>InformationVariable</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.Internal.CommonParameters+ValidateVariableName</string>
+            <string>System.Management.Automation.AliasAttribute</string>
+          </Attributes>
+          <Aliases>
+            <string>iv</string>
+          </Aliases>
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples>
+        <Example>
+          <Name>Example 1</Name>
+          <Cmd>PS C:\&gt; Get-HPComputerInformationForWarrantyFromCMDB -SqlServer 'SCCM.domain.org' -Database 'CM_123' -IntergratedSecurity</Cmd>
+          <Description />
+          <Output>ComputerName        : ABCDE12345
+Username            : domain\jdoe
+ADSiteName          : United-States
+LastHardwareScan    : 9/16/2015 6:24:23 PM
+ProductManufacturer : Hewlett-Packard
+SerialNumber        : ABCDE12345
+ProductNumber       : QE588AV
+ProductModel        : HP ProBook 6475b
+
+ComputerName        : 12345ABCDE
+Username            : domain\jsmith
+ADSiteName          : Europe
+LastHardwareScan    : 9/16/2015 7:32:22 PM
+ProductManufacturer : Hewlett-Packard
+SerialNumber        : 12345ABCDE
+ProductNumber       : QE588AV
+ProductModel        : HP ProBook 6475b</Output>
+        </Example>
+      </Examples>
+      <RelatedLinks>
+        <RelatedLink>
+          <LinkText>Project Home Page</LinkText>
+          <LinkUrl>http://dotps1.github.io/HPWarranty</LinkUrl>
         </RelatedLink>
       </RelatedLinks>
       <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />

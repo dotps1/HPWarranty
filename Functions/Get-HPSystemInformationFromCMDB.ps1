@@ -1,4 +1,4 @@
-Function Get-HPComputerInformationForWarrantyFromCMDB {
+Function  Get-HPSystemInformationFromCMDB {
     
     [OutputType([Array])]
     
@@ -34,7 +34,11 @@ Function Get-HPComputerInformationForWarrantyFromCMDB {
 
         [Parameter()]
         [Switch]
-        $IntergratedSecurity
+        $IntergratedSecurity,
+
+        [Parameter()]
+        [String]
+        $ComputerName = $null
     )
 
    $sqlConnection = New-Object -TypeName System.Data.SqlClient.SqlConnection -Property @{ 
@@ -67,11 +71,11 @@ Function Get-HPComputerInformationForWarrantyFromCMDB {
 	               JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
                    JOIN System_DISC            ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
                    JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
-	          WHERE MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
-	             OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard'
+	          WHERE (MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
+	                 OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard')
 	            AND PC_BIOS_DATA.SerialNumber00 <> ' '
                 AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
-	            AND MS_SYSTEMINFORMATION_DATA.SystemProductName00 <> ' '
+                AND Computer_System_DATA.Name00 LIKE '%$ComputerName%'
               ORDER BY WorkstationStatus_DATA.LastHWScan"
 
     $results = (New-Object -TypeName System.Data.SqlClient.SqlCommand -Property @{
@@ -80,19 +84,17 @@ Function Get-HPComputerInformationForWarrantyFromCMDB {
     }).ExecuteReader()
     
     if ($results.HasRows) {
-        while ($results.Read()) {
-            $results.GetEnumerator() | ForEach-Object { 
-                New-Object -TypeName PSObject -Property @{
-                    ComputerName = $_["ComputerName"]
-                    Username = $_["Username"]
-                    SerialNumber = $_["SerialNumber"]
-                    ProductNumber = $_["ProductNumber"]
-                    ProductManufacturer = $_["ProductManufacturer"]
-                    ProductModel = $_["ProductModel"]
-                    ADSiteName = $_["ADSiteName"]
-                    LastHardwareScan = $_["LastHardwareScan"] 
-                } 
-            }
+        $results.GetEnumerator() | ForEach-Object { 
+            New-Object -TypeName PSObject -Property @{
+                ComputerName = $_["ComputerName"]
+                Username = $_["Username"]
+                SerialNumber = $_["SerialNumber"]
+                ProductNumber = $_["ProductNumber"]
+                ProductManufacturer = $_["ProductManufacturer"]
+                ProductModel = $_["ProductModel"]
+                ADSiteName = $_["ADSiteName"]
+                LastHardwareScan = $_["LastHardwareScan"] 
+            } 
         }
 	}
 	
