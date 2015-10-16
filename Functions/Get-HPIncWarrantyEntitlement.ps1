@@ -101,7 +101,7 @@
                 } else {
                     if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
                         try {
-                            $entitlement.Save("$XmlExportPath\${SerialNumber}_entitlement.xml")
+                            $entitlement.Save("${XmlExportPath}\${SerialNumber}_entitlement.xml")
                         } catch {
                             Write-Error -Message 'Failed to save xml file.'
                         }

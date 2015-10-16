@@ -91,11 +91,13 @@ Function Get-HPWarrantyEntitlement {
             }
 
             try {
-                [Xml]$entitlement = (Invoke-SOAPRequest -SOAPRequest $request.Replace(
-                    '<[!--ProductNumber--!]>', $ProductNumber
-                ).Replace(
-                    '<[!--SerialNumber--!]>', $SerialNumber
-                ) -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2').Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response
+                [Xml]$entitlement = (
+                    Invoke-SOAPRequest -SOAPRequest $request.Replace(
+                        '<[!--ProductNumber--!]>', $ProductNumber
+                    ).Replace(
+                        '<[!--SerialNumber--!]>', $SerialNumber
+                    ) -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
+                ).Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response
             } catch {
                 Write-Error -Message 'Failed to invoke SOAP request.'
                 continue
@@ -108,7 +110,7 @@ Function Get-HPWarrantyEntitlement {
                 } else {
                     if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
                         try {
-                            $entitlement.Save("$XmlExportPath\${SerialNumber}_entitlement.xml")
+                            $entitlement.Save("${XmlExportPath}\${SerialNumber}_entitlement.xml")
                         } catch {
                             Write-Error -Message 'Failed to save xml file.'
                         }
