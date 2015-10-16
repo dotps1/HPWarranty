@@ -16,9 +16,11 @@
                 ProductNumber = (Get-WmiObject -Namespace root\WMI MS_SystemInformation -ComputerName $ComputerName -ErrorAction Stop).SystemSKU.Trim()
             }
         } else {
-            throw 'Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems.'
+            Write-Error -Message 'Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems.'
+            return $null
         }
     } catch {
-        throw "Failed to retrive SerailNumber and ProductNumber from $ComputerName."
+        Write-Error -Message "Failed to retrive SerailNumber and ProductNumber from $ComputerName."
+        return $null
     }
 }
