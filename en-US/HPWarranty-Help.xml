@@ -23,7 +23,7 @@ This function is primarily used for workstation class systems.</maml:para>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>CountryCode</maml:name>
 				<maml:description>
-					<maml:para>The county value to invoke the warranty lookup with.  Default value is EN.</maml:para>
+					<maml:para>The county value to invoke the warranty lookup with.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -61,7 +61,7 @@ This function is primarily used for workstation class systems.</maml:para>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>CountryCode</maml:name>
 				<maml:description>
-					<maml:para>The county value to invoke the warranty lookup with.  Default value is EN.</maml:para>
+					<maml:para>The county value to invoke the warranty lookup with.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -106,7 +106,7 @@ This function is primarily used for workstation class systems.</maml:para>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>CountryCode</maml:name>
 				<maml:description>
-					<maml:para>The county value to invoke the warranty lookup with.  Default value is EN.</maml:para>
+					<maml:para>The county value to invoke the warranty lookup with.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -137,14 +137,14 @@ This function is primarily used for workstation class systems.</maml:para>
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>CountryCode</maml:name>
 			<maml:description>
-				<maml:para>The county value to invoke the warranty lookup with.  Default value is EN.</maml:para>
+				<maml:para>The county value to invoke the warranty lookup with.</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
 				<maml:name>String</maml:name>
 				<maml:uri/>
 			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
+			<dev:defaultValue>EN</dev:defaultValue>
 		</command:parameter>
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>XmlExportPath</maml:name>
@@ -357,6 +357,13 @@ This function is primarily used for server class systems.</maml:para>
 		<command:syntaxItem>
 			<maml:name>Get-HPWarrantyEntitlement</maml:name>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>CountryCode</maml:name>
+				<maml:description>
+					<maml:para>The county value to invoke the warranty lookup with.</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>XmlExportPath</maml:name>
 				<maml:description>
 					<maml:para>Path to a location to export the entire reply envelope in XML.</maml:para>
@@ -386,6 +393,13 @@ This function is primarily used for server class systems.</maml:para>
 					<maml:para>The name of a computer to get the SerialNumber and ProductNumber from using WMI.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="true">String[]</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>CountryCode</maml:name>
+				<maml:description>
+					<maml:para>The county value to invoke the warranty lookup with.</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>XmlExportPath</maml:name>
@@ -422,6 +436,13 @@ This function is primarily used for server class systems.</maml:para>
 				<maml:name>SerialNumber</maml:name>
 				<maml:description>
 					<maml:para>A static serial number, must be used with the ProductNumber parameter.</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>CountryCode</maml:name>
+				<maml:description>
+					<maml:para>The county value to invoke the warranty lookup with.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -520,6 +541,18 @@ This function is primarily used for server class systems.</maml:para>
 				<maml:uri/>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+			<maml:name>CountryCode</maml:name>
+			<maml:description>
+				<maml:para>The county value to invoke the warranty lookup with.</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>EN</dev:defaultValue>
 		</command:parameter>
 	</command:parameters>
 	<command:inputTypes>
