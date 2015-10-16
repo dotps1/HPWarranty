@@ -66,11 +66,9 @@ Function Get-HPWarrantyEntitlement {
 	)
 
     Begin {
-        [Xml]$registration = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPWarrantyRegistration.xml").Replace(
+        [Xml]$registration = Invoke-SOAPRequest -SOAPRequest (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPWarrantyRegistration.xml").Replace(
             '<[!--UniversialDateTime--!]>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
-        )
-
-        $registration = Invoke-SOAPRequest -SOAPRequest $registration -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
+        ) -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
         
         $request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPWarrantyEntitlement.xml").Replace(
             '<[!--Gdid--!]>', $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
@@ -93,12 +91,11 @@ Function Get-HPWarrantyEntitlement {
             }
 
             try {
-                $entitlementAction = Invoke-SOAPRequest -SOAPRequest $request.Replace(
+                [Xml]$entitlement = (Invoke-SOAPRequest -SOAPRequest $request.Replace(
                     '<[!--ProductNumber--!]>', $ProductNumber
                 ).Replace(
                     '<[!--SerialNumber--!]>', $SerialNumber
-                ) -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
-                $entitlement = ([Xml]$entitlementAction.Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response) 
+                ) -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2').Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response
             } catch {
                 Write-Error -Message 'Failed to invoke SOAP request.'
                 continue
