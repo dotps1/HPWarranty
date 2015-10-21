@@ -58,7 +58,20 @@ Function  Get-HPSystemInformationFromCMDB {
         throw $_
     }
 
-    $sql = "SELECT Computer_System_DATA.Name00                    AS ComputerName,
+    $tableExists = (New-Object -TypeName System.Data.SqlClient.SqlCommand -Property @{
+        Connection = $sqlConnection
+        CommandText = "SELECT COUNT (*) FROM information_schema.tables WHERE table_name = 'MS_SYSTEMINFORMATION_DATA'"
+    }).ExecuteScalar()
+    
+    if ($tableExists -eq 0) {
+        Write-Error -Exception System.InvalidOperationException -Message 'The table MS_SYSTEMINFORMATION_DATA does not exist.' -Category InvalidOperation -RecommendedAction 'The MS_SYSTEMINFORMATION_DATA must be inventoried with the SCCM Client to use this cmdlet.'
+        return
+    }
+
+    $results = (New-Object -TypeName System.Data.SqlClient.SqlCommand -Property @{ 
+        Connection = $sqlConnection
+        CommandText = "
+            SELECT Computer_System_DATA.Name00                    AS ComputerName,
                    Computer_System_Data.UserName00                AS Username,
 	               PC_BIOS_DATA.SerialNumber00                    AS SerialNumber,
 	               MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
@@ -66,21 +79,17 @@ Function  Get-HPSystemInformationFromCMDB {
 	               MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
                    System_DISC.AD_Site_Name0                      AS ADSiteName,
                    WorkstationStatus_DATA.LastHWScan			  AS LastHardwareScan
-              FROM MS_SYSTEMINFORMATION_DATA
-	               JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
-	               JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
-                   JOIN System_DISC            ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
-                   JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
-	          WHERE (MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
-	                 OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard')
-	            AND PC_BIOS_DATA.SerialNumber00 <> ' '
-                AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
-                AND Computer_System_DATA.Name00 LIKE '%$ComputerName%'
-              ORDER BY WorkstationStatus_DATA.LastHWScan"
-
-    $results = (New-Object -TypeName System.Data.SqlClient.SqlCommand -Property @{
-        CommandText = $sql 
-        Connection = $sqlConnection 
+                   FROM MS_SYSTEMINFORMATION_DATA
+	                   JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
+	                   JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
+                       JOIN System_DISC            ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
+                       JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
+	               WHERE (MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
+	                      OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard')
+	               AND PC_BIOS_DATA.SerialNumber00 <> ' '
+                   AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
+                   AND Computer_System_DATA.Name00 LIKE '%$ComputerName%'
+                   ORDER BY WorkstationStatus_DATA.LastHWScan"
     }).ExecuteReader()
     
     if ($results.HasRows) {
