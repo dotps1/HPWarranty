@@ -37,5 +37,7 @@ Get-HPWarrantyEntitlement
 Example 4:
 ```PowerShell
 # Get info from ConfigMgr DB and then get warranty info.
+# To use the Get-HPSystemInformationFromCMDB cmdlet, the MS_SystemInformation WMI Class needs to be inventoried.
+# This is not done by default, and will need to be done in your client settings.
 Get-HPSystemInformationFromCMDB -SqlServer 'mysccmserver' -Database 'CM_AB1' -IntergratedSecurity -ComputerName 'mycomputer' | Get-HPWarrantyEntitlement
 ```
