@@ -60,6 +60,8 @@ This is still very beta, so please report any issues.  Thanks.</p>
 <p>Example 4:</p>
 
 <div class="highlight highlight-source-powershell"><pre><span class="pl-c"># Get info from ConfigMgr DB and then get warranty info.</span>
+<span class="pl-c"># To use the Get-HPSystemInformationFromCMDB cmdlet, the MS_SystemInformation WMI Class needs to be inventoried.</span>
+<span class="pl-c"># This is not done by default, and will need to be done in your client settings.</span>
 <span class="pl-c1">Get-HPSystemInformationFromCMDB</span> <span class="pl-k">-</span>SqlServer <span class="pl-s">'mysccmserver'</span> <span class="pl-k">-</span>Database <span class="pl-s">'CM_AB1'</span> <span class="pl-k">-</span>IntergratedSecurity <span class="pl-k">-</span>ComputerName <span class="pl-s">'mycomputer'</span> <span class="pl-k">|</span> <span class="pl-c1">Get-HPWarrantyEntitlement</span></pre></div>
 
       <footer class="site-footer">
