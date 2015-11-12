@@ -6,7 +6,11 @@ Function Get-HPWarrantyEntitlement {
 	Param (
         [Parameter(
             ParameterSetName = 'Default',
-            ValueFromPipeline = $true
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true
+        )]
+        [Alias(
+            'Name'
         )]
         [ValidateScript({
             if ($_ -eq $env:COMPUTERNAME) { 
@@ -80,9 +84,9 @@ Function Get-HPWarrantyEntitlement {
     }
 
     Process {
-        foreach ($c in $ComputerName) {
+        for ($i = 0; $i -lt $ComputerName.Length; $i++) {
             if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
-                if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $c) -ne $null) {
+                if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerName[$i]) -ne $null) {
                     $ProductNumber = $systemInformation.ProductNumber
                     $SerialNumber = $systemInformation.SerialNumber
                 } else {
@@ -116,7 +120,8 @@ Function Get-HPWarrantyEntitlement {
                         }
                     }
 
-                    [PSCustomObject]@{
+                    [System.Management.Automation.PSCustomObject]([Ordered]@{
+                        'ComputerName' = $ComputerName[$i]
                         'SerialNumber' = $SerialNumber
                         'ProductNumber' = $ProductNumber
                         'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
@@ -129,7 +134,7 @@ Function Get-HPWarrantyEntitlement {
                         'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
                         'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
                         'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                    }
+                    })
                 }
             } else {
                 Write-Error -Message 'No entitlement found.'

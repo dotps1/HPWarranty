@@ -6,7 +6,11 @@
 	Param (
         [Parameter(
             ParameterSetName = 'Default',
-            ValueFromPipeline = $true
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true
+        )]
+        [Alias(
+            'Name'
         )]
         [ValidateScript({
             if ($_ -eq $env:COMPUTERNAME) { 
@@ -74,21 +78,22 @@
     }
 
     Process {
-        foreach ($c in $ComputerName) {
+        for ($i = 0; $i -lt $ComputerName.Length; $i++) {
             if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
-                if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $c) -ne $null) {
+                if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerName[$i]) -ne $null) {
                     $SerialNumber = $systemInformation.SerialNumber
                     $ProductNumber = $systemInformation.ProductNumber
                 } else {
                     continue
                 }
             }
+
             try {
                 [xml]$entitlement = Invoke-RestMethod -Body $request.Replace(
                     '<[!--SerialNumber--!]>', $SerialNumber
                 ).Replace(
                     '<[!--ProductNumber--!]>', $ProductNumber
-                ) -Uri 'https://entitlement-ext.corp.hp.com/es/ES10_1/ESListener'  -ContentType 'text/html' -Method Post -ErrorAction Stop
+                ) -Uri 'https://entitlement-ext.corp.hp.com/es/ES10_1/ESListener' -ContentType 'text/html' -Method Post -ErrorAction Stop
             } catch {
                 Write-Error -Message 'Failed to invoke rest method.'
                 continue
@@ -107,7 +112,8 @@
                         }
                     }
 
-                    [PSCustomObject]@{
+                    [System.Management.Automation.PSCustomObject]([Ordered]@{
+                        'ComputerName' = $ComputerName[$i]
                         'SerialNumber' = $SerialNumber
                         'ProductNumber' = $ProductNumber
                         'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
@@ -120,7 +126,7 @@
                         'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
                         'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
                         'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                    }
+                    })
                 }
             } else {
                 Write-Error -Message 'No entitlement found.'
