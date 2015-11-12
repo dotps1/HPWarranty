@@ -60,8 +60,8 @@ Function Get-HPWarrantyEntitlement {
         [Parameter(
             ParameterSetName = 'Static'
         )]
-        [String]
         [ValidateNotNullOrEmpty()]
+        [String]
         $XmlExportPath = $null
 	)
 
