@@ -1,7 +1,7 @@
 ﻿Function Get-HPIncWarrantyEntitlement {
     
     [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
-    [OutputType([PSCustomObject])]
+    [OutputType([System.Management.Automation.PSCustomObject])]
     
 	Param (
         [Parameter(

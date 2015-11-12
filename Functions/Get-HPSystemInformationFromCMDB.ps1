@@ -1,6 +1,6 @@
 Function  Get-HPSystemInformationFromCMDB {
     
-    [OutputType([Array])]
+    [OutputType([System.Array])]
     
     Param (
         [Parameter()]
