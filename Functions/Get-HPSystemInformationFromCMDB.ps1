@@ -36,8 +36,13 @@ Function  Get-HPSystemInformationFromCMDB {
         [Switch]
         $IntergratedSecurity,
 
-        [Parameter()]
-        [String]
+        [Parameter(
+            ValueFromPipelineByPropertyName = $true
+        )]
+        [Alias(
+            'Name'
+        )]
+        [String[]]
         $ComputerName = $null
     )
 
@@ -68,45 +73,48 @@ Function  Get-HPSystemInformationFromCMDB {
         return
     }
 
-    $results = (New-Object -TypeName System.Data.SqlClient.SqlCommand -Property @{ 
-        Connection = $sqlConnection
-        CommandText = "
-            SELECT Computer_System_DATA.Name00                    AS ComputerName,
-                   Computer_System_Data.UserName00                AS Username,
-	               PC_BIOS_DATA.SerialNumber00                    AS SerialNumber,
-	               MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
-	               MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
-	               MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
-                   System_DISC.AD_Site_Name0                      AS ADSiteName,
-                   WorkstationStatus_DATA.LastHWScan			  AS LastHardwareScan
-                   FROM MS_SYSTEMINFORMATION_DATA
-	                   JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
-	                   JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
-                       JOIN System_DISC            ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
-                       JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
-	               WHERE (MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
-	                      OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard')
-	               AND PC_BIOS_DATA.SerialNumber00 <> ' '
-                   AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
-                   AND Computer_System_DATA.Name00 LIKE '%$ComputerName%'
-                   ORDER BY WorkstationStatus_DATA.LastHWScan"
-    }).ExecuteReader()
+    foreach ($item in $ComputerName) {
+        $results = (New-Object -TypeName System.Data.SqlClient.SqlCommand -Property @{ 
+            Connection = $sqlConnection
+            CommandText = `
+                "SELECT Computer_System_DATA.Name00                    AS ComputerName,
+                        Computer_System_Data.UserName00                AS Username,
+	                    PC_BIOS_DATA.SerialNumber00                    AS SerialNumber,
+	                    MS_SYSTEMINFORMATION_DATA.SystemSKU00          AS ProductNumber,
+	                    MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 AS ProductManufacturer,
+	                    MS_SYSTEMINFORMATION_DATA.SystemProductName00  AS ProductModel,
+                        System_DISC.AD_Site_Name0                      AS ADSiteName,
+                        WorkstationStatus_DATA.LastHWScan			   AS LastHardwareScan
+                        FROM MS_SYSTEMINFORMATION_DATA
+	                        JOIN Computer_System_Data   ON MS_SYSTEMINFORMATION_DATA.MachineID = Computer_System_DATA.MachineID
+	                        JOIN PC_BIOS_DATA           ON MS_SYSTEMINFORMATION_DATA.MachineID = PC_BIOS_DATA.MachineID
+                            JOIN System_DISC            ON MS_SYSTEMINFORMATION_DATA.MachineID = System_DISC.ItemKey
+                            JOIN WorkstationStatus_DATA ON MS_SYSTEMINFORMATION_DATA.MachineID = WorkstationStatus_DATA.MachineID
+	                    WHERE (MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'HP' 
+	                           OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard')
+	                    AND PC_BIOS_DATA.SerialNumber00 <> ' '
+                        AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
+                        AND Computer_System_DATA.Name00 LIKE '%$item%'
+                        ORDER BY WorkstationStatus_DATA.LastHWScan"
+        }).ExecuteReader()
     
-    if ($results.HasRows) {
-        $results.GetEnumerator() | ForEach-Object { 
-            New-Object -TypeName PSObject -Property @{
-                ComputerName = $_["ComputerName"]
-                Username = $_["Username"]
-                SerialNumber = $_["SerialNumber"]
-                ProductNumber = $_["ProductNumber"]
-                ProductManufacturer = $_["ProductManufacturer"]
-                ProductModel = $_["ProductModel"]
-                ADSiteName = $_["ADSiteName"]
-                LastHardwareScan = $_["LastHardwareScan"] 
-            } 
-        }
-	}
+        if ($results.HasRows) {
+            $results.GetEnumerator() | ForEach-Object { 
+                New-Object -TypeName System.Managment.Automation.PSObject -Property ([Ordered]@{
+                    ComputerName = $_["ComputerName"]
+                    Username = $_["Username"]
+                    SerialNumber = $_["SerialNumber"]
+                    ProductNumber = $_["ProductNumber"]
+                    ProductManufacturer = $_["ProductManufacturer"]
+                    ProductModel = $_["ProductModel"]
+                    ADSiteName = $_["ADSiteName"]
+                    LastHardwareScan = $_["LastHardwareScan"] 
+                })
+            }
+	    }
 	
-    $results.Close()
+        $results.Close()
+    }
+
     $sqlConnection.Close()
 }
