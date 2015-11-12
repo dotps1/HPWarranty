@@ -1,6 +1,5 @@
 Function  Get-HPSystemInformationFromCMDB {
-    
-    [OutputType([System.Array])]
+    [OutputType([Array])]
     
     Param (
         [Parameter()]
@@ -43,7 +42,7 @@ Function  Get-HPSystemInformationFromCMDB {
             'Name'
         )]
         [String[]]
-        $ComputerName = $null
+        $ComputerName = '%'
     )
 
    $sqlConnection = New-Object -TypeName System.Data.SqlClient.SqlConnection -Property @{ 
@@ -94,13 +93,13 @@ Function  Get-HPSystemInformationFromCMDB {
 	                           OR MS_SYSTEMINFORMATION_DATA.SystemManufacturer00 = 'Hewlett-Packard')
 	                    AND PC_BIOS_DATA.SerialNumber00 <> ' '
                         AND MS_SYSTEMINFORMATION_DATA.SystemSKU00 <> ' ' 
-                        AND Computer_System_DATA.Name00 LIKE '%$ComputerName[$i]%'
+                        AND Computer_System_DATA.Name00 LIKE '%$($ComputerName[$i])%'
                         ORDER BY WorkstationStatus_DATA.LastHWScan"
         }).ExecuteReader()
     
         if ($results.HasRows) {
             $results.GetEnumerator() | ForEach-Object { 
-                New-Object -TypeName System.Managment.Automation.PSCustomObject -Property ([Ordered]@{
+                New-Object -TypeName PSCustomObject -Property @{
                     ComputerName = $_["ComputerName"]
                     Username = $_["Username"]
                     SerialNumber = $_["SerialNumber"]
@@ -109,7 +108,7 @@ Function  Get-HPSystemInformationFromCMDB {
                     ProductModel = $_["ProductModel"]
                     ADSiteName = $_["ADSiteName"]
                     LastHardwareScan = $_["LastHardwareScan"] 
-                })
+                }
             }
 	    }
 	

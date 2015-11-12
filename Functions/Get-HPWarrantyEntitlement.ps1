@@ -1,16 +1,12 @@
 Function Get-HPWarrantyEntitlement {
     
     [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
-    [OutputType([System.Management.Automation.PSCustomObject])]
+    [OutputType([PSCustomObject])]
     
 	Param (
         [Parameter(
             ParameterSetName = 'Default',
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true
-        )]
-        [Alias(
-            'Name'
+            ValueFromPipeline = $true
         )]
         [ValidateScript({
             if ($_ -eq $env:COMPUTERNAME) { 
@@ -120,7 +116,7 @@ Function Get-HPWarrantyEntitlement {
                         }
                     }
 
-                    [System.Management.Automation.PSCustomObject]([Ordered]@{
+                    [PSCustomObject]@{
                         'ComputerName' = $ComputerName[$i]
                         'SerialNumber' = $SerialNumber
                         'ProductNumber' = $ProductNumber
@@ -134,7 +130,7 @@ Function Get-HPWarrantyEntitlement {
                         'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
                         'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
                         'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                    })
+                    }
                 }
             } else {
                 Write-Error -Message 'No entitlement found.'
