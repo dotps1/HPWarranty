@@ -88,6 +88,8 @@ Function Get-HPWarrantyEntitlement {
                 } else {
                     continue
                 }
+            } else {
+                $ComputerName[$i] = $null
             }
 
             try {

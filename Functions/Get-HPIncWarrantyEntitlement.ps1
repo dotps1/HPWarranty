@@ -82,6 +82,8 @@
                 } else {
                     continue
                 }
+            } else {
+                $ComputerName[$i] = $null
             }
 
             try {
