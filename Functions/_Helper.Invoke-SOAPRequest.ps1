@@ -36,8 +36,9 @@
     http://dotps1.github.io/HPWarranty
 #>
 Function Invoke-SOAPRequest  {
-    
-    [OutputType([Xml])]
+    [OutputType(
+        [Xml]
+    )]
     
     Param (
         [Parameter(
@@ -76,20 +77,24 @@ Function Invoke-SOAPRequest  {
     $soapWebRequest.Timeout = 30000
     $soapWebRequest.ServicePoint.Expect100Continue = $false
     $soapWebRequest.ServicePoint.MaxIdleTime = 2000
-    $soapWebRequest.ProtocolVersion = [system.net.httpversion]::version10
+    $soapWebRequest.ProtocolVersion = [System.Net.HttpVersion]::version10
 
-    $requestStream = $soapWebRequest.GetRequestStream()
-
-    $SOAPRequest.Save($requestStream) 
+    try {
+        $SOAPRequest.Save(
+            ($requestStream = $soapWebRequest.GetRequestStream())
+        ) 
     
-    $requestStream.Close() 
+        $requestStream.Close() 
 
-    $responseStream = ($soapWebRequest.GetResponse()).GetResponseStream() 
+        $responseStream = ($soapWebRequest.GetResponse()).GetResponseStream() 
     
-    $soapReader = [System.IO.StreamReader]($responseStream) 
-    $returnXml = [Xml]$soapReader.ReadToEnd() 
+        $soapReader = [System.IO.StreamReader]($responseStream) 
+        $returnXml = [Xml]$soapReader.ReadToEnd() 
     
-    $responseStream.Close() 
+        $responseStream.Close() 
 
-    return $returnXml 
+        return $returnXml
+    } catch {
+        throw $_
+    }
 }
