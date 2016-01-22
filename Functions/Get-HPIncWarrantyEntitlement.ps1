@@ -24,7 +24,7 @@
         $ComputerName = $env:ComputerName,
 
 		[Parameter(
-            Mandatory = $true,
+            Mandatory = $false,
             ParameterSetName = 'Static',
             ValueFromPipelineByPropertyName = $true
         )]
@@ -66,11 +66,11 @@
 	)
 
     Begin {
-        $request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPIncWarrantyEntitlement.xml").Replace(
-            '<[!--EntitlementCheckDate--!]>', (Get-Date -Format 'yyyy-MM-dd')
-        ).Replace(
-            '<[!--CountryCode--!]>', $CountryCode
-        )
+		$request = [Management.Automation.PSObject]@{
+			'countryCode' = "null"
+			'productNo' = "null"
+			'serialNo' = "null"
+		}
     }
 
     Process {
@@ -87,44 +87,38 @@
             }
 
             try {
-                [Xml]$entitlement = Invoke-RestMethod -Body $request.Replace(
-                    '<[!--SerialNumber--!]>', $SerialNumber
-                ).Replace(
-                    '<[!--ProductNumber--!]>', $ProductNumber
-                ) -Uri 'https://entitlement-ext.corp.hp.com/es/ES10_1/ESListener' -ContentType 'text/html' -Method Post -ErrorAction Stop
+				$request.serialNo = $SerialNumber
+				$request.productNo = $ProductNumber
+				$hpUrl = "https://hpscm-pro.glb.itcs.hp.com/mobileweb/hpsupport.asmx/GetEntitlementDetails"
+				$entitlement = Invoke-RestMethod -Body ($request | ConvertTo-Json) -Method Post -ContentType "application/json" -Uri $hpUrl
             } catch {
                 Write-Error -Message 'Failed to invoke rest method.'
                 continue
             }
 
             if ($entitlement -ne $null) {
-                if ($entitlement.GetElementsByTagName('ErrorID').InnerText -ne $null) {
-                    Write-Error -Message $($entitlement.GetElementsByTagName('DataPayLoad').InnerText) -ErrorId $($entitlement.GetElementsByTagName('ErrorID').InnerText)
-                    continue
-                } else {
-                    if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
-                        try {
-                            $entitlement.Save("${XmlExportPath}\${SerialNumber}_entitlement.xml")
-                        } catch {
-                            Write-Error -Message 'Failed to save xml file.'
-                        }
-                    }
-
-                    [PSCustomObject]@{
+				$contracts = $entitlement.d | ConvertFrom-Json
+                if ($contracts -ne $null) {
+					foreach ($contract in $contracts) {
+					    [PSCustomObject]@{
                         'ComputerName' = $ComputerName[$i]
                         'SerialNumber' = $SerialNumber
                         'ProductNumber' = $ProductNumber
-                        'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
-                        'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
-                        'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
-                        'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
-                        'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
-                        'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
-                        'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
-                        'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
-                        'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                        'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                    }
+#                        'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
+#                        'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
+                        'ActiveWarrantyEntitlement' = $contract.status
+                        'OverallWarrantyStartDate' = $contract.startDate
+                        'OverallWarrantyEndDate' = $contract.endDate
+#                        'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
+#                        'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
+#                        'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
+#                        'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+#                        'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+						'WarrantyType' = $contract.title
+						'WarrantyDeliverables' = $contract.deliverables
+						'WarrantyOfferCode' = $contract.offerCode
+                    	}
+					}
                 }
             } else {
                 Write-Error -Message 'No entitlement found.'
