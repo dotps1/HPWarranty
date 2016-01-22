@@ -66,11 +66,11 @@
 	)
 
     Begin {
-		$request = [Management.Automation.PSObject]@{
-			'countryCode' = "null"
-			'productNo' = "null"
-			'serialNo' = "null"
-		}
+	$request = [Management.Automation.PSObject]@{
+		'countryCode' = "null"
+		'productNo' = "null"
+		'serialNo' = "null"
+	}
     }
 
     Process {
@@ -87,38 +87,38 @@
             }
 
             try {
-				$request.serialNo = $SerialNumber
-				$request.productNo = $ProductNumber
-				$hpUrl = "https://hpscm-pro.glb.itcs.hp.com/mobileweb/hpsupport.asmx/GetEntitlementDetails"
-				$entitlement = Invoke-RestMethod -Body ($request | ConvertTo-Json) -Method Post -ContentType "application/json" -Uri $hpUrl
+		$request.serialNo = $SerialNumber
+		$request.productNo = $ProductNumber
+		$hpUrl = "https://hpscm-pro.glb.itcs.hp.com/mobileweb/hpsupport.asmx/GetEntitlementDetails"
+		$entitlement = Invoke-RestMethod -Body ($request | ConvertTo-Json) -Method Post -ContentType "application/json" -Uri $hpUrl
             } catch {
                 Write-Error -Message 'Failed to invoke rest method.'
                 continue
             }
 
             if ($entitlement -ne $null) {
-				$contracts = $entitlement.d | ConvertFrom-Json
+		$contracts = $entitlement.d | ConvertFrom-Json
                 if ($contracts -ne $null) {
-					foreach ($contract in $contracts) {
-					    [PSCustomObject]@{
-                        'ComputerName' = $ComputerName[$i]
-                        'SerialNumber' = $SerialNumber
-                        'ProductNumber' = $ProductNumber
-#                        'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
-#                        'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
-                        'ActiveWarrantyEntitlement' = $contract.status
-                        'OverallWarrantyStartDate' = $contract.startDate
-                        'OverallWarrantyEndDate' = $contract.endDate
-#                        'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
-#                        'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
-#                        'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
-#                        'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-#                        'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-						'WarrantyType' = $contract.title
-						'WarrantyDeliverables' = $contract.deliverables
-						'WarrantyOfferCode' = $contract.offerCode
-                    	}
-					}
+			foreach ($contract in $contracts) {
+				[PSCustomObject]@{
+                        	'ComputerName' = $ComputerName[$i]
+                        	'SerialNumber' = $SerialNumber
+                        	'ProductNumber' = $ProductNumber
+#                        	'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
+#                        	'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
+                        	'ActiveWarrantyEntitlement' = $contract.status
+                        	'OverallWarrantyStartDate' = $contract.startDate
+                        	'OverallWarrantyEndDate' = $contract.endDate
+	#                        'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
+	#                        'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
+	#                        'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
+	#                        'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+	#                        'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+				'WarrantyType' = $contract.title
+				'WarrantyDeliverables' = $contract.deliverables
+				'WarrantyOfferCode' = $contract.offerCode
+            			}
+			}
                 }
             } else {
                 Write-Error -Message 'No entitlement found.'
