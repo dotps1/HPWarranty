@@ -1,6 +1,8 @@
 # HPWarranty PowerShell Module
 ## As HP has recently split into two different companies, this is a complete rewrite, and is still beta.  Cmdlet names and functionallity may change, I will not be supporting backwards compatibility.
 
+## HP has changed how they do things, again........ At this time the `Invoke-HPWarrantyEntitlement` Cmdlet for looking up HPE warranties is not working.  I will have it fixed as soon as I can, thanks.
+
 This module can be installed from the [PowerShellGallery](https://www.powershellgallery.com/packages/HPWarranty/).  You need [WMF 5](https://www.microsoft.com/en-us/download/details.aspx?id=44987) to use this feature.
 ```PowerShell
 Install-Module -Name HPWarranty
