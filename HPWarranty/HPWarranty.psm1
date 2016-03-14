@@ -1,0 +1,1 @@
+﻿"$(Split-Path -Path $MyInvocation.MyCommand.Path)\*\*.ps1" | Resolve-Path | % { . $_.ProviderPath }

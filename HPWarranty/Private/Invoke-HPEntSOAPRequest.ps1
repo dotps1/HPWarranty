@@ -14,9 +14,9 @@
 .PARAMETER Action
     The ISEE Action to be performed.
 .EXAMPLE
-    Invoke-SOAPRequest -SOAPRequest $registrationSOAPRequest -Url 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
+    Invoke-HPEntSOAPRequest -SOAPRequest $registrationSOAPRequest -Url 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 .EXAMPLE
-    Invoke-SOAPRequest -SOAPRequest $entitlementSOAPRequest -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
+    Invoke-HPEntSOAPRequest -SOAPRequest $entitlementSOAPRequest -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
 .NOTES
     This module contains two XML douments used for the -SOAPRequest Parameter.
     RegistrationSOAPRequest.xml (See Invoke-HPWarrantyRegistrationRequest Cmdlet)
@@ -35,7 +35,8 @@
 .LINK
     http://dotps1.github.io/HPWarranty
 #>
-Function Invoke-SOAPRequest  {
+Function Invoke-HPEntSOAPRequest  {
+    
     [OutputType(
         [Xml]
     )]

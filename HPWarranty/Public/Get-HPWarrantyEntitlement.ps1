@@ -1,7 +1,9 @@
-Function Get-HPWarrantyEntitlement {
+Function Get-HPEntWarrantyEntitlement {
     
     [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
-    [OutputType([PSCustomObject])]
+    [OutputType(
+        [PSCustomObject]
+    )]
     
 	Param (
         [Parameter(
@@ -66,11 +68,11 @@ Function Get-HPWarrantyEntitlement {
 	)
 
     Begin {
-        [Xml]$registration = Invoke-SOAPRequest -SOAPRequest (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPWarrantyRegistration.xml").Replace(
+        [Xml]$registration = Invoke-HPEntSOAPRequest -SOAPRequest (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyRegistration.xml").Replace(
             '<[!--UniversialDateTime--!]>',$([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
         ) -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
         
-        $request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPWarrantyEntitlement.xml").Replace(
+        $request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyEntitlement.xml").Replace(
             '<[!--Gdid--!]>', $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
         ).Replace(
             '<[!--Token--!]>', $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.RegistrationToken
