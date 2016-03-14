@@ -1,9 +1,10 @@
 # HPWarranty PowerShell Module
-## As HP has recently split into two different companies, this is a complete rewrite, and is still beta.  Cmdlet names and functionallity may change, I will not be supporting backwards compatibility.
+## HP it would seem is going out of there way to make this constantly stop working.
 
-## HP has changed how they do things, again........ At this time the `Invoke-HPWarrantyEntitlement` Cmdlet for looking up HPE warranties is not working.  I will have it fixed as soon as I can, thanks.
+Currently, after being shutdown again....the Get-HPIncWarrantyEntitlement is working again.  However the Get-HPEntWarrantyEntitlement is not.
 
-This module can be installed from the [PowerShellGallery](https://www.powershellgallery.com/packages/HPWarranty/).  You need [WMF 5](https://www.microsoft.com/en-us/download/details.aspx?id=44987) to use this feature.
+~~This module can be installed from the [PowerShellGallery](https://www.powershellgallery.com/packages/HPWarranty/).  You need [WMF 5](https://www.microsoft.com/en-us/download/details.aspx?id=44987) to use this feature.~~
+currently disabled until the enterprise cmdlet is working again.
 ```PowerShell
 Install-Module -Name HPWarranty
 ```
@@ -16,7 +17,7 @@ This is still very beta, so please report any issues.  Thanks.
 
 * [Get-HPIncWarrantyEntitlement](https://github.com/dotps1/HPWarranty/wiki/Get-HPIncWarrantyEntitlement)
 * [Get-HPSystemInformationFromCMDB](https://github.com/dotps1/HPWarranty/wiki/Get-HPSystemInformationFromCMDB)
-* [Get-HPWarrantyEntitlement](https://github.com/dotps1/HPWarranty/wiki/Get-HPWarrantyEntitlement)
+* [Get-HPEntWarrantyEntitlement](https://github.com/dotps1/HPWarranty/wiki/Get-HPWarrantyEntitlement)
 
 Example 1:
 ```PowerShell
@@ -33,7 +34,7 @@ Get-HPIncWarrantyEntitlement -ComputerName 'MyFriendsHP.ourdomain.org'
 Example 3:
 ```PowerShell
 # Execute for local HP Server
-Get-HPWarrantyEntitlement
+Get-HPEntWarrantyEntitlement
 ```
 
 Example 4:
@@ -41,5 +42,5 @@ Example 4:
 # Get info from ConfigMgr DB and then get warranty info.
 # To use the Get-HPSystemInformationFromCMDB cmdlet, the MS_SystemInformation WMI Class needs to be inventoried.
 # This is not done by default, and will need to be done in your client settings.
-Get-HPSystemInformationFromCMDB -SqlServer 'mysccmserver' -Database 'CM_AB1' -IntergratedSecurity -ComputerName 'mycomputer' | Get-HPWarrantyEntitlement
+Get-HPSystemInformationFromCMDB -SqlServer 'mysccmserver' -Database 'CM_AB1' -IntergratedSecurity -ComputerName 'mycomputer' | Get-HPIncWarrantyEntitlement
 ```
