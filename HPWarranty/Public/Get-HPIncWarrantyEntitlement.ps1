@@ -96,8 +96,23 @@
             }
 
             if ($entitlement -ne $null) {
-                if ($entitlement.GetElementsByTagName('ErrorID').InnerText -ne $null) {
-                    Write-Error -Message $($entitlement.GetElementsByTagName('DataPayLoad').InnerText) -ErrorId $($entitlement.GetElementsByTagName('ErrorID').InnerText)
+                if ($entitlement.GetElementsByTagName('messageComment') -like '*Hewlett Packard Enterprise*') {
+                    <# TODO: Invoke Get-HPEntWarrantyEntitlment.
+                    $hpEntParams = @{
+                        ProductNumber = $ProductNumber
+                        SerialNumber = $SerialNumber
+                        ErrorAction = $ErrorActionPreference
+                    }
+
+                    if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
+                        $hpEntParams.Add('XmlExportPath', $XmlExportPath)
+                    }
+                    Get-HPEntWarrantyEntitlement @hpEntParams
+
+                    continue #>
+                } elseif ($entitlement.SelectSingleNode("//*[local-name() = 'messageClassCode']").'#text' -eq 'ERROR') {
+                    Write-Error -Message $entitlement.SelectSingleNode("//*[local-name() = 'messageComment']").'#text'
+
                     continue
                 } else {
                     if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
@@ -108,18 +123,20 @@
                         }
                     }
 
-                    [PSCustomObject]@{
-                        'ComputerName' = $ComputerName[$i]
-                        'SerialNumber' = $SerialNumber
-                        'ProductNumber' = $ProductNumber
-                        'ProductLineDescription' = $entitlement.GetElementsByTagName('productLineDescription').InnerText
-                        'ProductLineCode' = $entitlement.GetElementsByTagName('productLineCode').InnerText
-                        'ServiceObligationHardwareActiveIndicator' = $entitlement.GetElementsByTagName('serviceObligationHardwareActiveIndicator').InnerText
-                        'ServiceObligationStartDate' = $entitlement.GetElementsByTagName('serviceObligationStartDate').InnerText
-                        'ServiceObligationEndDate' = $entitlement.GetElementsByTagName('serviceObligationEndDate').InnerText
-                        'DateSourceCode' = $entitlement.GetElementsByTagName('dateSourceCode').InnerText
-                        'DateSourceDescription' = $entitlement.GetElementsByTagName('dateSourceDescription').InnerText
-                        'WarrantyIdentifierCode' = $entitlement.GetElementsByTagName('warrantyIdentifierCode').InnerText
+                    foreach ($node in $entitlement.SelectSingleNode("//*[local-name() = 'lnkServiceObligations']")) {
+                        [PSCustomObject]@{
+                            'ComputerName' = $ComputerName[$i]
+                            'SerialNumber' = $SerialNumber
+                            'ProductNumber' = $ProductNumber
+                            'ProductLineDescription' = $entitlement.GetElementsByTagName('productLineDescription').InnerText
+                            'ProductLineCode' = $entitlement.GetElementsByTagName('productLineCode').InnerText
+                            'ServiceObligationHardwareActiveIndicator' = $node.serviceObligationHardwareActiveIndicator
+                            'ServiceObligationStartDate' = $node.serviceObligationStartDate
+                            'ServiceObligationEndDate' = $node.serviceObligationEndDate
+                            'DateSourceCode' = $node.dateSourceCode
+                            'DateSourceDescription' = $node.dateSourceDescription
+                            'WarrantyIdentifierCode' = $node.warrantyIdentifierCode
+                        }
                     }
                 }
             } else {
