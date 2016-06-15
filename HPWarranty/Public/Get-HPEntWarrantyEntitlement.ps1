@@ -107,35 +107,29 @@ Function Get-HPEntWarrantyEntitlement {
                 Write-Error -Message 'Failed to invoke SOAP request.'
                 continue
             }
-
-            if ($entitlement -ne $null) {
-                if ($entitlement.GetElementsByTagName('ErrorID').InnerText -ne $null) {
-                    Write-Error -Message $($entitlement.GetElementsByTagName('DataPayLoad').InnerText) -ErrorId $($entitlement.GetElementsByTagName('ErrorID').InnerText)
-                    continue
-                } else {
-                    if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
-                        try {
-                            $entitlement.Save("${XmlExportPath}\${SerialNumber}_entitlement.xml")
-                        } catch {
-                            Write-Error -Message 'Failed to save xml file.'
-                        }
+			if ($entitlement -ne $null) {
+                if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
+                    try {
+                        $entitlement.Save("${XmlExportPath}\${SerialNumber}_entitlement.xml")
+                    } catch {
+                        Write-Error -Message 'Failed to save xml file.'
                     }
+                }
 
-                    [PSCustomObject]@{
-                        'ComputerName' = $ComputerName[$i]
-                        'SerialNumber' = $SerialNumber
-                        'ProductNumber' = $ProductNumber
-                        'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
-                        'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
-                        'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
-                        'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
-                        'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
-                        'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
-                        'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
-                        'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
-                        'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                        'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                    }
+                [PSCustomObject]@{
+                    'ComputerName' = $ComputerName[$i]
+                    'SerialNumber' = $SerialNumber
+                    'ProductNumber' = $ProductNumber
+                    'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
+                    'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
+                    'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
+                    'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
+                    'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
+                    'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
+                    'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
+                    'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
+                    'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+                    'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
                 }
             } else {
                 Write-Error -Message 'No entitlement found.'
