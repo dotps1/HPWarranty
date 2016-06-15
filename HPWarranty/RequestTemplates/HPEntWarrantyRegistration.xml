@@ -14,7 +14,7 @@
                 <Section name="SYSTEM_IDENTIFIERS">
                   <Property name="CollectorType" value="MC3"/>
                   <Property name="CollectorVersion" value="T05.80.1 build 1"/>
-                  <Property name="AutoDetectedSystemSerialNumber" value="ABCDE12345"/>
+                  <Property name="AutoDetectedSystemSerialNumber" value="<[!--SerialNumber--!]>/"/>
                   <Property name="SystemModel" value="HP ProLiant"/>
                   <Property name="TimestampGenerated" value="<[!--UniversialDateTime--!]>"/> 
                 </Section>
