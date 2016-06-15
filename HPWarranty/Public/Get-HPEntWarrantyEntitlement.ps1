@@ -97,7 +97,7 @@ Function Get-HPEntWarrantyEntitlement {
 
             try {
                 [Xml]$entitlement = (
-                    Invoke-SOAPRequest -SOAPRequest $request.Replace(
+                    Invoke-HPEntSOAPRequest -SOAPRequest $request.Replace(
                         '<[!--ProductNumber--!]>', $ProductNumber
                     ).Replace(
                         '<[!--SerialNumber--!]>', $SerialNumber
