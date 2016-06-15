@@ -1,0 +1,27 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:int="http://interfaces.obligation.sbs.it.hp.com/">
+  <soapenv:Header />
+  <soapenv:Body>
+    <int:retrieveServiceObligationResponsesByServiceObligationRequests>
+      <context>
+        <appContextName>HPSF</appContextName>
+        <userLocale>en-US</userLocale>
+      </context>
+      <obligationRequests>
+        <lnkServiceObligationDepthFilter>
+          <includeProductObjectOfServiceInstance>true</includeProductObjectOfServiceInstance>
+          <includeServiceObligation>true</includeServiceObligation>
+          <includeServiceObligationHeaderOffer>true</includeServiceObligationHeaderOffer>
+          <includeServiceObligationMessage>true</includeServiceObligationMessage>
+          <maxNumberOfProductObjectOfServiceInstance>100</maxNumberOfProductObjectOfServiceInstance>
+        </lnkServiceObligationDepthFilter>
+        <lnkServiceObligationEnrichment>
+          <iso2CountryCode><[!--CountryCode--!]></iso2CountryCode>
+        </lnkServiceObligationEnrichment>
+        <lnkServiceObligationProductObjectOfServiceIdentifier>
+          <hpProductNumber><[!--ProductNumber--!]></hpProductNumber>
+          <hpSerialNumber><[!--SerialNumber--!]></hpSerialNumber>
+        </lnkServiceObligationProductObjectOfServiceIdentifier>
+      </obligationRequests>
+    </int:retrieveServiceObligationResponsesByServiceObligationRequests>
+  </soapenv:Body>
+</soapenv:Envelope>
