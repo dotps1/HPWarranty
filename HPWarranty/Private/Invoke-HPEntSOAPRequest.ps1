@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Executes a SOAP Request.
+    Invokes a SOAP Request.
 .DESCRIPTION
     Sends a SOAP Request to Hewlett-Packard ISEE Servers to either create a Registration GDID and Token, or retrieve Warranty Info.
 .INPUTS
@@ -13,10 +13,6 @@
     The ISEE URL to send the SOAP request.
 .PARAMETER Action
     The ISEE Action to be performed.
-.EXAMPLE
-    Invoke-HPEntSOAPRequest -SOAPRequest $registrationSOAPRequest -Url 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
-.EXAMPLE
-    Invoke-HPEntSOAPRequest -SOAPRequest $entitlementSOAPRequest -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
 .NOTES
     This module contains two XML douments used for the -SOAPRequest Parameter.
     RegistrationSOAPRequest.xml (See Invoke-HPWarrantyRegistrationRequest Cmdlet)
@@ -74,11 +70,6 @@ Function Invoke-HPEntSOAPRequest  {
     $soapWebRequest.ContentType = 'text/xml; charset=utf-8'
     $soapWebRequest.Accept = 'text/xml'
     $soapWebRequest.Method = 'POST' 
-    $soapWebRequest.UserAgent = 'RemoteSupport/A.05.05 - gSOAP/2.7'
-    $soapWebRequest.Timeout = 30000
-    $soapWebRequest.ServicePoint.Expect100Continue = $false
-    $soapWebRequest.ServicePoint.MaxIdleTime = 2000
-    $soapWebRequest.ProtocolVersion = [System.Net.HttpVersion]::version10
 
     try {
         $SOAPRequest.Save(
@@ -87,14 +78,11 @@ Function Invoke-HPEntSOAPRequest  {
     
         $requestStream.Close() 
 
-        $responseStream = ($soapWebRequest.GetResponse()).GetResponseStream() 
-    
-        $soapReader = [System.IO.StreamReader]($responseStream) 
-        $returnXml = [Xml]$soapReader.ReadToEnd() 
-    
-        $responseStream.Close() 
+	    $responseStream = ($soapWebRequest.GetResponse()).GetResponseStream()
+        
+        [Xml]([System.IO.StreamReader]($responseStream)).ReadToEnd()
 
-        return $returnXml
+	    $responseStream.Close() 
     } catch {
         throw $_
     }

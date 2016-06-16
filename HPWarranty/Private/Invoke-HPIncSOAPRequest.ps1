@@ -1,4 +1,20 @@
-﻿Function Invoke-HPIncSOAPRequest {
+﻿<#
+    .SYNOPSIS
+        Invokes a SOAP Request.
+    .DESCRIPTION
+        Sends a SOAP Request to Hewlett-Packard and returns Entitlement data for non Enterprise systems.
+    .INPUTS
+        None.
+    .OUTPUTS
+        System.Xml
+    .PARAMETER SOAPRequest
+        The Xml formated request to send
+    .PARAMETER Url
+        The URL to send the SOAP request.
+    .LINK
+        http://dotps1.github.io/HPWarranty
+#>
+Function Invoke-HPIncSOAPRequest {
 
     [CmdletBinding()]
     [OutputType(
@@ -10,33 +26,32 @@
             Mandatory = $true
         )]
         [Xml]
-        $SOAPRequest = "$PSScriptRoot\..\RequestTemplates\HPIncWarrantyEntitlement.xml",
+        $SOAPRequest,
         
         [Parameter()]
         [String]
-        $URL = 'https://api-uns-sgw.external.hp.com/gw/hpit/egit/obligation.sa/1.1'
+        $Url = 'https://api-uns-sgw.external.hp.com/gw/hpit/egit/obligation.sa/1.1'
     )
 
-    try {
-	    $soapWebRequest = [System.Net.WebRequest]::Create($URL) 
-	    $soapWebRequest.Headers.Add('X-HP-SBS-ApplicationId','hpi-obligation-hpsa')
-	    $soapWebRequest.Headers.Add('X-HP-SBS-ApplicationKey','ft2VGa2hx9j$')
-	    $soapWebRequest.ContentType = 'text/xml; charset=utf-8'
-	    $soapWebRequest.Accept = 'text/xml'
-	    $soapWebRequest.Method = 'POST'
-	    $soapWebRequest.ProtocolVersion = [System.Net.HttpVersion]::Version11
+    $soapWebRequest = [System.Net.WebRequest]::Create($URL) 
+    $soapWebRequest.Headers.Add('X-HP-SBS-ApplicationId','hpi-obligation-hpsa')
+    $soapWebRequest.Headers.Add('X-HP-SBS-ApplicationKey','ft2VGa2hx9j$')
+    $soapWebRequest.ContentType = 'text/xml; charset=utf-8'
+    $soapWebRequest.Accept = 'text/xml'
+    $soapWebRequest.Method = 'POST'
 
-	    $requestStream = $soapWebRequest.GetRequestStream() 
-	    $SOAPRequest.Save($requestStream) 
+    try {
+	    $SOAPRequest.Save(
+            ($requestStream = $soapWebRequest.GetRequestStream())
+        )
+
 	    $requestStream.Close() 
 
-	    $response = $soapWebRequest.GetResponse() 
-	    $responseStream = $response.GetResponseStream() 
-	    $soapReader = [System.IO.StreamReader]($responseStream) 
-	    $returnXml = [Xml]$soapReader.ReadToEnd() 
-	    $responseStream.Close() 
+	    $responseStream = ($soapWebRequest.GetResponse()).GetResponseStream()
+        
+        [Xml]([System.IO.StreamReader]($responseStream)).ReadToEnd()
 
-	    return $returnXml
+	    $responseStream.Close() 
     } catch {
         throw $_
     }

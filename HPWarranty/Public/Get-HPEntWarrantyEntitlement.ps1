@@ -1,14 +1,17 @@
 Function Get-HPEntWarrantyEntitlement {
     
-    [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
+    [CmdletBinding(
+        DefaultParameterSetName = '__AllParameterSets'
+    )]
     [OutputType(
-        [PSCustomObject]
+        [HashTable]
     )]
     
 	Param (
         [Parameter(
-            ParameterSetName = 'Default',
-            ValueFromPipeline = $true
+            ParameterSetName = 'Computer',
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true
         )]
         [ValidateScript({
             if ($_ -eq $env:COMPUTERNAME) { 
@@ -24,6 +27,13 @@ Function Get-HPEntWarrantyEntitlement {
         })]
         [String[]]
         $ComputerName = $env:ComputerName,
+
+        [Parameter(
+            ParameterSetName = 'Computer'
+        )]
+        [ValidateNotNullOrEmpty()]
+        [PSCredential]
+        $Credential = $null,
 
 		[Parameter(
             Mandatory = $true,
@@ -41,37 +51,24 @@ Function Get-HPEntWarrantyEntitlement {
 		[String]
         $SerialNumber,
 
-        [Parameter(
-            ParameterSetName = '__AllParameterSets'
-        )]
-		[Parameter(
-            ParameterSetName = 'Default'
-        )]
-        [Parameter(
-            ParameterSetName = 'Static'
-        )]
+		[Parameter()]
 		[String]
         $CountryCode = 'US',
 
-        [Parameter(
-            ParameterSetName = '__AllParameterSets'
-        )]
-		[Parameter(
-            ParameterSetName = 'Default'
-        )]
-        [Parameter(
-            ParameterSetName = 'Static'
-        )]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $XmlExportPath = $null
 	)
 
     Begin {
-		$request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyRegistration.xml")
-		$request = $request.Replace('<[!--UniversialDateTime--!]>', $([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T')) )
-		$request = $request.Replace('<[!--SerialNumber--!]>', $SerialNumber )
-        [Xml]$registration = Invoke-HPEntSOAPRequest -SOAPRequest $request -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
+		$registrationRequest = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyRegistration.xml").Replace(
+            '<[!--UniversialDateTime--!]>', $([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
+        ).Replace(
+            '<[!--SerialNumber--!]>', $SerialNumber
+        )
+
+        [Xml]$registration = Invoke-HPEntSOAPRequest -SOAPRequest $registrationRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
         
         $request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyEntitlement.xml").Replace(
             '<[!--Gdid--!]>', $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
@@ -85,7 +82,7 @@ Function Get-HPEntWarrantyEntitlement {
     Process {
         for ($i = 0; $i -lt $ComputerName.Length; $i++) {
             if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
-                if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerName[$i]) -ne $null) {
+                if ($null -ne ($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerName[$i] -Credential $Credential)) {
                     $ProductNumber = $systemInformation.ProductNumber
                     $SerialNumber = $systemInformation.SerialNumber
                 } else {
@@ -116,8 +113,7 @@ Function Get-HPEntWarrantyEntitlement {
                     }
                 }
 
-                [PSCustomObject]@{
-                    'ComputerName' = $ComputerName[$i]
+                [HashTable]$output = @{
                     'SerialNumber' = $SerialNumber
                     'ProductNumber' = $ProductNumber
                     'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
@@ -131,6 +127,12 @@ Function Get-HPEntWarrantyEntitlement {
                     'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
                     'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
                 }
+
+                if ($PSCmdlet.ParameterSetName -eq 'Computer') {
+                    $output.Add('ComputerName', $ComputerName[$i])
+                }
+
+                Write-Output -InputObject $output
             } else {
                 Write-Error -Message 'No entitlement found.'
                 continue

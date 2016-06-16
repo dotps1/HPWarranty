@@ -1,11 +1,15 @@
 ﻿Function Get-HPIncWarrantyEntitlement {
     
-    [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
-    [OutputType([PSCustomObject])]
+    [CmdletBinding(
+        DefaultParameterSetName = '__AllParameterSets'
+    )]
+    [OutputType(
+        [HashTable]
+    )]
     
 	Param (
         [Parameter(
-            ParameterSetName = 'Default',
+            ParameterSetName = 'Computer',
             ValueFromPipeline = $true
         )]
         [ValidateScript({
@@ -23,6 +27,13 @@
         [String[]]
         $ComputerName = $env:ComputerName,
 
+        [Parameter(
+            ParameterSetName = 'Computer'
+        )]
+        [ValidateNotNullOrEmpty()]
+        [PSCredential]
+        $Credential = $null,
+
 		[Parameter(
             Mandatory = $true,
             ParameterSetName = 'Static',
@@ -39,27 +50,11 @@
 		[String]
         $SerialNumber,
 
-        [Parameter(
-            ParameterSetName = '__AllParameterSets'
-        )]
-		[Parameter(
-            ParameterSetName = 'Default'
-        )]
-        [Parameter(
-            ParameterSetName = 'Static'
-        )]
+        [Parameter()]
 		[String]
         $CountryCode = 'US',
 
-        [Parameter(
-            ParameterSetName = '__AllParameterSets'
-        )]
-		[Parameter(
-            ParameterSetName = 'Default'
-        )]
-        [Parameter(
-            ParameterSetName = 'Static'
-        )]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $XmlExportPath = $null
@@ -74,7 +69,7 @@
     Process {
         for ($i = 0; $i -lt $ComputerName.Length; $i++) {
             if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
-                if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerName[$i]) -ne $null) {
+                if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerName[$i] -Credential $Credential) -ne $null) {
                     $SerialNumber = $systemInformation.SerialNumber
                     $ProductNumber = $systemInformation.ProductNumber
                 } else {
@@ -91,7 +86,7 @@
                     '<[!--ProductNumber--!]>', $ProductNumber
                 ) -ErrorAction Stop
             } catch {
-                Write-Error -Message 'Failed to invoke rest method.'
+                Write-Error -Message 'Failed to invoke SOAP request.'
                 continue
             }
 
@@ -123,21 +118,24 @@
                         }
                     }
 
-                    foreach ($node in $entitlement.SelectSingleNode("//*[local-name() = 'lnkServiceObligations']")) {
-                        [PSCustomObject]@{
-                            'ComputerName' = $ComputerName[$i]
-                            'SerialNumber' = $SerialNumber
-                            'ProductNumber' = $ProductNumber
-                            'ProductLineDescription' = $entitlement.GetElementsByTagName('productLineDescription').InnerText
-                            'ProductLineCode' = $entitlement.GetElementsByTagName('productLineCode').InnerText
-                            'ServiceObligationHardwareActiveIndicator' = $node.serviceObligationHardwareActiveIndicator
-                            'ServiceObligationStartDate' = $node.serviceObligationStartDate
-                            'ServiceObligationEndDate' = $node.serviceObligationEndDate
-                            'DateSourceCode' = $node.dateSourceCode
-                            'DateSourceDescription' = $node.dateSourceDescription
-                            'WarrantyIdentifierCode' = $node.warrantyIdentifierCode
-                        }
+                    [HashTable]$output = @{
+                        'SerialNumber' = $SerialNumber
+                        'ProductNumber' = $ProductNumber
+                        'ProductLineDescription' = $entitlement.GetElementsByTagName('productLineDescription').InnerText
+                        'ProductLineCode' = $entitlement.GetElementsByTagName('productLineCode').InnerText
+                        'ServiceObligationHardwareActiveIndicator' = $node.serviceObligationHardwareActiveIndicator
+                        'ServiceObligationStartDate' = $node.serviceObligationStartDate
+                        'ServiceObligationEndDate' = $node.serviceObligationEndDate
+                        'DateSourceCode' = $node.dateSourceCode
+                        'DateSourceDescription' = $node.dateSourceDescription
+                        'WarrantyIdentifierCode' = $node.warrantyIdentifierCode
                     }
+
+                    if ($PSCmdlet.ParameterSetName -eq 'Computer') {
+                        $output.Add('ComputerName', $ComputerName[$i])
+                    }
+
+                    Write-Output -InputObject $output
                 }
             } else {
                 Write-Error -Message 'No entitlement found.'
