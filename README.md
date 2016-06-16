@@ -2,6 +2,8 @@
 
 ## **Finally getting this working a bit again, refractor in progress.**
 
+[![Build status](https://ci.appveyor.com/api/projects/status/7vp1jrn1vtssy635?svg=true)](https://ci.appveyor.com/project/dotps1/hpwarranty)
+
 ~~This module can be installed from the [PowerShellGallery](https://www.powershellgallery.com/packages/HPWarranty/).  You need [WMF 5](https://www.microsoft.com/en-us/download/details.aspx?id=44987) to use this feature.~~
 currently disabled until refractor is complete.
 ```PowerShell
