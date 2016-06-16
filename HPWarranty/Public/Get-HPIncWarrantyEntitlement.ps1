@@ -32,6 +32,7 @@
         )]
         [ValidateNotNullOrEmpty()]
         [PSCredential]
+        [System.Management.Automation.Credential()]
         $Credential = $null,
 
 		[Parameter(
@@ -69,7 +70,7 @@
     Process {
         for ($i = 0; $i -lt $ComputerName.Length; $i++) {
             if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
-                if (($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerName[$i] -Credential $Credential) -ne $null) {
+                if ($null -ne ($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerName[$i] -Credential $Credential)) {
                     $SerialNumber = $systemInformation.SerialNumber
                     $ProductNumber = $systemInformation.ProductNumber
                 } else {
@@ -90,7 +91,7 @@
                 continue
             }
 
-            if ($entitlement -ne $null) {
+            if ($null -eq $entitlement) {
                 if ($entitlement.GetElementsByTagName('messageComment') -like '*Hewlett Packard Enterprise*') {
                     <# TODO: Invoke Get-HPEntWarrantyEntitlment.
                     $hpEntParams = @{

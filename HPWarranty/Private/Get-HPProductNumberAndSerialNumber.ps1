@@ -30,22 +30,25 @@ Function Get-HPProductNumberAndSerialNumber {
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [PSCredential]
+        [System.Management.Automation.Credential()]
         $Credential = $null
     )
 
     try {
-        $manufacturer = (Get-WmiObject -Class Win32_ComputerSystem -Namespace 'root\CIMV2' -Property 'Manufacturer' -ComputerName $ComputerName -Credential $Credential -ErrorAction Stop).Manufacturer
+        $cimSession = New-CimSession -ComputerName $ComputerName -Credential $Credential -SessionOption (New-CimSessionOption -Protocol Dcom) -ErrorAction Stop
+        $manufacturer = Get-CimInstance -CimSession $cimSession -ClassName Win32_ComputerSystem -ErrorAction Stop
         if ($manufacturer -eq 'Hewlett-Packard' -or $manufacturer -eq 'HP') {
-            return [HashTable] @{
-                SerialNumber = (Get-WmiObject -Namespace 'root\cimV2' -Class 'Win32_Bios' -ComputerName $ComputerName -Credential $Credential -ErrorAction Stop).SerialNumber.Trim()
-                ProductNumber = (Get-WmiObject -Namespace 'root\WMI' -Class 'MS_SystemInformation' -ComputerName $ComputerName -Credential $Credential -ErrorAction Stop).SystemSKU.Trim()
-            }
+            Write-OutPut -InputObject ([HashTable]@{
+                SerialNumber = (Get-CimInstance -CimSession $cimSession -Class 'Win32_Bios' -ErrorAction Stop).SerialNumber.Trim()
+                ProductNumber = (Get-CimInstance -CimSession $cimSession -Class 'MS_SystemInformation' -Namespace 'root\WMI' -ErrorAction Stop).SystemSKU.Trim()
+            })
         } else {
             Write-Error -Message 'Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems.'
             return $null
         }
     } catch {
-        Write-Error -Message "Failed to retrive SerailNumber and ProductNumber from $ComputerName."
+        $_
+        Write-Error -Message "Failed to retrive SerialNumber and ProductNumber from $ComputerName."
         return $null
     }
 }

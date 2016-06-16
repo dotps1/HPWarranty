@@ -33,6 +33,7 @@ Function Get-HPEntWarrantyEntitlement {
         )]
         [ValidateNotNullOrEmpty()]
         [PSCredential]
+        [System.Management.Automation.Credential()]
         $Credential = $null,
 
 		[Parameter(
@@ -62,7 +63,7 @@ Function Get-HPEntWarrantyEntitlement {
 	)
 
     Begin {
-        if ($Script:HPEntRegistration.DateTime -lt (Get-Date).AddMinutes(-15)) {
+        if ($Script:HPEntRegistration.DateTime -lt (Get-Date).AddMinutes($Script:HPEntRegistration.ThresholdInMinutes)) {
 		    $registrationRequest = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyRegistration.xml").Replace(
                 '<[!--UniversialDateTime--!]>', $([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
             ).Replace(
@@ -112,7 +113,7 @@ Function Get-HPEntWarrantyEntitlement {
                 Write-Error -Message 'Failed to invoke SOAP request.'
                 continue
             }
-			if ($entitlement -ne $null) {
+			if ($null -ne $entitlement) {
                 if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
                     try {
                         $entitlement.Save("${XmlExportPath}\${SerialNumber}_entitlement.xml")
