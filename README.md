@@ -1,10 +1,9 @@
 # HPWarranty PowerShell Module
-## HP it would seem is going out of there way to make this constantly stop working.
 
-Currently, after being shutdown again....the Get-HPIncWarrantyEntitlement is working again.  However the Get-HPEntWarrantyEntitlement is not.
+## **Finally getting this working a bit again, refractor in progress.**
 
 ~~This module can be installed from the [PowerShellGallery](https://www.powershellgallery.com/packages/HPWarranty/).  You need [WMF 5](https://www.microsoft.com/en-us/download/details.aspx?id=44987) to use this feature.~~
-currently disabled until the enterprise cmdlet is working again.
+currently disabled until refractor is complete.
 ```PowerShell
 Install-Module -Name HPWarranty
 ```
@@ -15,9 +14,9 @@ This is still very beta, so please report any issues.  Thanks.
 
 ## HPWarranty Cmdlets
 
-* [Get-HPIncWarrantyEntitlement](https://github.com/dotps1/HPWarranty/wiki/Get-HPIncWarrantyEntitlement)
-* [Get-HPSystemInformationFromCMDB](https://github.com/dotps1/HPWarranty/wiki/Get-HPSystemInformationFromCMDB)
-* [Get-HPEntWarrantyEntitlement](https://github.com/dotps1/HPWarranty/wiki/Get-HPWarrantyEntitlement)
+* [Get-HPIncWarrantyEntitlement]
+* [Get-HPEntWarrantyEntitlement]
+* [Get-HPSystemInformationFromCMDB]
 
 Example 1:
 ```PowerShell
@@ -28,7 +27,7 @@ Get-HPIncWarrantyEntitlement
 Example 2:
 ```PowerShell
 # Execute against remote HP workstation (must be on).
-Get-HPIncWarrantyEntitlement -ComputerName 'MyFriendsHP.ourdomain.org'
+Get-HPIncWarrantyEntitlement -ComputerName 'MyFriendsHP.ourdomain.org' -Credential (Get-Credential)
 ```
 
 Example 3:
