@@ -62,18 +62,26 @@ Function Get-HPEntWarrantyEntitlement {
 	)
 
     Begin {
-		$registrationRequest = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyRegistration.xml").Replace(
-            '<[!--UniversialDateTime--!]>', $([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
-        ).Replace(
-            '<[!--SerialNumber--!]>', $SerialNumber
-        )
+        if ($Script:HPEntRegistration.DateTime -lt (Get-Date).AddMinutes(-15)) {
+		    $registrationRequest = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyRegistration.xml").Replace(
+                '<[!--UniversialDateTime--!]>', $([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
+            ).Replace(
+                '<[!--SerialNumber--!]>', $SerialNumber
+            )
 
-        [Xml]$registration = Invoke-HPEntSOAPRequest -SOAPRequest $registrationRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
+            [Xml]$registration = Invoke-HPEntSOAPRequest -SOAPRequest $registrationRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
+
+            $Script:HPEntRegistration = @{
+                Gdid = $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
+                Token = $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.RegistrationToken
+                DateTime = Get-Date
+            }
+        }
         
         $request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyEntitlement.xml").Replace(
-            '<[!--Gdid--!]>', $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
+            '<[!--Gdid--!]>', $Script:HPEntRegistration.Gdid
         ).Replace(
-            '<[!--Token--!]>', $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.RegistrationToken
+            '<[!--Token--!]>', $Script:HPEntRegistration.Token
         ).Replace(
             '<[!--CountryCode--!]>', $CountryCode
         )

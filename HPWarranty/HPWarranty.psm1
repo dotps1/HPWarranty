@@ -8,3 +8,5 @@ foreach ($path in $paths) {
 	    . $_.ProviderPath 
     }
 }
+
+$Script:HPEntRegistration = @{ }
