@@ -23,12 +23,13 @@
 <a id="hpwarranty-powershell-module" class="anchor" href="#hpwarranty-powershell-module" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>HPWarranty PowerShell Module</h1>
 
 <h2>
-<a id="hp-it-would-seem-is-going-out-of-there-way-to-make-this-constantly-stop-working" class="anchor" href="#hp-it-would-seem-is-going-out-of-there-way-to-make-this-constantly-stop-working" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>HP it would seem is going out of there way to make this constantly stop working.</h2>
+<a id="finally-getting-this-working-a-bit-again-refractor-in-progress" class="anchor" href="#finally-getting-this-working-a-bit-again-refractor-in-progress" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>Finally getting this working a bit again, refractor in progress.</strong>
+</h2>
 
-<p>Currently, after being shutdown again....the Get-HPIncWarrantyEntitlement is working again.  However the Get-HPEntWarrantyEntitlement is not.</p>
+<p><a href="https://ci.appveyor.com/project/dotps1/hpwarranty"><img src="https://ci.appveyor.com/api/projects/status/7vp1jrn1vtssy635?svg=true" alt="Build status"></a></p>
 
 <p><del>This module can be installed from the <a href="https://www.powershellgallery.com/packages/HPWarranty/">PowerShellGallery</a>.  You need <a href="https://www.microsoft.com/en-us/download/details.aspx?id=44987">WMF 5</a> to use this feature.</del>
-currently disabled until the enterprise cmdlet is working again.</p>
+currently disabled until refractor is complete.</p>
 
 <div class="highlight highlight-source-powershell"><pre><span class="pl-c1">Install-Module</span> <span class="pl-k">-</span>Name HPWarranty</pre></div>
 
@@ -40,9 +41,9 @@ This is still very beta, so please report any issues.  Thanks.</p>
 <a id="hpwarranty-cmdlets" class="anchor" href="#hpwarranty-cmdlets" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>HPWarranty Cmdlets</h2>
 
 <ul>
-<li><a href="https://github.com/dotps1/HPWarranty/wiki/Get-HPIncWarrantyEntitlement">Get-HPIncWarrantyEntitlement</a></li>
-<li><a href="https://github.com/dotps1/HPWarranty/wiki/Get-HPSystemInformationFromCMDB">Get-HPSystemInformationFromCMDB</a></li>
-<li><a href="https://github.com/dotps1/HPWarranty/wiki/Get-HPWarrantyEntitlement">Get-HPEntWarrantyEntitlement</a></li>
+<li>Get-HPIncWarrantyEntitlement</li>
+<li>Get-HPEntWarrantyEntitlement</li>
+<li>Get-HPSystemInformationFromCMDB</li>
 </ul>
 
 <p>Example 1:</p>
@@ -53,7 +54,7 @@ This is still very beta, so please report any issues.  Thanks.</p>
 <p>Example 2:</p>
 
 <div class="highlight highlight-source-powershell"><pre><span class="pl-c"># Execute against remote HP workstation (must be on).</span>
-<span class="pl-c1">Get-HPIncWarrantyEntitlement</span> <span class="pl-k">-</span>ComputerName <span class="pl-s">'MyFriendsHP.ourdomain.org'</span></pre></div>
+<span class="pl-c1">Get-HPIncWarrantyEntitlement</span> <span class="pl-k">-</span>ComputerName <span class="pl-s">'MyFriendsHP.ourdomain.org'</span> <span class="pl-k">-</span>Credential <span class="pl-k">(</span><span class="pl-c1">Get-Credential</span><span class="pl-k">)</span></pre></div>
 
 <p>Example 3:</p>
 
