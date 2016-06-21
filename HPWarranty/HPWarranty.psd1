@@ -87,18 +87,19 @@ AliasesToExport = @()
 # List of all files packaged with this module
 FileList = 
                'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\en-US\LICENCE.md', 
-               'HPWarranty\en-US\about_HPWarranty.help.txt', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\en-US\about_HPWarranty.help.txt', 
                'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\en-US\HPWarranty.Help.xml', 
-               'HPWarranty\Public\Get-HPIncWarrantyEntitlement.ps1', 
-               'HPWarranty\Public\Get-HPSystemInformationFromCMDB.ps1', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Public\Get-HPIncWarrantyEntitlement.ps1', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Public\Get-HPSystemInformationFromCMDB.ps1', 
                'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\Public\Get-HPEntWarrantyEntitlment.ps1', 
-               'HPWarranty\Private\Get-HPProductNumberAndSerialNumber.ps1', 
-               'HPWarranty\Private\Invoke-HPIncSOAPRequest.ps1', 
-               'HPWarranty\Private\Invoke-HPEntSOAPRequest.ps1', 
-               'HPWarranty\RequestTemplates\HPEntWarrantyRegistration.xml', 
-               'HPWarranty\RequestTemplates\HPEntWarrantyEntitlement.xml', 
-               'HPWarranty\RequestTemplates\HPIncWarrantyEntitlement.xml', 
-               'HPWarranty\HPWarranty.psd1', 'HPWarranty\HPWarranty.psm1'
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Private\Get-HPProductNumberAndSerialNumber.ps1', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Private\Invoke-HPIncSOAPRequest.ps1', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Private\Invoke-HPEntSOAPRequest.ps1', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\RequestTemplates\HPEntWarrantyRegistration.xml', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\RequestTemplates\HPEntWarrantyEntitlement.xml', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\RequestTemplates\HPIncWarrantyEntitlement.xml', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\HPWarranty.psd1', 
+               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\HPWarranty.psm1'
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{

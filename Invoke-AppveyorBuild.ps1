@@ -25,7 +25,7 @@ try {
         throw "Build failed."
     } else {
         # Publish to the PowerShell Gallery if the build is successful.
-        Update-ModuleManifest -ModuleVersion $env:APPVEYOR_BUILD_VERSION -ReleaseNotes $env:APPVEYOR_REPO_COMMIT_MESSAGE -ErrorAction Stop
+        Update-ModuleManifest -Path ".\${env:APPVEYOR_PROJECT_NAME}\${env:APPVEYOR_PROJECT_NAME}.psd1" -ModuleVersion $env:APPVEYOR_BUILD_VERSION -ReleaseNotes "$env:APPVEYOR_REPO_COMMIT_MESSAGE" -ErrorAction Stop
         Publish-Module -Path .\$env:APPVEYOR_PROJECT_NAME -NuGetApiKey $env:POWERSHELL_GALLERY_API_TOKEN -ErrorAction Stop
     }
 } catch {
