@@ -21,7 +21,7 @@ GUID = '4fb06411-cfeb-47fd-bf25-c0fbbdc6a09b'
 Author = 'Thomas J. Malkewitz @dotps1 and Ben @beanska'
 
 # Company or vendor of this module
-CompanyName = 'Unknown'
+# CompanyName = 'Unknown'
 
 # Copyright statement for this module
 Copyright = '(c) 2015 Thomas J. Malkewitz @dotps1 and Ben @beanska. All rights reserved.'
@@ -51,23 +51,24 @@ ProcessorArchitecture = 'None'
 # RequiredModules = @()
 
 # Assemblies that must be loaded prior to importing this module
-RequiredAssemblies = @()
+# RequiredAssemblies = @()
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
-ScriptsToProcess = @()
+# ScriptsToProcess = @()
 
 # Type files (.ps1xml) to be loaded when importing this module
-TypesToProcess = @()
+# TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-FormatsToProcess = @()
+# FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = 
-               'Get-HPIncWarrantyEntitlement Get-HPSystemInformationFromCMDB Get-HPEntWarrantyEntitlement'
+FunctionsToExport = 'Get-HPIncWarrantyEntitlement',
+    'Get-HPSystemInformationFromCMDB', 
+    'Get-HPEntWarrantyEntitlement'
 
 # Cmdlets to export from this module
 CmdletsToExport = @()
@@ -85,21 +86,20 @@ AliasesToExport = @()
 # ModuleList = @()
 
 # List of all files packaged with this module
-FileList = 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\en-US\LICENCE.md', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\en-US\about_HPWarranty.help.txt', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\en-US\HPWarranty.Help.xml', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Public\Get-HPIncWarrantyEntitlement.ps1', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Public\Get-HPSystemInformationFromCMDB.ps1', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\Public\Get-HPEntWarrantyEntitlment.ps1', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Private\Get-HPProductNumberAndSerialNumber.ps1', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Private\Invoke-HPIncSOAPRequest.ps1', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\Private\Invoke-HPEntSOAPRequest.ps1', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\RequestTemplates\HPEntWarrantyRegistration.xml', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\RequestTemplates\HPEntWarrantyEntitlement.xml', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\RequestTemplates\HPIncWarrantyEntitlement.xml', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\HPWarranty.psd1', 
-               'C:\Users\tmalkewitz\Documents\GitHub\HPWarranty\HPWarranty\HPWarranty\HPWarranty.psm1'
+FileList = 'en-US\LICENCE.md', 
+    'en-US\about_HPWarranty.help.txt', 
+    'en-US\HPWarranty.Help.xml', 
+    'Public\Get-HPIncWarrantyEntitlement.ps1', 
+    'Public\Get-HPSystemInformationFromCMDB.ps1', 
+    'Public\Get-HPEntWarrantyEntitlment.ps1', 
+    'Private\Get-HPProductNumberAndSerialNumber.ps1', 
+    'Private\Invoke-HPIncSOAPRequest.ps1', 
+    'Private\Invoke-HPEntSOAPRequest.ps1', 
+    'RequestTemplates\HPEntWarrantyRegistration.xml', 
+    'RequestTemplates\HPEntWarrantyEntitlement.xml', 
+    'RequestTemplates\HPIncWarrantyEntitlement.xml', 
+    'HPWarranty.psd1', 
+    'HPWarranty.psm1'
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{
@@ -119,7 +119,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
+        ReleaseNotes = ''
 
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
@@ -129,7 +129,7 @@ PrivateData = @{
  } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
-HelpInfoURI = 'https://raw.githubusercontent.com/dotps1/HPWarranty/master/en-US/HPWarranty.Help.xml'
+HelpInfoURI = 'http://dotps1.github.io/HPWarranty'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
