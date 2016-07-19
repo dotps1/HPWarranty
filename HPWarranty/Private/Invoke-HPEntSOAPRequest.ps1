@@ -33,6 +33,7 @@
 #>
 Function Invoke-HPEntSOAPRequest  {
     
+    [CmdletBinding()]
     [OutputType(
         [Xml]
     )]

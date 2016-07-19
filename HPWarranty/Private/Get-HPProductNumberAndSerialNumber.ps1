@@ -36,9 +36,11 @@ Function Get-HPProductNumberAndSerialNumber {
 
     try {
         $cimSession = New-CimSession -ComputerName $ComputerName -Credential $Credential -SessionOption (New-CimSessionOption -Protocol Dcom) -ErrorAction Stop
-        $manufacturer = Get-CimInstance -CimSession $cimSession -ClassName Win32_ComputerSystem -ErrorAction Stop
+        $manufacturer = Get-CimInstance -CimSession $cimSession -ClassName Win32_ComputerSystem -ErrorAction Stop | 
+            Select-Object -ExpandProperty Manufacturer
+
         if ($manufacturer -eq 'Hewlett-Packard' -or $manufacturer -eq 'HP') {
-            Write-OutPut -InputObject ([HashTable]@{
+            Write-Output -InputObject ([HashTable]@{
                 SerialNumber = (Get-CimInstance -CimSession $cimSession -Class 'Win32_Bios' -ErrorAction Stop).SerialNumber.Trim()
                 ProductNumber = (Get-CimInstance -CimSession $cimSession -Class 'MS_SystemInformation' -Namespace 'root\WMI' -ErrorAction Stop).SystemSKU.Trim()
             })

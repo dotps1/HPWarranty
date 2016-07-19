@@ -113,7 +113,16 @@ Function Get-HPEntWarrantyEntitlement {
                 Write-Error -Message 'Failed to invoke SOAP request.'
                 continue
             }
+
+            if ($DebugPreference -eq 'Inquire') {
+                Write-Debug -Message 'Returning raw xml.'
+                return $entitlement
+            }
+
 			if ($null -ne $entitlement) {
+                if ($null -ne $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EIAError) {
+                    Write-Error -Message $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EIAError.ErrorText
+                }
                 if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
                     try {
                         $entitlement.Save("${XmlExportPath}\${SerialNumber}_entitlement.xml")
@@ -121,20 +130,13 @@ Function Get-HPEntWarrantyEntitlement {
                         Write-Error -Message 'Failed to save xml file.'
                     }
                 }
-
+                
                 [HashTable]$output = @{
                     'SerialNumber' = $SerialNumber
                     'ProductNumber' = $ProductNumber
-                    'ProductLineDescription' = $entitlement.GetElementsByTagName('ProductLineDescription').InnerText
-                    'ProductLineCode' = $entitlement.GetElementsByTagName('ProductLineCode').InnerText
-                    'ActiveWarrantyEntitlement' = $entitlement.GetElementsByTagName('ActiveWarrantyEntitlement').InnerText
-                    'OverallWarrantyStartDate' = $entitlement.GetElementsByTagName('OverallWarrantyStartDate').InnerText
-                    'OverallWarrantyEndDate' = $entitlement.GetElementsByTagName('OverallWarrantyEndDate').InnerText
-                    'OverallContractEndDate' = $entitlement.GetElementsByTagName('OverallContractEndDate').InnerText
-                    'WarrantyDeterminationDescription' = $entitlement.GetElementsByTagName('WarrantyDeterminationDescription').InnerText
-                    'WarrantyDeterminationCode' = $entitlement.GetElementsByTagName('WarrantyDeterminationCode').InnerText
-                    'WarrantyExtension' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
-                    'GracePeriod' = $entitlement.GetElementsByTagName('WarrantyExtension').InnerText
+                    'ActiveEntitlement' = $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EsReply.CombinedUnitEntitlement.ActiveWarrantyEntitlement
+                    'OverallEntitlementStartDate' = $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EsReply.CombinedUnitEntitlement.OverallWarrantyStartDate
+                    'OverallEntitlementEndDate' = $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EsReply.CombinedUnitEntitlement.OverallWarrantyEndDate
                 }
 
                 if ($PSCmdlet.ParameterSetName -eq 'Computer') {

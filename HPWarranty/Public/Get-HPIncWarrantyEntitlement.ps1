@@ -10,7 +10,8 @@
 	Param (
         [Parameter(
             ParameterSetName = 'Computer',
-            ValueFromPipeline = $true
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true
         )]
         [ValidateScript({
             if ($_ -eq $env:COMPUTERNAME) { 
@@ -90,54 +91,29 @@
                 Write-Error -Message 'Failed to invoke SOAP request.'
                 continue
             }
-
-            if ($null -eq $entitlement) {
-                if ($entitlement.GetElementsByTagName('messageComment') -like '*Hewlett Packard Enterprise*') {
-                    <# TODO: Invoke Get-HPEntWarrantyEntitlment.
-                    $hpEntParams = @{
-                        ProductNumber = $ProductNumber
-                        SerialNumber = $SerialNumber
-                        ErrorAction = $ErrorActionPreference
+            
+            if ($null -ne $entitlement) {
+                if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
+                    try {
+                        $entitlement.Save("${XmlExportPath}\${SerialNumber}_entitlement.xml")
+                    } catch {
+                        Write-Error -Message 'Failed to save xml file.'
                     }
-
-                    if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
-                        $hpEntParams.Add('XmlExportPath', $XmlExportPath)
-                    }
-                    Get-HPEntWarrantyEntitlement @hpEntParams
-
-                    continue #>
-                } elseif ($entitlement.SelectSingleNode("//*[local-name() = 'messageClassCode']").'#text' -eq 'ERROR') {
-                    Write-Error -Message $entitlement.SelectSingleNode("//*[local-name() = 'messageComment']").'#text'
-
-                    continue
-                } else {
-                    if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
-                        try {
-                            $entitlement.Save("${XmlExportPath}\${SerialNumber}_entitlement.xml")
-                        } catch {
-                            Write-Error -Message 'Failed to save xml file.'
-                        }
-                    }
-
-                    [HashTable]$output = @{
-                        'SerialNumber' = $SerialNumber
-                        'ProductNumber' = $ProductNumber
-                        'ProductLineDescription' = $entitlement.GetElementsByTagName('productLineDescription').InnerText
-                        'ProductLineCode' = $entitlement.GetElementsByTagName('productLineCode').InnerText
-                        'ServiceObligationHardwareActiveIndicator' = $node.serviceObligationHardwareActiveIndicator
-                        'ServiceObligationStartDate' = $node.serviceObligationStartDate
-                        'ServiceObligationEndDate' = $node.serviceObligationEndDate
-                        'DateSourceCode' = $node.dateSourceCode
-                        'DateSourceDescription' = $node.dateSourceDescription
-                        'WarrantyIdentifierCode' = $node.warrantyIdentifierCode
-                    }
-
-                    if ($PSCmdlet.ParameterSetName -eq 'Computer') {
-                        $output.Add('ComputerName', $ComputerName[$i])
-                    }
-
-                    Write-Output -InputObject $output
                 }
+
+                [HashTable]$output = @{
+                    'SerialNumber' = $SerialNumber
+                    'ProductNumber' = $ProductNumber
+                    'ActiveEntitlement' = $entitlement.Envelope.Body.retrieveServiceObligationResponsesByServiceObligationRequestsResponse.return.lnkServiceObligations.serviceObligationActiveIndicator
+                    'OverallEntitlementStartDate' = $entitlement.Envelope.Body.retrieveServiceObligationResponsesByServiceObligationRequestsResponse.return.lnkServiceObligations.serviceObligationStartDate
+                    'OverallEntitlementEndDate' = $entitlement.Envelope.Body.retrieveServiceObligationResponsesByServiceObligationRequestsResponse.return.lnkServiceObligations.serviceObligationEndDate
+                }
+
+                if ($PSCmdlet.ParameterSetName -eq 'Computer') {
+                    $output.Add('ComputerName', $ComputerName[$i])
+                }
+
+                Write-Output -InputObject $output
             } else {
                 Write-Error -Message 'No entitlement found.'
                 continue
