@@ -10,8 +10,7 @@
 	Param (
         [Parameter(
             ParameterSetName = 'Computer',
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true
+            ValueFromPipeline = $true
         )]
         [ValidateScript({
             if ($_ -eq $env:COMPUTERNAME) { 

@@ -33,7 +33,7 @@ Function  Get-HPSystemInformationFromCMDB {
 
         [Parameter()]
         [Switch]
-        $IntergratedSecurity,
+        $IntegratedSecurity,
 
         [Parameter(
             ValueFromPipelineByPropertyName = $true
