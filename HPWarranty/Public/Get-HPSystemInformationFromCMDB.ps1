@@ -49,7 +49,7 @@ Function  Get-HPSystemInformationFromCMDB {
         ConnectionString = "Server=$SqlServer,$ConnectionPort;Database=$Database;" 
     }
 
-    if ($IntergratedSecurity.IsPresent) {
+    if ($IntegratedSecurity.IsPresent) {
         $sqlConnection.ConnectionString += "Integrated Security=true;"
     } else {
         $sqlCredentials = Get-Credential
