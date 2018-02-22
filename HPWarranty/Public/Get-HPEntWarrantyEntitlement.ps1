@@ -62,21 +62,22 @@ Function Get-HPEntWarrantyEntitlement {
 	)
 
     Begin {
-        if ($Script:HPEntRegistration.DateTime -lt (Get-Date).AddMinutes($Script:HPEntRegistration.ThresholdInMinutes)) {
-		    $registrationRequest = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyRegistration.xml").Replace(
+        if ((Get-Date) -gt $Script:HPEntRegistration.TokenRenewDate ) {
+            $registrationRequest = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyRegistration.xml").Replace(
                 '<[!--UniversialDateTime--!]>', $([DateTime]::SpecifyKind($(Get-Date), [DateTimeKind]::Local).ToUniversalTime().ToString('yyyy\/MM\/dd hh:mm:ss \G\M\T'))
             ).Replace(
                 '<[!--SerialNumber--!]>', $SerialNumber
             )
-
+            write-verbose "Connecting to HP Instant Support"
             [Xml]$registration = Invoke-HPEntSOAPRequest -SOAPRequest $registrationRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
             $Script:HPEntRegistration = @{
                 Gdid = $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
                 Token = $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.RegistrationToken
-                DateTime = Get-Date
+                TokenRenewDate = (Get-Date).addminutes($Script:HPEntRegistration.ThresholdInMinutes)
             }
         }
+
         
         $request = (Get-Content -Path "$PSScriptRoot\..\RequestTemplates\HPEntWarrantyEntitlement.xml").Replace(
             '<[!--Gdid--!]>', $Script:HPEntRegistration.Gdid
@@ -88,18 +89,21 @@ Function Get-HPEntWarrantyEntitlement {
     }
 
     Process {
-        for ($i = 0; $i -lt $ComputerName.Length; $i++) {
+        foreach ($ComputerNameItem in $ComputerName) {
+            
             if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
-                if ($null -ne ($systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerName[$i] -Credential $Credential)) {
+                write-verbose "Fetching device information from $ComputerNameItem"
+                $systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerNameItem -Credential $Credential
+                if ($systemInformation) {
                     $ProductNumber = $systemInformation.ProductNumber
                     $SerialNumber = $systemInformation.SerialNumber
                 } else {
+                    write-error "Unable to retrieve product information from $ComputerName via WMI. Verify your credentials are correct and the device is reachable"
                     continue
-                }
-            } else {
-                $ComputerName[$i] = $null
+                }            
             }
-
+            
+            write-verbose "Looking up device with Product ID $ProductNumber and Serial Number $SerialNumber"
             try {
                 [Xml]$entitlement = (
                     Invoke-HPEntSOAPRequest -SOAPRequest $request.Replace(
@@ -118,8 +122,8 @@ Function Get-HPEntWarrantyEntitlement {
                 return $entitlement
             }
 
-			if ($null -ne $entitlement) {
-                if ($null -ne $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EIAError) {
+			if ($entitlement) {
+                if ($entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EIAError) {
                     Write-Error -Message $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EIAError.ErrorText
                 }
                 if ($PSBoundParameters.ContainsKey('XmlExportPath')) {
@@ -130,7 +134,7 @@ Function Get-HPEntWarrantyEntitlement {
                     }
                 }
                 
-                [HashTable]$output = @{
+                $output = [ordered]@{
                     'SerialNumber' = $SerialNumber
                     'ProductNumber' = $ProductNumber
                     'ActiveEntitlement' = $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EsReply.CombinedUnitEntitlement.ActiveWarrantyEntitlement
@@ -139,10 +143,12 @@ Function Get-HPEntWarrantyEntitlement {
                 }
 
                 if ($PSCmdlet.ParameterSetName -eq 'Computer') {
-                    $output.Add('ComputerName', $ComputerName[$i])
+                    $output.computername = $ComputerName[$i]
+                } else {
+                    $output.computername = $null
                 }
 
-                Write-Output -InputObject $output
+                [PSCustomObject]$output
             } else {
                 Write-Error -Message 'No entitlement found.'
                 continue
