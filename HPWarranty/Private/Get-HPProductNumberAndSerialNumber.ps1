@@ -31,7 +31,13 @@ Function Get-HPProductNumberAndSerialNumber {
         [ValidateNotNullOrEmpty()]
         [PSCredential]
         [System.Management.Automation.Credential()]
-        $Credential = $null
+        $Credential = $null,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [PSCredential]
+        [System.Management.Automation.Credential()]
+        $ESXCredential = $null
     )
     write-verbose "$Computername`: Attempting to retrieve Product Number and Serial Number automatically. Beginning Discovery..."
 
@@ -66,7 +72,7 @@ Function Get-HPProductNumberAndSerialNumber {
             Authentication = 'Basic'
             Verbose = $false
             ComputerName = $ComputerName
-            Credential = $Credential
+            Credential = {if ($ESXCredential) {$ESXcredential} else {$Credential}}
             SessionOption = New-CimSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck -Encoding utf8 -UseSsl
         }
         try {

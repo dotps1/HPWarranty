@@ -35,6 +35,14 @@ Function Get-HPEntWarrantyEntitlement {
         [System.Management.Automation.Credential()]
         $Credential = $null,
 
+        [Parameter(
+            ParameterSetName = 'Computer'
+        )]
+        [ValidateNotNullOrEmpty()]
+        [PSCredential]
+        [System.Management.Automation.Credential()]
+        $ESXCredential = $null,
+
 		[Parameter(
             Mandatory = $true,
             ParameterSetName = 'Static',
