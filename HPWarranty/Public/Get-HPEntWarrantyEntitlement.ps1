@@ -92,17 +92,16 @@ Function Get-HPEntWarrantyEntitlement {
         foreach ($ComputerNameItem in $ComputerName) {
             
             if (-not ($PSCmdlet.ParameterSetName -eq 'Static')) {
-                write-verbose "Fetching device information from $ComputerNameItem"
                 $systemInformation = Get-HPProductNumberAndSerialNumber -ComputerName $ComputerNameItem -Credential $Credential
                 if ($systemInformation) {
                     $ProductNumber = $systemInformation.ProductNumber
                     $SerialNumber = $systemInformation.SerialNumber
                 } else {
-                    write-error "Unable to retrieve product information from $ComputerName via WMI. Verify your credentials are correct and the device is reachable"
+                    write-error "Unable to retrieve product information from $ComputerName. Verify your credentials are correct and the device is reachable"
                     continue
                 }            
             }
-            
+
             write-verbose "Looking up device with Product ID $ProductNumber and Serial Number $SerialNumber"
             try {
                 [Xml]$entitlement = (
