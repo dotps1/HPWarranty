@@ -150,7 +150,7 @@ Function Get-HPEntWarrantyEntitlement {
                 }
 
                 if ($PSCmdlet.ParameterSetName -eq 'Computer') {
-                    $output.computername = $ComputerName[$i]
+                    $output.computername = $ComputerNameItem
                 } else {
                     $output.computername = $null
                 }
