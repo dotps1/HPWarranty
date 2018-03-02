@@ -2,20 +2,10 @@
     .SYNOPSIS
         Get the Product Number (SKU) and Serial Number from a system.
     .DESCRIPTION
-        Query the local or remote system for its Product Number (SKU) and Serial Number, return that object in a HashTable.
-    .INPUTS
-        None.
-    .OUTPUTS
-        System.Collections.HashTable
-    .PARAMETER ComputerName
-        The system to query.
-    .PARAMETER Credential
-        PSCredential object to authenticate with.
-    .LINK
-        http://dotps1.github.io/HPWarranty
+        Query the local or remote system for its Product Number (SKU) and Serial Number
 #>
 
-Function Get-HPProductNumberAndSerialNumber {
+Function Get-HPProductSerialNumber {
     
     [CmdletBinding()]
     [OutputType(
@@ -23,39 +13,37 @@ Function Get-HPProductNumberAndSerialNumber {
     )]
 
     Param (
-        [Parameter()]
+        [Parameter(Position=1)]
         [String]
         $ComputerName = $env:ComputerName,
 
         [Parameter()]
-        [ValidateNotNullOrEmpty()]
         [PSCredential]
         [System.Management.Automation.Credential()]
         $Credential = $null,
 
         [Parameter()]
-        [ValidateNotNullOrEmpty()]
         [PSCredential]
         [System.Management.Automation.Credential()]
-        $ESXCredential = $null
+        $ESXCredential
     )
     write-verbose "$Computername`: Attempting to retrieve Product Number and Serial Number automatically. Beginning Discovery..."
 
     #Detect if it is a Windows Server by checking for MSRPC port
     if ((test-port $ComputerName -port 135 -tcptimeout 2000 -verbose:$false).open) {
-        write-verbose "Windows Server Detected! Retrieving Product and Serial Number"
+        write-verbose "Windows Server Detected! Retrieving Product and Serial Number via WMI CIM"
         try {
-            $cimSession = New-CimSession -ComputerName $ComputerName -Credential $Credential -SessionOption (New-CimSessionOption -Protocol Dcom) -ErrorAction Stop
-            $manufacturer = Get-CimInstance -CimSession $cimSession -ClassName Win32_ComputerSystem -ErrorAction Stop | 
+            $cimSession = New-CimSession -ComputerName $ComputerName -Credential $Credential -SessionOption (New-CimSessionOption -Protocol Dcom) -ErrorAction Stop -verbose:$false
+            $manufacturer = Get-CimInstance -CimSession $cimSession -ClassName Win32_ComputerSystem -verbose:$false -ErrorAction Stop | 
                 Select-Object -ExpandProperty Manufacturer
 
-            if ($manufacturer -eq 'Hewlett-Packard' -or $manufacturer -eq 'HP') {
+            if ($manufacturer -match 'Hewlett-Packard|HP') {
                 return @{
-                    SerialNumber = (Get-CimInstance -CimSession $cimSession -Class 'Win32_Bios' -ErrorAction Stop).SerialNumber.Trim()
-                    ProductNumber = (Get-CimInstance -CimSession $cimSession -Class 'MS_SystemInformation' -Namespace 'root\WMI' -ErrorAction Stop).SystemSKU.Trim()
+                    SerialNumber = (Get-CimInstance -CimSession $cimSession -Class 'Win32_Bios' -verbose:$false -ErrorAction Stop).SerialNumber.Trim()
+                    ProductNumber = (Get-CimInstance -CimSession $cimSession -Class 'MS_SystemInformation' -verbose:$false -Namespace 'root\WMI' -ErrorAction Stop).SystemSKU.Trim()
                 }
             } else {
-                Write-Error -Message 'Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems.'
+                Write-Error -Message 'Computer Manufacturer is not of type Hewlett-Packard, HP, or HPE.  This cmdlet can only be used with HP systems.'
                 return $null
             }
         } catch {
@@ -72,17 +60,17 @@ Function Get-HPProductNumberAndSerialNumber {
             Authentication = 'Basic'
             Verbose = $false
             ComputerName = $ComputerName
-            Credential = {if ($ESXCredential) {$ESXcredential} else {$Credential}}
+            Credential = if ($ESXCredential) {$ESXcredential} elseif ($Credential -eq $null) {$ESXCredential = Get-Credential -Username "root" -Message "Please specify ESXi root credentials for $ComputerName";$ESXCredential} else {$Credential}
             SessionOption = New-CimSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck -Encoding utf8 -UseSsl
         }
         try {
-            $CIMSession = New-CimSession @CimSessionParams
-            $ServerInfo = Get-CimInstance -verbose:$false -cimsession $session -classname CIM_PhysicalPackage | 
+            $CIMSession = New-CimSession @CimSessionParams -erroraction stop
+            $ServerInfo = Get-CimInstance -cimsession $CIMSession -classname CIM_PhysicalPackage -erroraction stop -verbose:$false | 
                 where elementname -match 'Chassis' | 
                 select -first 1 manufacturer,
                     model,
                     serialnumber,
-                    @{N="productnumber";E={($PSItem.oemspecificstrings -match '^Product ID:') -replace '^Product ID: (\w{6}-\w{3})$','$1'}}
+                    @{N="productnumber";E={($PSItem.oemspecificstrings -match '^Product ID:') -replace '^Product ID: *([^ ]+) *$','$1'}}
 
             if ($ServerInfo.manufacturer -notmatch 'HP|Hewlett-Packard') {
                 Write-Error -Message "$ComputerName`: Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used with values from Hewlett-Packard systems."
@@ -94,7 +82,7 @@ Function Get-HPProductNumberAndSerialNumber {
             }
         }
         catch {
-            Write-Error -Message "Failed to retrive SerialNumber and ProductNumber from $ComputerName."
+            Write-Error -Message "Failed to retrieve SerialNumber and ProductNumber from $ComputerName."
             return $null
         }
     } else {
