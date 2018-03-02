@@ -12,7 +12,7 @@
         <Width>15</Width>
       </TableColumnHeader>
       <TableColumnHeader>
-        <Label>Coverage</Label>
+        <Label>Covered</Label>
         <Width>8</Width>
       </TableColumnHeader>
       <TableColumnHeader>
