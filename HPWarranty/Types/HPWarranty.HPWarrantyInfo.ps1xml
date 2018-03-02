@@ -26,10 +26,10 @@
         <Alignment>Right</Alignment>
       </TableColumnHeader>
       <TableColumnHeader>
-        <Alignment>Right</Alignment>
+        <Alignment>Left</Alignment>
       </TableColumnHeader>
       <TableColumnHeader>
-        <Alignment>Right</Alignment>
+        <Alignment>Left</Alignment>
       </TableColumnHeader>
     </TableHeaders>
     <TableRowEntries>

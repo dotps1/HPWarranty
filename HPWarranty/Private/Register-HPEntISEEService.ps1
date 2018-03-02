@@ -33,5 +33,7 @@ function Register-HPEntISEEService {
         
     }
     #Return a copy of the template so it doesn't get directly modified
-    $Script:HPEntRequestTemplate.PSObject.Copy()
+    if ($Script:HPEntRequestTemplate) {
+        $Script:HPEntRequestTemplate.PSObject.Copy()
+    }   
 }

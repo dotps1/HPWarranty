@@ -108,8 +108,9 @@ Function Get-HPEntWarrantyEntitlement {
                             #Prep the ISEE Request
                             $request = Register-HPEntISEEService $SerialNumberItem
                             if (-not $request) {
-                                write-error "Unable to register with HP Instant Support at this time. Disabling ISEE discovery method for this run."
-                                $QueryMethod = $QueryMethod | where {$PSItem -ne "ISEE"}
+                                write-error "Unable to register with HP Instant Support at this time. Disabling ISEE discovery method for this run unless it is the only specified method."
+                                $QueryMethodUpdate = $QueryMethod | where {$PSItem -ne "ISEE"}
+                                if ($QueryMethodUpdate) {$QueryMethod = $QueryMethodUpdate}
                                 continue
                             }
 
