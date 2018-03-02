@@ -2,7 +2,9 @@
     .SYNOPSIS
         Get the Product Number (SKU) and Serial Number from a system.
     .DESCRIPTION
-        Query the local or remote system for its Product Number (SKU) and Serial Number
+        Query the local or remote system for its Product Number (SKU) and Serial Number.
+        This function will first identify based on open ports whether this is a Windows or VMware system
+        And then query using the appropriate management interface
 #>
 
 Function Get-HPProductSerialNumber {
@@ -13,15 +15,18 @@ Function Get-HPProductSerialNumber {
     )]
 
     Param (
+        #The hostname or IP address you wish to query. Defaults to the local computer
         [Parameter(Position=1)]
         [String]
         $ComputerName = $env:ComputerName,
 
+        #The credentials you wish to use when connecting. Defaults to your logged in Windows Account if on a windows system.
         [Parameter()]
         [PSCredential]
         [System.Management.Automation.Credential()]
         $Credential = $null,
 
+        #The credentials to use on ESX servers. Specify this if they are different than the default credentials you specify.
         [Parameter()]
         [PSCredential]
         [System.Management.Automation.Credential()]
