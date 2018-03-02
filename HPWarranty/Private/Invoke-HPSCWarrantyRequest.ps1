@@ -18,12 +18,7 @@ function Invoke-HPSCWarrantyRequest {
     process {
         #TODO: Do bulk query, however trying to parse this is *super* annoying as HP doesn't make it separate tables on the output
         foreach ($SerialNumberItem in $SerialNumber) {
-            $requestBody = "rows%5B0%5D.item.serialNumber=$SerialNumberItem&rows%5B0%5D.item.countryCode=$CountryCode&rows%5B1%5D.item.serialNumber=&rows
-            %5B1%5D.item.countryCode=US&rows%5B2%5D.item.serialNumber=&rows%5B2%5D.item.countryCode=US&rows%5B3%5D.item.serialNumber
-            =&rows%5B3%5D.item.countryCode=US&rows%5B4%5D.item.serialNumber=&rows%5B4%5D.item.countryCode=US&rows%5B5%5D.item.serial
-            Number=&rows%5B5%5D.item.countryCode=US&rows%5B6%5D.item.serialNumber=&rows%5B6%5D.item.countryCode=US&rows%5B7%5D.item.
-            serialNumber=&rows%5B7%5D.item.countryCode=US&rows%5B8%5D.item.serialNumber=&rows%5B8%5D.item.countryCode=US&rows%5B9%5D
-            .item.serialNumber=&rows%5B9%5D.item.countryCode=US&submitButton=Submit"
+            $requestBody = "rows%5B0%5D.item.serialNumber=$SerialNumberItem&rows%5B0%5D.item.countryCode=$CountryCode&submitButton=Submit"
 
             $requestParams = @{
                 URI = ("https://" + $HPWCHostname + $HPWCPath)
