@@ -1,13 +1,71 @@
+<#
+.SYNOPSIS
+Retrieve the HPE warranty information about a device from HPE warranty data sources.
+
+.DESCRIPTION
+This will fetch the warranty information for an HP Enterprise system such as a server or storage, 
+and return a warranty detail object with a summary default view but contains all the detailed 
+information about the warranty.
+
+.EXAMPLE
+Get-HPEntWarrantyEntitlement
+Returns the warranty status and information summary for the localhost
+
+SerialNumber    Coverage      Start        End                   ProductDescription                        ComputerName
+------------    --------      -----        ---                   ------------------                        ------------
+AAA1234ABC      True          8/22/2016    6/30/2018             HP DL360G7 CTO Server                  mylocalcomputer
+
+.EXAMPLE
+Get-HPEntWarrantyEntitlement myserver1,myserver2
+Connects to both myserver1 and myserver2, retrieves the product and serial number, and returns the result
+
+SerialNumber    Coverage      Start        End                   ProductDescription                        ComputerName
+------------    --------      -----        ---                   ------------------                        ------------
+AAA1234ACD      True          8/22/2016    6/30/2018             HP DL380G7 CTO Server                        myserver1
+AAA1234AAA      False         8/22/2013    6/30/2016             HP DL560G7 CTO Server                        myserver2
+
+.EXAMPLE
+1..50 | foreach {"myserver" + $PSItem.tostring("00")} | Get-HPEntWarrantyEntitlement | Where {-not $PSItem.Covered}
+Retrieves the warranties for 50 servers named myserver01 through myserver50 and only return the ones that do not have coverage.
+
+.EXAMPLE
+Import-CSV ./MyListOfServers.csv | Get-HPEntWarrantyEntitlement
+Retrieves a list of warranties from a CSV with SerialNumber and ProductNumber columns. If it has a computername column, it will query that info instead from the server.
+
+.EXAMPLE
+Get-HPEntWarrantyEntitlement -QueryMethod ISEE,HPSC
+Fetch Warranty Info, but try the ISEE method first before trying HPSC method
+
+.EXAMPLE
+Get-HPEntWarrantyEntitlement | Format-List
+Show a more detailed summary for the device
+
+.EXAMPLE
+Get-HPEntWarrantyEntitlement | % WarrantyDetail
+See the detailed warranty information for the server.
+
+.EXAMPLE 
+Get-HPEntWarrantyEntitlement | % ContractDetail
+See the detailed service agreements for the server.
+
+.EXAMPLE 
+Get-HPEntWarrantyEntitlement | % OriginalOrderDetail
+See the original sales information the server (ISEE Query Method Only)
+
+.NOTES
+For backwards compatability with previous versions of this module, use the "-QueryMethod ISEE -AsHashTable" parameters. 
+You can force this behavior for all commands by adding the following two lines to your profile or prior to script execution:
+$PSDefaultParameterValues.add("Get-HPEntWarrantyEntitlement:AsHashTable",$true)
+$PSDefaultParameterValues.add("Get-HPEntWarrantyEntitlement:QueryMethod","ISEE")
+#>
 Function Get-HPEntWarrantyEntitlement {
     
-    [CmdletBinding(
-        DefaultParameterSetName = 'Computer'
-    )]
-    [OutputType(
-        [PSCustomObject]
-    )]
+    [CmdletBinding(DefaultParameterSetName = 'Computer')]
+    [OutputType([PSCustomObject])]
+    [OutputType([HashTable])]
     
 	Param (
+        #The hostname(s) or IP addresses of HP Enterprise servers to query. Default is the local hostname.
         [Parameter(
             ParameterSetName = 'Computer',
             ValueFromPipeline = $true,
@@ -17,6 +75,7 @@ Function Get-HPEntWarrantyEntitlement {
         [String[]]
         $ComputerName = $env:ComputerName,
 
+        #The credentials to use when connecting to the system. By default this will use your local Windows Credentials if on a Windows System, otherwise it will prompt.
         [Parameter(
             ParameterSetName = 'Computer'
         )]
@@ -24,6 +83,7 @@ Function Get-HPEntWarrantyEntitlement {
         [System.Management.Automation.Credential()]
         $Credential = $null,
 
+        #Separate credentials to use for ESXi discovery. This is useful if you want to specify multiple types of servers in the query but they have different credentials.
         [Parameter(
             ParameterSetName = 'Computer'
         )]
@@ -32,6 +92,7 @@ Function Get-HPEntWarrantyEntitlement {
         [System.Management.Automation.Credential()]
         $ESXCredential = $null,
 
+        #The serial number(s) of the device(s) you wish to retrieve support entitlements for
         [Parameter(
             Mandatory = $true,
             ParameterSetName = 'Static',
@@ -41,6 +102,7 @@ Function Get-HPEntWarrantyEntitlement {
 		[String[]]
         $SerialNumber = "GetHPEntWarrantyEntitlement",
 
+        #The product number of a device you wish to retrieve support entitlements for. Mandatory for ISEE query method.
 		[Parameter(
             ParameterSetName = 'Static',
             Position=2,
@@ -49,6 +111,7 @@ Function Get-HPEntWarrantyEntitlement {
 		[String]
         $ProductNumber,
 
+        #The Country Code for where the device was purchased. Defaults to US
 		[Parameter()]
 		[String]
         $CountryCode = 'US',
@@ -61,11 +124,13 @@ Function Get-HPEntWarrantyEntitlement {
         #Specify which query method to use. Valid values are "HPSC" and "ISEE". 
         #HPSC - HP Service Center Warranty Check HTML Screenscrape
         #ISEE - HP Instant Support Enterprise Edition XML Web Service
-        #If you specify both e.g. "HPSC","ISEE" then this cmdlet will attempt the first one specified and try the second if it fails. Default is "HPSC"
+        #If you specify both e.g. "HPSC","ISEE" then this cmdlet will attempt the first one specified and try the second if it fails. 
+        #If you only specify one, it will only attempt using that query method. Useful if one or the other warranty interfaces are down.
+        #The default behavior is to try HPSC first and ISEE as a fallback
         [Parameter()]
         [ValidateSet("HPSC","ISEE")]
         [String[]]
-        $QueryMethod = ("HPSC"),
+        $QueryMethod = ("HPSC","ISEE"),
 
         #Returns the data in the legacy hashtable format rather than the new object format
         [Switch]$AsHashTable
