@@ -5,6 +5,12 @@
         Query the local or remote system for its Product Number (SKU) and Serial Number.
         This function will first identify based on open ports whether this is a Windows or VMware system
         And then query using the appropriate management interface
+    .EXAMPLE
+        Get-HPProductAndSerialNumber
+    
+    .EXAMPLE
+        Get-HPProductAndSerialNumber MyVMWareHost -esxcredential (Get-Credential)
+        Retrieves the specified information from a VMware host, prompting for root credentials
 #>
 
 Function Get-HPProductSerialNumber {
@@ -16,7 +22,7 @@ Function Get-HPProductSerialNumber {
 
     Param (
         #The hostname or IP address you wish to query. Defaults to the local computer
-        [Parameter(Position=1)]
+        [Parameter(Position=1,ValueFromPipeline,ValueFromPipelineByPropertyName)]
         [String]
         $ComputerName = $env:ComputerName,
 
