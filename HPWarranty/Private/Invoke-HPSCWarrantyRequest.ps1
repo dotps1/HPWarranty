@@ -2,6 +2,7 @@ function Invoke-HPSCWarrantyRequest {
     [Cmdletbinding()]
     param (
         [Parameter(Mandatory)][String]$SerialNumber,
+        [Parameter()][String]$ProductNumber,
         [Parameter()][String]$CountryCode = "US"
     )
 
@@ -18,8 +19,7 @@ function Invoke-HPSCWarrantyRequest {
     process {
         #TODO: Do bulk query, however trying to parse this is *super* annoying as HP doesn't make it separate tables on the output
         foreach ($SerialNumberItem in $SerialNumber) {
-            $requestBody = "rows%5B0%5D.item.serialNumber=$SerialNumberItem&rows%5B0%5D.item.countryCode=$CountryCode&submitButton=Submit"
-
+            $requestBody = "rows%5B0%5D.item.serialNumber=$SerialNumberItem&$(if ($ProductNumber) {"rows%5B0%5D.item.productNumber=$ProductNumber&"})rows%5B0%5D.item.countryCode=$CountryCode&submitButton=Submit"
             $requestParams = @{
                 URI = ("https://" + $HPWCHostname + $HPWCPath)
                 Body = $requestBody

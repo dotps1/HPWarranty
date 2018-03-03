@@ -71,7 +71,7 @@ Function Get-HPProductSerialNumber {
             Authentication = 'Basic'
             Verbose = $false
             ComputerName = $ComputerName
-            Credential = if ($ESXCredential) {$ESXcredential} elseif ($Credential -eq $null) {$ESXCredential = Get-Credential -Username "root" -Message "Please specify ESXi root credentials for $ComputerName";$ESXCredential} else {$Credential}
+            Credential = if ($ESXCredential) {$ESXcredential} elseif ($null -eq $Credential) {$ESXCredential = Get-Credential -Username "root" -Message "Please specify ESXi root credentials for $ComputerName";$ESXCredential} else {$Credential}
             SessionOption = New-CimSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck -Encoding utf8 -UseSsl
         }
         try {

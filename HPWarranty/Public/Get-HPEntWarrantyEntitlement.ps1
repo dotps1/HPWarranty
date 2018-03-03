@@ -102,14 +102,14 @@ Function Get-HPEntWarrantyEntitlement {
 		[String[]]
         $SerialNumber = "GetHPEntWarrantyEntitlement",
 
-        #The product number of a device you wish to retrieve support entitlements for. Mandatory for ISEE query method.
+        #The product number of a device you wish to retrieve support entitlements for. Mandatory for ISEE query method and some devices such as storage.
 		[Parameter(
             ParameterSetName = 'Static',
             Position=2,
             ValueFromPipeLineByPropertyName = $true
         )]
 		[String]
-        $ProductNumber,
+        $ProductNumber = $null,
 
         #The Country Code for where the device was purchased. Defaults to US
 		[Parameter()]
@@ -167,7 +167,7 @@ Function Get-HPEntWarrantyEntitlement {
                     switch ($QueryMethodItem) {
                         "HPSC" {
                             write-verbose "Looking up device with Serial Number $SerialNumberItem$(if ($ProductNumber) {`" and Product ID $ProductNumber`"}) via HPSC method"
-                            $output = Invoke-HPSCWarrantyRequest -SerialNumber $SerialNumberItem -CountryCode $CountryCode
+                            $output = Invoke-HPSCWarrantyRequest -SerialNumber $SerialNumberItem -CountryCode $CountryCode -ProductNumber $ProductNumber
                         }
                         "ISEE" {
                             #Prep the ISEE Request
@@ -211,7 +211,7 @@ Function Get-HPEntWarrantyEntitlement {
                                         write-warning "This system was not found in the HPE ISEE database but may be covered in the HPSC or HP Consumer warranty databases" 
                                         if ($QueryMethod -contains "HPSC") {
                                             write-warning "Re-Attempting using HPSC method..."
-                                            $output = Invoke-HPSCWarrantyRequest -SerialNumber $SerialNumberItem -CountryCode $CountryCode
+                                            $output = Invoke-HPSCWarrantyRequest -SerialNumber $SerialNumberItem -CountryCode $CountryCode -ProductNumber $ProductNumber
                                         } else {
                                             continue
                                         }
@@ -273,7 +273,7 @@ Function Get-HPEntWarrantyEntitlement {
                     #Deliver the warranty report
                     if ($AsHashTable) {
                         #Legacy compatability format
-                        [ordered]@{
+                        @{
                             SerialNumber = $output.SerialNumber
                             ProductNumber = $output.ProductNumber
                             OverallEntitlementStartDate = $OverallCoverageStartDate
