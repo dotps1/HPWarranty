@@ -103,7 +103,7 @@ function ConvertFrom-HPSCWarrantyResponse {
     if (-not $ProductDescriptionRaw) {
         $ProductDescriptionRaw = ($WebRequest.ParsedHtml.IHTMLDocument3_getElementsByTagName("td") | where id -match '^product_description_' | select -first 1).innertext.trim()
     }
-    if (-not $ProductDescriptionRaw) {write-error "Unable to find a warranty table in the response. Maybe HPE changed the format and broke this query format?"}
+    if (-not $ProductDescriptionRaw) {write-error "Unable to find a warranty table in the response. Maybe HPE changed the format and broke this query format?"; continue}
     
     $ProductDescription = $ProductDescriptionRaw -replace $ProductDescriptionAndSerialNumberRegEx,'$1'
     $returnedSerialNumber = $ProductDescriptionRaw -replace $ProductDescriptionAndSerialNumberRegEx,'$2'
@@ -146,5 +146,9 @@ function ConvertFrom-HPSCWarrantyResponse {
         'ContractDetail' = $contracts
         'OriginalOrderDetail' = $null
     }
-    $returnObject
+
+    #If the returned object at least has a serial number, return it, otherwise skip
+    if ($returnObject.SerialNumber) {
+        $returnObject
+    }
 }

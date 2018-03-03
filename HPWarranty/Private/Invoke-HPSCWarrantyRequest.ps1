@@ -33,6 +33,14 @@ function Invoke-HPSCWarrantyRequest {
                     write-error ("$SerialNumber`: Error occurred during HPSC query - " + $responseError.InnerText.trim())
                     continue
                 }
+                
+                #Handle the error if a product ID is required
+                $productNumberNeededError = $response.ParsedHtml.IHTMLDocument3_getElementsByTagName("div") | where classname -match 'hpui-user-error-text'
+                if ($productNumberNeededError) {
+                    write-error "$SerialNumberItem`: $($productNumberNeededError.InnerText.trim())"
+                    continue
+                }
+
                 ConvertFrom-HPSCWarrantyResponse $response -SerialNumber $SerialNumber
             } 
             else {
