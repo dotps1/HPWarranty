@@ -4,8 +4,8 @@ $timestamp = Get-Date -uformat "%Y%m%d-%H%M%S"
 $resultsFile = "Results_${timestamp}.xml"
 
 $NetFrameworkRelease = Get-ChildItem "HKLM:SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\" | Get-ItemPropertyValue -Name Release
-write-verbose "Powershell Version: $($PSversionTable.psversion.tostring())"
-write-verbose ".NET Framework Release: $NetFrameworkRelease"
+"Powershell Version: $($PSversionTable.psversion.tostring())"
+".NET Framework Release: $NetFrameworkRelease"
 
 Import-Module -Name Pester -Force -ErrorAction Stop
 Import-Module -Name PSScriptAnalyzer -Force -ErrorAction Stop
