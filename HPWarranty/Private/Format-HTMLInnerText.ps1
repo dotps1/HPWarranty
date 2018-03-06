@@ -3,7 +3,7 @@ function Format-HTMLInnerText {
     #Extract the text
     $result = $inputobject.innertext
     #Convert it fron HTML
-    $result = [System.Web.HTTPUtility]::HtmlDecode($result)
+    $result = [System.Net.WebUtility]::HtmlDecode($result)
     #Remove extra whitespaces
     $result = $result -replace "\s+"," "
  
