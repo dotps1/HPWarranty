@@ -1,6 +1,6 @@
 # http://www.appveyor.com/docs/appveyor-yml
 
-os: WMF 5
+image: Visual Studio 2017
 skip_commits:
   message: /updated readme.*/
 install:
