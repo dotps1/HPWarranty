@@ -11,10 +11,10 @@ Describe "HPWarranty API Operational Tests" {
 
         #These serial numbers were found on public google image searches
         It "Serial Number MXQ84504T0 is not covered" {
-            ($SNs[0] | Get-HPEntWarrantyEntitlement -warningaction silentlycontinue).Covered | Should -Be $false
+            ($SNs[0] | Get-HPEntWarrantyEntitlement -warningaction silentlycontinue).Covered | Should Be $false
         }
         It "Serial Number MX263000LM is covered" {
-            ($SNs[1] | Get-HPEntWarrantyEntitlement -warningaction silentlycontinue).Covered | Should -Be $true
+            ($SNs[1] | Get-HPEntWarrantyEntitlement -warningaction silentlycontinue).Covered | Should Be $true
         }
     }
 }

@@ -1,4 +1,4 @@
-#requires -Module Pester, PSScriptAnalyzer
+#requires -module PSScriptAnalyzer,Pester
 
 #Move out of tests to the subdirectory of the modulepwd
 if ((get-item .).Name -match 'Tests') {Set-Location $PSScriptRoot\..}
