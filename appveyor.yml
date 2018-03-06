@@ -1,11 +1,11 @@
 # http://www.appveyor.com/docs/appveyor-yml
 
-os: WMF 5
+image: Visual Studio 2015
 skip_commits:
   message: /updated readme.*/
 install:
-  - ps: Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Confirm:$false -Force -ErrorAction Stop | Out-Null
-  - ps: Install-Module -Name Configuration, Pester, PSScriptAnalyzer -Confirm:$false -Force -ErrorAction SilentlyContinue | Out-Null
+#  - ps: Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Confirm:$false -Force -ErrorAction Stop | Out-Null
+  - ps: Install-Module -Name Pester,PSScriptAnalyzer -Confirm:$false -Force -ErrorAction Stop -SkipPublisherCheck
 build: off
 test_script:
   - ps: . .\Invoke-AppveyorBuild.ps1
