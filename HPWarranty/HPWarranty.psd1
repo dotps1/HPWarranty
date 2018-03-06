@@ -60,10 +60,10 @@ ProcessorArchitecture = 'None'
 # TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-FormatsToProcess = @('./Types/*.ps1xml')
+FormatsToProcess = @('Types\*.ps1xml')
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('./SubModules/PowerHTML/PowerHtml.psd1')
+NestedModules = @('SubModules\PowerHTML\PowerHtml.psd1')
 
 # Functions to export from this module
 # FunctionsToExport = @('*')
