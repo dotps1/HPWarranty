@@ -1,0 +1,3 @@
+[submodule ".\\HPWarranty\\SubModules\\PowerHTML"]
+	path = .\\HPWarranty\\SubModules\\PowerHTML
+	url = https://github.com/JustinGrote/PowerHTML

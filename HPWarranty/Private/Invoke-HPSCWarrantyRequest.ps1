@@ -25,17 +25,17 @@ function Invoke-HPSCWarrantyRequest {
                 Body = $requestBody
                 Method = "POST"
             }
-            $response = invoke-webrequest @requestParams -verbose:$false
+            $response = invoke-webrequest -UseBasicParsing @requestParams -verbose:$false | ConvertFrom-HTML
 
             if ($response) {
-                $responseError = $response.ParsedHtml.IHTMLDocument3_getElementsByTagName("span") | where classname -match 'hpui-system-error-text' | select -first 1
+                $responseError = $response.SelectSingleNode('//span[@class="hpui-system-error-text"]')
                 if ($responseError) {
                     write-error ("$SerialNumber`: Error occurred during HPSC query - " + $responseError.InnerText.trim())
                     continue
                 }
                 
                 #Handle the error if a product ID is required
-                $productNumberNeededError = $response.ParsedHtml.IHTMLDocument3_getElementsByTagName("div") | where classname -match 'hpui-user-error-text'
+                $productNumberNeededError = $response.SelectSingleNode('//div[@class="hpui-user-error-text"]')
                 if ($productNumberNeededError) {
                     write-error "$SerialNumberItem`: $($productNumberNeededError.InnerText.trim())"
                     continue
