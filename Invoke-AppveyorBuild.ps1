@@ -32,6 +32,4 @@ try {
         Write-Verbose "Auto Publish of Module Disabled"
         #Publish-Module -Path .\$env:APPVEYOR_PROJECT_NAME -NuGetApiKey $env:POWERSHELL_GALLERY_API_TOKEN -Verbose -ErrorAction Stop   
     }
-} catch {
-    throw $_
 }
