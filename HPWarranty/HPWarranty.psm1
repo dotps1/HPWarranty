@@ -5,10 +5,12 @@ foreach ($NetAssembly in $NetAssemblies) {
 }
 
 #Load Powershell Module submodules if present
+<#
 $SubModules = Get-Childitem -Path $PSScriptRoot\Submodules -ErrorAction SilentlyContinue
 foreach ($SubModuleItem in $SubModules) {
 	Import-Module $SubModuleItem.fullname -ErrorAction Stop
 }
+#>
 
 #Get public and private function definition files.
 $PublicFunctions  = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
