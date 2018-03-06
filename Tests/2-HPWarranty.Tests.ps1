@@ -16,10 +16,5 @@ Describe "HPWarranty API Operational Tests" {
         It "Serial Number MX263000LM is covered" {
             ($SNs[1] | Get-HPEntWarrantyEntitlement -warningaction silentlycontinue).Covered | Should -Be $true
         }
-
-
-
-
-
     }
 }
