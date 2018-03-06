@@ -41,7 +41,7 @@ function Invoke-HPSCWarrantyRequest {
                     continue
                 }
 
-                ConvertFrom-HPSCWarrantyResponse2 $response -SerialNumber $SerialNumber
+                ConvertFrom-HPSCWarrantyResponse $response -SerialNumber $SerialNumber
             } 
             else {
                 write-error "Unable to retrieve warranty information for $SerialNumberItem via HPSC method"
