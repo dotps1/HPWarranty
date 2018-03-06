@@ -1,4 +1,4 @@
-function ConvertFrom-HPSCWarrantyResponse2 {
+function ConvertFrom-HPSCWarrantyResponse {
     param(
         [Parameter(Mandatory = $true)]
         [HtmlAgilityPack.HtmlNode] $WebRequest,
