@@ -1,8 +1,9 @@
-#requires -Modules Configuration, Pester, PSScriptAnalyzer
 Set-Location -Path $env:APPVEYOR_BUILD_FOLDER -ErrorAction Stop
 
 $timestamp = Get-Date -uformat "%Y%m%d-%H%M%S"
 $resultsFile = "Results_${timestamp}.xml"
+
+get-command test-modulemanifest
 
 Import-Module -Name Pester -Force -ErrorAction Stop
 Import-Module -Name PSScriptAnalyzer -Force -ErrorAction Stop
