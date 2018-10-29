@@ -49,8 +49,8 @@ Function Invoke-HPEntSOAPRequest  {
             Mandatory = $true
         )]
         [ValidateSet(
-            'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx',
-            'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx'
+            'https://api.support.hpe.com/v1/ClientRegistration/ClientRegistrationService.asmx',
+            'https://api.support.hpe.com/v1/EntitlementCheck/EntitlementCheckService.asmx'
         )]
         [String]
         $Url,
