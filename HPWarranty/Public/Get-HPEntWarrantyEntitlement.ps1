@@ -69,7 +69,7 @@ Function Get-HPEntWarrantyEntitlement {
                 '<[!--SerialNumber--!]>', $SerialNumber
             )
 
-            [Xml]$registration = Invoke-HPEntSOAPRequest -SOAPRequest $registrationRequest -URL 'https://services.isee.hp.com/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
+            [Xml]$registration = Invoke-HPEntSOAPRequest -SOAPRequest $registrationRequest -URL 'https://api.support.hpe.com/v1/ClientRegistration/ClientRegistrationService.asmx' -Action 'http://www.hp.com/isee/webservices/RegisterClient2'
 
             $Script:HPEntRegistration = @{
                 Gdid = $registration.Envelope.Body.RegisterClient2Response.RegisterClient2Result.Gdid
@@ -106,7 +106,7 @@ Function Get-HPEntWarrantyEntitlement {
                         '<[!--ProductNumber--!]>', $ProductNumber
                     ).Replace(
                         '<[!--SerialNumber--!]>', $SerialNumber
-                    ) -Url 'https://services.isee.hp.com/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
+                    ) -Url 'https://api.support.hpe.com/v1/EntitlementCheck/EntitlementCheckService.asmx' -Action 'http://www.hp.com/isee/webservices/GetOOSEntitlementList2'
                 ).Envelope.Body.GetOOSEntitlementList2Response.GetOOSEntitlementList2Result.Response
             } catch {
                 Write-Error -Message 'Failed to invoke SOAP request.'
