@@ -3,8 +3,8 @@
 Retrieve the HPE warranty information about a device from HPE warranty data sources.
 
 .DESCRIPTION
-This will fetch the warranty information for an HP Enterprise system such as a server or storage, 
-and return a warranty detail object with a summary default view but contains all the detailed 
+This will fetch the warranty information for an HP Enterprise system such as a server or storage,
+and return a warranty detail object with a summary default view but contains all the detailed
 information about the warranty.
 
 .EXAMPLE
@@ -44,26 +44,26 @@ Show a more detailed summary for the device
 Get-HPEntWarrantyEntitlement | % WarrantyDetail
 See the detailed warranty information for the server.
 
-.EXAMPLE 
+.EXAMPLE
 Get-HPEntWarrantyEntitlement | % ContractDetail
 See the detailed service agreements for the server.
 
-.EXAMPLE 
+.EXAMPLE
 Get-HPEntWarrantyEntitlement | % OriginalOrderDetail
 See the original sales information the server (ISEE Query Method Only)
 
 .NOTES
-For backwards compatability with previous versions of this module, use the "-QueryMethod ISEE -AsHashTable" parameters. 
+For backwards compatability with previous versions of this module, use the "-QueryMethod ISEE -AsHashTable" parameters.
 You can force this behavior for all commands by adding the following two lines to your profile or prior to script execution:
 $PSDefaultParameterValues.add("Get-HPEntWarrantyEntitlement:AsHashTable",$true)
 $PSDefaultParameterValues.add("Get-HPEntWarrantyEntitlement:QueryMethod","ISEE")
 #>
 Function Get-HPEntWarrantyEntitlement {
-    
+
     [CmdletBinding(DefaultParameterSetName = 'Computer')]
     [OutputType([PSCustomObject])]
     [OutputType([HashTable])]
-    
+
 	Param (
         #The hostname(s) or IP addresses of HP Enterprise servers to query. Default is the local hostname.
         [Parameter(
@@ -120,17 +120,17 @@ Function Get-HPEntWarrantyEntitlement {
         [ValidateNotNullOrEmpty()]
         [String]
         $XmlExportPath = $null,
-        
-        #Specify which query method to use. Valid values are "HPSC" and "ISEE". 
+
+        #Specify which query method to use. Valid values are "HPSC" and "ISEE".
         #HPSC - HP Service Center Warranty Check HTML Screenscrape
         #ISEE - HP Instant Support Enterprise Edition XML Web Service
-        #If you specify both e.g. "HPSC","ISEE" then this cmdlet will attempt the first one specified and try the second if it fails. 
+        #If you specify both e.g. "HPSC","ISEE" then this cmdlet will attempt the first one specified and try the second if it fails.
         #If you only specify one, it will only attempt using that query method. Useful if one or the other warranty interfaces are down.
         #The default behavior is to try HPSC first and ISEE as a fallback
         [Parameter()]
         [ValidateSet("HPSC","ISEE")]
         [String[]]
-        $QueryMethod = ("HPSC","ISEE"),
+        $QueryMethod = "HPSC",
 
         #Returns the data in the legacy hashtable format rather than the new object format
         [Switch]$AsHashTable
@@ -142,7 +142,10 @@ Function Get-HPEntWarrantyEntitlement {
             Credential = $Credential
             ESXCredential = $ESXCredential
         }
-
+        #ISEE no longer works, so depreciating this code.
+        if ($QueryMethod -contains $ISEE) {
+            throw "Legacy ISEE query method has been retired (HP shut down the servers), please use HPSC from now on."
+        }
         if (($QueryMethod -contains "ISEE") -and ($PSCmdlet.ParameterSetName -match 'Static') -and (-not $ProductNumber)) {
             throw "ISEE query method specified but -ProductNumber not specified. You must specify a product number for this query method. If you don't know your product number, try the '-QueryMethod HPSC' parameter"
         }
@@ -169,6 +172,7 @@ Function Get-HPEntWarrantyEntitlement {
                             write-verbose "Looking up device with Serial Number $SerialNumberItem$(if ($ProductNumber) {`" and Product ID $ProductNumber`"}) via HPSC method"
                             $output = Invoke-HPSCWarrantyRequest -SerialNumber $SerialNumberItem -CountryCode $CountryCode -ProductNumber $ProductNumber
                         }
+                        <#
                         "ISEE" {
                             #Prep the ISEE Request
                             $request = Register-HPEntISEEService $SerialNumberItem
@@ -208,7 +212,7 @@ Function Get-HPEntWarrantyEntitlement {
                             if ($entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EIAError) {
                                 switch ($entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EIAError.ErrorID) {
                                     214 {
-                                        write-warning "This system was not found in the HPE ISEE database but may be covered in the HPSC or HP Consumer warranty databases" 
+                                        write-warning "This system was not found in the HPE ISEE database but may be covered in the HPSC or HP Consumer warranty databases"
                                         if ($QueryMethod -contains "HPSC") {
                                             write-warning "Re-Attempting using HPSC method..."
                                             $output = Invoke-HPSCWarrantyRequest -SerialNumber $SerialNumberItem -CountryCode $CountryCode -ProductNumber $ProductNumber
@@ -220,10 +224,10 @@ Function Get-HPEntWarrantyEntitlement {
                                         Write-Error -Message $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.EIAError.ErrorText
                                         continue
                                     }
-            
+
                                 }
                             }
-                            
+
                             $entitlementInfo = $entitlement.'ISEE-GetOOSEntitlementInfoResponse'.Data.esreply.CombinedUnitEntitlement
                             if ($entitlementInfo) {
                                 $output = [ordered]@{
@@ -247,6 +251,7 @@ Function Get-HPEntWarrantyEntitlement {
                                 }
                             }
                         }
+                        #>
                     }
 
                     #If the query method succeded, don't try the next method and move on
@@ -289,7 +294,7 @@ Function Get-HPEntWarrantyEntitlement {
                         $returnObject | Add-Member -MemberType AliasProperty -Name End -Value OverallCoverageEndDate
                         $returnObject
                     }
-                    
+
                 } else {
                     write-error "No Entitlement was obtained using specified methods. Check that your network is operational and the APIs aren't under maintenance"
                     continue

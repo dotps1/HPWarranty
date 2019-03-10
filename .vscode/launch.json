@@ -7,9 +7,25 @@
         {
             "type": "PowerShell",
             "request": "launch",
+            "name": "PowerShell Interactive Session",
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
             "name": "PowerShell Launch Current File",
             "script": "${file}",
             "args": [],
+            "cwd": "${file}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Launch Current File w/Args Prompt",
+            "script": "${file}",
+            "args": [
+                "${command:SpecifyScriptArgs}"
+            ],
             "cwd": "${file}"
         },
         {
@@ -24,12 +40,13 @@
         {
             "type": "PowerShell",
             "request": "launch",
-            "name": "PowerShell Launch Current File w/Args Prompt",
+            "name": "PowerShell Launch Current File w/Args Prompt in Temporary Console",
             "script": "${file}",
             "args": [
                 "${command:SpecifyScriptArgs}"
             ],
-            "cwd": "${file}"
+            "cwd": "${file}",
+            "createTemporaryIntegratedConsole": true
         },
         {
             "type": "PowerShell",
@@ -41,7 +58,27 @@
         {
             "type": "PowerShell",
             "request": "launch",
-            "name": "PowerShell Interactive Session",
+            "name": "Run Pester Tests",
+            "script": "Invoke-Pester",
+            "args": [],
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "Run Invoke-Build",
+            "script": "Invoke-Build",
+            "args": [],
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "Run Invoke-Build with Arguments",
+            "script": "Invoke-Build",
+            "args": [
+                "${command:SpecifyScriptArgs}"
+            ],
             "cwd": "${workspaceRoot}"
         }
     ]

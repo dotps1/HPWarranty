@@ -2,8 +2,6 @@
 
 ## **Finally getting this working a bit again, refractor in progress.**
 
-[![Build status](https://ci.appveyor.com/api/projects/status/7vp1jrn1vtssy635?svg=true)](https://ci.appveyor.com/project/dotps1/hpwarranty)
-
 This module can be installed from the [PowerShellGallery](https://www.powershellgallery.com/packages/HPWarranty/).  You need [WMF 5](https://www.microsoft.com/en-us/download/details.aspx?id=44987) to use this feature.
 ```PowerShell
 Install-Module -Name HPWarranty
@@ -33,14 +31,6 @@ Get-HPIncWarrantyEntitlement -ComputerName 'MyFriendsHP.ourdomain.org' -Credenti
 
 Example 3:
 ```PowerShell
-# Execute for local HP Server
+# Execute for local HPE Server
 Get-HPEntWarrantyEntitlement
-```
-
-Example 4:
-```PowerShell
-# Get info from ConfigMgr DB and then get warranty info.
-# To use the Get-HPSystemInformationFromCMDB cmdlet, the MS_SystemInformation WMI Class needs to be inventoried.
-# This is not done by default, and will need to be done in your client settings.
-Get-HPSystemInformationFromCMDB -SqlServer 'mysccmserver' -Database 'CM_AB1' -IntergratedSecurity -ComputerName 'mycomputer' | Get-HPIncWarrantyEntitlement
 ```
