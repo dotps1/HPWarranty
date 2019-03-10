@@ -33,4 +33,4 @@ Example 3:
 ```PowerShell
 # Execute for local HPE Server
 Get-HPEntWarrantyEntitlement
-```
+```g
