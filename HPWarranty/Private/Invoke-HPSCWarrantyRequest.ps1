@@ -25,7 +25,11 @@ function Invoke-HPSCWarrantyRequest {
                 Body = $requestBody
                 Method = "POST"
             }
+            #Progress bar slows down Invoke-Web Request by a lot
+            $currentProgressPreference = $progressPreference
+            $progressPreference = 'silentlycontinue'
             $response = invoke-webrequest -UseBasicParsing @requestParams -verbose:$false | ConvertFrom-HTML
+            $progressPreference = $currentProgressPreference
 
             if ($response) {
                 $responseError = $response.SelectSingleNode('//span[@class="hpui-system-error-text"]')
@@ -33,7 +37,7 @@ function Invoke-HPSCWarrantyRequest {
                     write-error ("$SerialNumber`: Error occurred during HPSC query - " + $responseError.InnerText.trim())
                     continue
                 }
-                
+
                 #Handle the error if a product ID is required
                 $productNumberNeededError = $response.SelectSingleNode('//div[@class="hpui-user-error-text"]')
                 if ($productNumberNeededError) {
@@ -42,7 +46,7 @@ function Invoke-HPSCWarrantyRequest {
                 }
 
                 ConvertFrom-HPSCWarrantyResponse $response -SerialNumber $SerialNumber
-            } 
+            }
             else {
                 write-error "Unable to retrieve warranty information for $SerialNumberItem via HPSC method"
                 continue
