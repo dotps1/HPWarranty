@@ -39,6 +39,9 @@ Function Invoke-HPIncSOAPRequest {
     $soapWebRequest.ContentType = 'text/xml; charset=utf-8'
     $soapWebRequest.Accept = 'text/xml'
     $soapWebRequest.Method = 'POST'
+    $proxy = [System.Net.WebRequest]::GetSystemWebProxy()
+    $proxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials
+    $soapWebRequest.Proxy = $proxy
 
     try {
 	    $SOAPRequest.Save(
